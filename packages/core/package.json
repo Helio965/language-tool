@@ -1,0 +1,17 @@
+{
+  "name": "@english-ai/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Domínio, conteúdo, regras pedagógicas, camada de IA e casos de uso do English AI (independente de framework).",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.3"
+  }
+}

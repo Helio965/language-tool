@@ -1,0 +1,29 @@
+{
+  "name": "english-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Plataforma de aprendizado de inglês com Inteligência Artificial — MVP acadêmico",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @english-ai/web",
+    "dev:api": "npm run dev -w @english-ai/api",
+    "dev:full": "concurrently -k -n api,web -c blue,magenta \"npm run dev -w @english-ai/api\" \"npm run dev:http -w @english-ai/web\"",
+    "build": "npm run typecheck && npm run build -w @english-ai/api && npm run build -w @english-ai/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "start:api": "npm run start -w @english-ai/api",
+    "preview": "npm run preview -w @english-ai/web"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5",
+    "typescript": "^5.9.3"
+  }
+}
