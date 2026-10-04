@@ -1,7 +1,6 @@
-import { Check, Circle } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router';
-import { passwordChecks, validateRegistration, type FieldErrors } from '@english-ai/core';
+import { validateRegistration, type FieldErrors } from '@english-ai/core';
 import { Button } from '../../components/Button';
 import { Checkbox } from '../../components/Controls';
 import { InlineAlert } from '../../components/States';
@@ -12,6 +11,7 @@ import { useSession } from '../../app/session';
 import { ApiError, errorMessage } from '../../services';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import styles from './Auth.module.css';
+import { PasswordChecklist } from './PasswordChecklist';
 
 /** UC01 — Criar conta: apenas os dados necessários, validação em tempo real e feedback claro. */
 export function RegisterPage() {
@@ -105,17 +105,7 @@ export function RegisterPage() {
           onChange={(e) => update('password', e.target.value)}
           onBlur={() => blur('password')}
           error={visibleError('password')}
-          hint={
-            <ul className={styles.checks} aria-label="Requisitos da senha">
-              {passwordChecks(form.password).map((check) => (
-                <li key={check.id} className={check.ok ? styles.ok : undefined}>
-                  {check.ok ? <Check aria-hidden="true" /> : <Circle aria-hidden="true" />}
-                  {check.label}
-                  <span className="visually-hidden">{check.ok ? ' (atendido)' : ' (pendente)'}</span>
-                </li>
-              ))}
-            </ul>
-          }
+          hint={<PasswordChecklist password={form.password} />}
         />
         <PasswordField
           id="register-passwordConfirmation"

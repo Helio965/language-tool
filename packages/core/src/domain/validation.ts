@@ -68,16 +68,28 @@ export function validatePassword(password: string): string | null {
   return null;
 }
 
+export interface NewPasswordInput {
+  password: string;
+  passwordConfirmation: string;
+}
+
+/** Senha nova + confirmação: a mesma política no cadastro e na redefinição de senha. */
+export function validateNewPassword(input: NewPasswordInput): FieldErrors {
+  const errors: FieldErrors = {};
+  const password = validatePassword(input.password);
+  if (password) errors.password = password;
+  if (!input.passwordConfirmation) errors.passwordConfirmation = 'Confirme sua senha.';
+  else if (input.password !== input.passwordConfirmation) errors.passwordConfirmation = 'As senhas não coincidem.';
+  return errors;
+}
+
 export function validateRegistration(input: RegistrationInput): FieldErrors {
   const errors: FieldErrors = {};
   const name = validateName(input.name);
   const email = validateEmail(input.email);
-  const password = validatePassword(input.password);
   if (name) errors.name = name;
   if (email) errors.email = email;
-  if (password) errors.password = password;
-  if (!input.passwordConfirmation) errors.passwordConfirmation = 'Confirme sua senha.';
-  else if (input.password !== input.passwordConfirmation) errors.passwordConfirmation = 'As senhas não coincidem.';
+  Object.assign(errors, validateNewPassword(input));
   if (!input.acceptedTerms) errors.acceptedTerms = 'Para continuar, aceite os termos e a política de privacidade.';
   return errors;
 }

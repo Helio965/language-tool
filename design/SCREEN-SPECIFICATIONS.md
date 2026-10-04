@@ -11,15 +11,27 @@ Larguras de captura: celular 390px · tablet 820px · desktop 1440px.
 
 ## Públicas
 
-### 1. Boas-vindas — `/`
+### 1. Página pública — `/`
 
-![Boas-vindas no celular](./screenshots/mobile-01-boas-vindas.jpg)
+| Celular | Desktop |
+| --- | --- |
+| ![Página pública no celular](./screenshots/mobile-01-pagina-publica.jpg) | ![Página pública no desktop](./screenshots/desktop-01-pagina-publica.jpg) |
 
-- **Objetivo:** explicar a proposta em segundos e levar ao cadastro.
-- **Conteúdo:** marca → título "Inglês de verdade, no seu ritmo." (com marca-texto) → subtítulo → **Criar conta
-  grátis** · "Já tenho conta" → "Explorar demonstração com dados de exemplo" (só no modo demo, com aviso de que
-  os dados ficam no navegador) → prévia dos dois modos (Aprender / Conversar) com exemplo de conversa corrigida.
-- **Desktop:** duas colunas (texto + prévia). [desktop-01](./screenshots/desktop-01-boas-vindas.jpg)
+- **Objetivo:** apresentar o produto com clareza e levar ao cadastro, sem prometer o que não existe.
+- **Cabeçalho fixo:** logo · seções (Início, Como funciona, Aprender, Conversar, IA, Progresso, Segurança) ·
+  **Entrar** · **Criar conta**. Abaixo de 1100px: botão **Menu de seções**; abaixo de 600px, "Criar conta" entra no
+  menu.
+- **Conteúdo, na ordem:** hero (título "Aprenda inglês no seu ritmo, com uma IA que realmente explica." com
+  marca-texto, **Começar gratuitamente** · **Já tenho conta** · no modo demo "Explorar demonstração com dados de
+  exemplo" e o aviso de que os dados ficam no navegador, fatos do conteúdo, prévia de aula e conversa) → problema
+  (7 cartões) → como funciona (5 passos) → Modo Aprender (recursos + exercício corrigido) → Modo Conversação
+  (princípio "Naturalidade > correção excessiva" + conversa) → IA (capacidades + correção explicada) → progresso
+  (métricas + prévia "Exemplo ilustrativo") → personalização → privacidade e segurança → chamada final (fundo
+  azul-marinho, botão amarelo) → rodapé (Sobre o projeto, Produto, Conta, Informações, Legal).
+- **Estados:** com sessão, a tela não aparece (vai para a etapa pendente ou para o Início); erro ao preparar a
+  demonstração aparece abaixo do botão.
+- **Desktop:** hero em duas colunas; seções de modo alternam texto e exemplo; grades de 4/5 colunas.
+- Especificação de conteúdo e navegação: [UX-SPECIFICATION.md §3.1](../docs/UX-SPECIFICATION.md).
 
 ### 2. Criar conta — `/cadastro` (UC01, RF01)
 
@@ -41,7 +53,24 @@ Larguras de captura: celular 390px · tablet 820px · desktop 1440px.
   não aparece (só o toast "Você saiu da sua conta.").
 - Botão em carregamento "Entrando…"; um segundo clique/Enter durante o envio é ignorado.
 - Cartão com a conta de demonstração (modo demo).
-- Recuperação: mensagem neutra "Se existir uma conta com este e-mail…" (envio simulado no MVP).
+- Link **Esqueci minha senha** → `/recuperar-senha`.
+
+### 3.1 Recuperar senha — `/recuperar-senha` e Redefinir senha — `/redefinir-senha/:token`
+
+| Recuperar (simulação da demonstração) | Redefinir |
+| --- | --- |
+| ![Recuperar senha](./screenshots/mobile-20-recuperar-senha.jpg) | ![Redefinir senha](./screenshots/mobile-21-redefinir-senha.jpg) |
+
+- **Recuperar:** campo E-mail → **Enviar link de redefinição** ("Enviando…"). Resposta sempre igual: "Se existir uma
+  conta com este e-mail, enviaremos as instruções de recuperação." No modo http: "Confira a caixa de entrada e a
+  pasta de spam. O link vale por 15 minutos e só pode ser usado uma vez." No modo demo: cartão tracejado
+  **Simulação do modo demonstração** (nenhum e-mail real é enviado) com Para, Assunto e **Abrir o link de
+  redefinição**. Ações: **Voltar para o login** · **Usar outro e-mail**.
+- **Redefinir:** estados — verificando ("Verificando o link…") → **Criar uma senha nova** (Nova senha com
+  requisitos ao vivo, Confirme a nova senha, **Redefinir senha** / "Salvando…") → "Senha redefinida com sucesso." +
+  **Entrar**. Link indisponível: "Este link venceu", "Este link já foi usado" ou "Link inválido", com **Pedir um
+  novo link** e **Voltar para o login**. Falha de conexão: "Não foi possível verificar o link" + **Tentar de
+  novo**. O título recebe o foco a cada mudança de estado.
 
 ### 4. Termos e privacidade — `/termos-e-privacidade`
 
@@ -200,10 +229,10 @@ conversas. Cada alteração salva na hora com toast.
 Tabela de dados coletados (empilhada no celular) → o que vai para a IA → direitos → **Apagar todas as
 conversas** → **Excluir minha conta** (diálogo com senha).
 
-Depois de excluir: a pessoa vai para a página de boas-vindas com o toast "Sua conta e seus dados foram
+Depois de excluir: a pessoa vai para a página pública com o toast "Sua conta e seus dados foram
 excluídos."; Voltar não reabre telas privadas. Senha errada: mensagem no diálogo e campo limpo. Fechar e reabrir
 um diálogo começa do zero; **Cancelar** fica desabilitado enquanto a exclusão está em andamento.
 
 ### 19. Página não encontrada — `*`
 
-Mensagem amigável e botão para o Início (ou boas-vindas, sem sessão).
+Mensagem amigável e botão para o Início (ou para a página pública, sem sessão).

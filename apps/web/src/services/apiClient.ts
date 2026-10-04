@@ -23,6 +23,8 @@ import type {
   ProfileInput,
   ProgressOverview,
   RegistrationInput,
+  ResetPasswordInput,
+  ResetTokenStatus,
   ReviewQueueView,
   ReviewResult,
   ReviewSessionView,
@@ -35,6 +37,18 @@ import type {
 
 export type ApiMode = 'demo' | 'http';
 
+/** Resposta do pedido de recuperação de senha — a mesma exista a conta ou não. */
+export interface PasswordResetRequestResult {
+  message: string;
+  /** Validade do link enviado por e-mail, em minutos. */
+  expiresInMinutes: number;
+  /**
+   * Apenas no modo demonstração, que não envia e-mails: o que seria enviado, para quem testa o fluxo.
+   * null quando não haveria e-mail (nenhuma conta com o endereço neste navegador). Ausente no modo http.
+   */
+  simulatedEmail?: { to: string; subject: string; resetPath: string } | null;
+}
+
 export interface ApiClient {
   readonly mode: ApiMode;
 
@@ -43,7 +57,11 @@ export interface ApiClient {
   register(input: RegistrationInput): Promise<AccountState>;
   login(input: LoginInput): Promise<AccountState>;
   logout(): Promise<void>;
-  requestPasswordReset(email: string): Promise<string>;
+  requestPasswordReset(email: string): Promise<PasswordResetRequestResult>;
+  /** Situação do link de redefinição (válido, inválido, vencido ou já usado). */
+  checkPasswordResetToken(token: string): Promise<ResetTokenStatus>;
+  /** Define a senha nova. `sessionEnded`: a sessão deste navegador era da mesma conta e foi encerrada. */
+  resetPassword(input: ResetPasswordInput): Promise<{ sessionEnded: boolean }>;
   deleteAccount(password: string): Promise<void>;
   /** Apenas no modo demonstração: entra (ou cria) a conta de exemplo. */
   startDemo?(): Promise<AccountState>;

@@ -1,4 +1,4 @@
-import { DEMO, EXPIRED_MESSAGE, expect, exploreDemo, signIn, signOut, test } from './fixtures';
+import { DEMO, EXPIRED_MESSAGE, expect, exploreDemo, fillNewPassword, signIn, signOut, test } from './fixtures';
 
 /** Modo demonstração: dados no localStorage deste navegador, IA de demonstração. */
 
@@ -114,4 +114,51 @@ test('sem rolagem horizontal nas telas principais em 320px', async ({ page }) =>
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), path).toBeLessThanOrEqual(0);
   }
+});
+
+test('página pública no celular: menu, âncoras e ações de conta', async ({ page, consoleErrors }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1, name: /Aprenda inglês no seu ritmo/ })).toBeVisible();
+
+  const menu = page.getByRole('button', { name: 'Menu de seções' });
+  await expect(menu).toHaveAttribute('aria-expanded', 'false');
+  await menu.click();
+  await page.getByRole('navigation', { name: 'Seções da página' }).getByRole('link', { name: 'Conversar' }).click();
+  await expect(page).toHaveURL(/\/#conversar$/);
+  await expect(menu).toHaveAttribute('aria-expanded', 'false');
+  await expect(page.getByRole('heading', { level: 2, name: 'Pratique conversando, sem medo de errar' })).toBeInViewport();
+  await expect(page.locator('#conversar-title')).toBeFocused();
+
+  // Link do rodapé para outra seção e ação de conta do cabeçalho.
+  await page.getByRole('navigation', { name: 'Rodapé' }).getByRole('link', { name: 'Privacidade e segurança' }).click();
+  await expect(page).toHaveURL(/\/#seguranca$/);
+  await page.getByRole('banner').getByRole('link', { name: 'Entrar' }).click();
+  await expect(page).toHaveURL(/\/entrar$/);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
+  expect(consoleErrors).toEqual([]);
+});
+
+test('demonstração: recuperação de senha simulada, sem fingir que um e-mail foi enviado', async ({ page, consoleErrors }) => {
+  const NEW_PASSWORD = 'novaSenha9';
+  await exploreDemo(page);
+  await signOut(page);
+
+  await page.getByRole('link', { name: 'Esqueci minha senha' }).click();
+  // O login também tem um campo "E-mail": espera a nova tela antes de digitar.
+  await expect(page.getByRole('heading', { level: 1, name: 'Recuperar senha' })).toBeVisible();
+  await page.getByLabel('E-mail').fill(DEMO.email);
+  await page.getByRole('button', { name: 'Enviar link de redefinição' }).click();
+  const simulation = page.getByRole('region', { name: /Simulação do modo demonstração/ });
+  await expect(simulation.getByText('Nenhum e-mail real é enviado na demonstração.')).toBeVisible();
+  await simulation.getByRole('link', { name: 'Abrir o link de redefinição' }).click();
+
+  await fillNewPassword(page, NEW_PASSWORD);
+  await expect(page.getByRole('heading', { name: 'Senha redefinida com sucesso.' })).toBeVisible();
+  await page.getByRole('link', { name: 'Entrar' }).click();
+  await page.getByLabel('E-mail').fill(DEMO.email);
+  await page.getByLabel('Senha', { exact: true }).fill(NEW_PASSWORD);
+  await page.getByRole('button', { name: 'Entrar' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: /Alex/ })).toBeVisible();
+  expect(consoleErrors).toEqual([]);
 });

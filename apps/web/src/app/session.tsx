@@ -43,7 +43,18 @@ const SessionContext = createContext<SessionValue | null>(null);
 const CHANNEL_NAME = 'english-ai:session';
 
 /** Métodos que não exigem sessão: um UNAUTHENTICATED neles não significa "sessão expirou". */
-const PUBLIC_METHODS = new Set<PropertyKey>(['mode', 'bindSession', 'getSession', 'register', 'login', 'logout', 'requestPasswordReset', 'startDemo']);
+const PUBLIC_METHODS = new Set<PropertyKey>([
+  'mode',
+  'bindSession',
+  'getSession',
+  'register',
+  'login',
+  'logout',
+  'requestPasswordReset',
+  'checkPasswordResetToken',
+  'resetPassword',
+  'startDemo',
+]);
 
 /**
  * Envolve o cliente para avisar o SessionProvider de qualquer UNAUTHENTICATED (queries, mutations ou
@@ -258,6 +269,6 @@ export function pathForStep(step: AccountState['nextStep']): string {
 /** Só aceita caminhos internos como destino após o login (evita redirecionamentos para fora). */
 export function safeReturnPath(value: unknown): string | null {
   if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//')) return null;
-  if (/^\/(entrar|cadastro|recuperar-senha)?(\?|$)/.test(value)) return null;
+  if (/^\/(entrar|cadastro|recuperar-senha)?(\?|$)/.test(value) || value.startsWith('/redefinir-senha/')) return null;
   return value;
 }

@@ -1,5 +1,17 @@
 import type { Page } from '@playwright/test';
-import { EXPIRED_MESSAGE, expect, finishFirstAccess, PASSWORD, signIn, signOut, signUp, test } from './fixtures';
+import {
+  EXPIRED_MESSAGE,
+  expect,
+  fillNewPassword,
+  finishFirstAccess,
+  outboxFor,
+  PASSWORD,
+  resetLinkFor,
+  signIn,
+  signOut,
+  signUp,
+  test,
+} from './fixtures';
 
 /** Modo http: API + SQLite + sessão em cookie httpOnly. */
 
@@ -134,4 +146,95 @@ test('excluir a conta: vira visitante, Voltar não revela dados e o login é rec
   await expect(page.getByText('E-mail ou senha incorretos. Tente novamente.')).toBeVisible();
   // O único erro de console aceito é o 401 do login recusado.
   expect(consoleErrors.filter((error) => !/401/.test(error))).toEqual([]);
+});
+
+test('página pública → Criar conta → configuração → nivelamento → Início (e e-mail de boas-vindas)', async ({ page, consoleErrors }) => {
+  const email = unique('eli');
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1, name: /Aprenda inglês no seu ritmo/ })).toBeVisible();
+  // Modo http: nada de demonstração na página pública.
+  await expect(page.getByRole('button', { name: /demonstração/i })).toHaveCount(0);
+
+  await page.getByRole('link', { name: 'Começar gratuitamente' }).click();
+  await expect(page).toHaveURL(/\/cadastro$/);
+  await page.getByLabel('Nome').fill('Eli');
+  await page.getByLabel('E-mail').fill(email);
+  await page.getByLabel('Senha', { exact: true }).fill(PASSWORD);
+  await page.getByLabel('Confirme a senha').fill(PASSWORD);
+  await page.getByRole('checkbox').check();
+  await page.getByRole('button', { name: 'Criar conta' }).click();
+  await expect(page).toHaveURL(/\/configuracao$/);
+  await finishFirstAccess(page, 'Eli');
+  await expect(page).toHaveURL(/\/inicio$/);
+
+  await expect.poll(() => outboxFor(email, 'welcome').length).toBe(1);
+  const welcome = outboxFor(email, 'welcome')[0];
+  expect(welcome?.subject).toBe('Boas-vindas ao English AI');
+  expect(`${welcome?.html}${welcome?.text}`).not.toContain(PASSWORD);
+
+  // Com sessão, "/" leva ao Início em vez da página pública.
+  await page.goto('/');
+  await expect(page).toHaveURL(/\/inicio$/);
+  expect(consoleErrors).toEqual([]);
+});
+
+test('esqueci a senha: link por e-mail, senha nova, sessões antigas encerradas e link de uso único', async ({ page, browser, consoleErrors }) => {
+  const email = unique('gabi');
+  const NEW_PASSWORD = 'novaSenha9';
+  await signUp(page, 'Gabi', email);
+  await finishFirstAccess(page, 'Gabi');
+
+  // Outro aparelho conectado à mesma conta antes da troca de senha.
+  const other = await browser.newContext({ baseURL: 'http://localhost:4311' });
+  const otherPage = await other.newPage();
+  await signIn(otherPage, email);
+  await expect(otherPage).toHaveURL(/\/inicio$/);
+
+  // Neste navegador: visitante pedindo a recuperação.
+  await page.context().clearCookies();
+  await page.goto('/entrar');
+  await page.getByRole('link', { name: 'Esqueci minha senha' }).click();
+  // O login também tem um campo "E-mail": espera a nova tela antes de digitar.
+  await expect(page.getByRole('heading', { level: 1, name: 'Recuperar senha' })).toBeVisible();
+  await page.getByLabel('E-mail').fill(email);
+  await page.getByRole('button', { name: 'Enviar link de redefinição' }).click();
+  await expect(page.getByText('Se existir uma conta com este e-mail, enviaremos as instruções de recuperação.')).toBeVisible();
+  await expect(page.getByText(/Confira a caixa de entrada e a pasta de spam/)).toBeVisible();
+  await expect(page.getByText(/Simulação/)).toHaveCount(0);
+
+  const link = await resetLinkFor(email);
+  expect(link.startsWith('http://localhost:4311/redefinir-senha/')).toBe(true);
+  await page.goto(link);
+  await fillNewPassword(page, NEW_PASSWORD);
+  await expect(page.getByRole('heading', { name: 'Senha redefinida com sucesso.' })).toBeVisible();
+
+  // A sessão do outro aparelho acabou.
+  await otherPage.getByRole('link', { name: 'Progresso' }).first().click();
+  await expect(otherPage).toHaveURL(/\/entrar$/);
+  await expect(otherPage.getByText(EXPIRED_MESSAGE)).toBeVisible();
+  await other.close();
+
+  // Senha antiga recusada; a nova entra.
+  await page.getByRole('link', { name: 'Entrar' }).click();
+  await signIn(page, email, PASSWORD);
+  await expect(page.getByText('E-mail ou senha incorretos. Tente novamente.')).toBeVisible();
+  await signIn(page, email, NEW_PASSWORD);
+  await expect(page).toHaveURL(/\/inicio$/);
+
+  // O mesmo link não funciona de novo.
+  await page.goto(link);
+  await expect(page.getByRole('heading', { name: 'Este link já foi usado' })).toBeVisible();
+  // Únicos erros aceitos: os 401 do login recusado e da sessão encerrada no outro aparelho.
+  expect(consoleErrors.filter((error) => !/401/.test(error))).toEqual([]);
+});
+
+test('recuperação para e-mail sem conta: mesma resposta e nenhum e-mail', async ({ page, consoleErrors }) => {
+  const email = unique('ninguem');
+  await page.goto('/recuperar-senha');
+  await page.getByLabel('E-mail').fill(email);
+  await page.getByRole('button', { name: 'Enviar link de redefinição' }).click();
+  await expect(page.getByText('Se existir uma conta com este e-mail, enviaremos as instruções de recuperação.')).toBeVisible();
+  await page.waitForTimeout(300);
+  expect(outboxFor(email)).toEqual([]);
+  expect(consoleErrors).toEqual([]);
 });

@@ -5,6 +5,8 @@ import cors from 'cors';
 import express, { type Express } from 'express';
 import helmet from 'helmet';
 import type { AppServices } from '@english-ai/core';
+import { createEmailService, type EmailService } from '../email/emailService';
+import { DisabledMailer } from '../email/mailers';
 import type { Logger } from '../logger';
 import type { SessionTokens } from '../security/sessionTokens';
 import { errorHandler, notFound } from './middleware/errors';
@@ -12,6 +14,7 @@ import { authenticate, createRateLimiters, CSRF_HEADER, requireCsrfHeader, SESSI
 import { authRoutes } from './routes/authRoutes';
 import { conversationRoutes } from './routes/conversationRoutes';
 import { learningRoutes } from './routes/learningRoutes';
+import { passwordRoutes } from './routes/passwordRoutes';
 
 export interface AppOptions {
   services: AppServices;
@@ -23,12 +26,16 @@ export interface AppOptions {
   rateLimits?: RateLimitOptions;
   /** Pasta com o build do front-end para servir na mesma origem (opcional). */
   webDistPath?: string;
+  /** Envio de e-mails (boas-vindas, recuperação de senha). Sem ele, nenhum e-mail é enviado. */
+  email?: EmailService;
 }
 
 export function createApp(options: AppOptions): Express {
   const { services, tokens, logger } = options;
   const app = express();
   const limiters = createRateLimiters(options.rateLimits);
+  const email =
+    options.email ?? createEmailService({ mailer: new DisabledMailer(), logger, appUrl: options.corsOrigin.split(',')[0]?.trim() ?? '' });
 
   app.disable('x-powered-by');
   app.set('trust proxy', 1);
@@ -59,12 +66,22 @@ export function createApp(options: AppOptions): Express {
     next();
   });
   app.use('/api', requireCsrfHeader);
-  app.use('/api', authenticate(tokens));
+  app.use('/api', authenticate(tokens, (userId) => services.auth.sessionVersion(userId)));
 
   app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', aiProvider: options.aiProvider });
   });
-  app.use('/api', authRoutes({ services, tokens, secureCookies: options.secureCookies, authLimiter: limiters.auth }));
+  app.use('/api', authRoutes({ services, tokens, email, secureCookies: options.secureCookies, authLimiter: limiters.auth }));
+  app.use(
+    '/api',
+    passwordRoutes({
+      services,
+      email,
+      secureCookies: options.secureCookies,
+      requestLimiter: limiters.passwordReset,
+      authLimiter: limiters.auth,
+    }),
+  );
   app.use('/api', conversationRoutes({ services, aiLimiter: limiters.ai }));
   app.use('/api', learningRoutes({ services, aiLimiter: limiters.ai }));
   app.use('/api', notFound);

@@ -3,10 +3,11 @@ import { AppShell, type RouteHandle } from '../layouts/AppShell';
 import { ForgotPasswordPage } from '../features/auth/ForgotPasswordPage';
 import { LoginPage } from '../features/auth/LoginPage';
 import { RegisterPage } from '../features/auth/RegisterPage';
-import { WelcomePage } from '../features/auth/WelcomePage';
+import { ResetPasswordPage } from '../features/auth/ResetPasswordPage';
 import { ChatPage } from '../features/conversation/ChatPage';
 import { ConversationHubPage } from '../features/conversation/ConversationHubPage';
 import { HomePage } from '../features/home/HomePage';
+import { LandingPage } from '../features/landing/LandingPage';
 import { LearnPage } from '../features/learning/LearnPage';
 import { LessonPage } from '../features/learning/LessonPage';
 import { NotFoundPage } from '../features/legal/NotFoundPage';
@@ -29,10 +30,13 @@ const immersive = (mode?: RouteHandle['mode']): RouteHandle => ({ immersive: tru
  * públicas → configuração inicial → nivelamento → app (Início, Aprender, Conversar, Progresso, Perfil).
  */
 export const routes: RouteObject[] = [
-  { path: '/', element: <PublicOnly><WelcomePage /></PublicOnly> },
+  // Página pública completa; com sessão, a guarda leva à etapa pendente (ou ao Início).
+  { path: '/', element: <PublicOnly><LandingPage /></PublicOnly> },
   { path: '/entrar', element: <PublicOnly><LoginPage /></PublicOnly> },
   { path: '/cadastro', element: <PublicOnly><RegisterPage /></PublicOnly> },
   { path: '/recuperar-senha', element: <PublicOnly><ForgotPasswordPage /></PublicOnly> },
+  // Sem guarda: o link do e-mail precisa abrir mesmo com uma sessão ativa neste navegador.
+  { path: '/redefinir-senha/:token', element: <ResetPasswordPage /> },
   { path: '/termos-e-privacidade', element: <TermsPage /> },
   {
     path: '/configuracao',

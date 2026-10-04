@@ -1,3 +1,6 @@
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { test as base, expect, type Page } from '@playwright/test';
 
 /** Página com coleta de erros do console (o uso normal do app não deve gerar nenhum). */
@@ -59,4 +62,38 @@ export async function exploreDemo(page: Page) {
   await page.goto('/');
   await page.getByRole('button', { name: /Explorar demonstração/ }).click();
   await expect(page.getByRole('heading', { level: 1, name: /Alex/ })).toBeVisible();
+}
+
+/** Caixa de saída local do servidor http dos testes (ver start-http-server.mjs). */
+const OUTBOX = join(dirname(fileURLToPath(import.meta.url)), '.output', 'http', 'outbox');
+
+interface OutboxMessage {
+  to: string;
+  kind: 'welcome' | 'password_reset';
+  subject: string;
+  text: string;
+  html: string;
+}
+
+/** E-mails gravados para o endereço (mais antigo primeiro). */
+export function outboxFor(email: string, kind?: OutboxMessage['kind']): OutboxMessage[] {
+  if (!existsSync(OUTBOX)) return [];
+  return readdirSync(OUTBOX)
+    .filter((file) => file.endsWith('.json'))
+    .sort()
+    .map((file) => JSON.parse(readFileSync(join(OUTBOX, file), 'utf8')) as OutboxMessage)
+    .filter((message) => message.to === email && (!kind || message.kind === kind));
+}
+
+/** Link de redefinição do último e-mail de recuperação (o envio é assíncrono, então espera chegar). */
+export async function resetLinkFor(email: string): Promise<string> {
+  const pattern = /https?:\/\/\S+\/redefinir-senha\/[A-Za-z0-9_-]{43}/;
+  await expect.poll(() => outboxFor(email, 'password_reset').at(-1)?.text ?? '', { timeout: 10_000 }).toMatch(pattern);
+  return (outboxFor(email, 'password_reset').at(-1)?.text.match(pattern) ?? [''])[0];
+}
+
+export async function fillNewPassword(page: Page, password: string) {
+  await page.getByLabel('Nova senha', { exact: true }).fill(password);
+  await page.getByLabel('Confirme a nova senha').fill(password);
+  await page.getByRole('button', { name: 'Redefinir senha' }).click();
 }

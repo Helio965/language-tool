@@ -6,7 +6,8 @@
 
 ```mermaid
 flowchart TD
-    U([Usuário]) --> Q{Já tem conta?}
+    LP([Página pública /]) --> U([Usuário])
+    U --> Q{Já tem conta?}
     Q -- "Novo usuário" --> C[Criar conta<br/>UC01]
     Q -- "Usuário existente" --> L[Login<br/>UC02]
     Q -- "Perfil existente" --> P2[Configurar perfil<br/>UC03 — a partir de Perfil]
@@ -31,6 +32,10 @@ flowchart TD
     RV --> PR
 ```
 
+A porta de entrada é a página pública (`/`), com "Começar gratuitamente", "Já tenho conta" e, no modo
+demonstração, "Explorar demonstração". Quem já tem sessão e abre `/` vai direto para a etapa pendente (ou para o
+Início) — a página pública é só para visitantes.
+
 Regra: **o usuário nunca repete uma etapa concluída**. A sessão guarda `nextStep` (`onboarding` → `placement` → `ready`), e as rotas protegidas redirecionam para a etapa pendente.
 
 ## 2. Cadastro (UC01)
@@ -45,6 +50,7 @@ flowchart TD
     F -- inválido (A1) --> D
     F -- conta existe (A2) --> G[Aviso + atalho "Entrar com este e-mail"]
     F -- criada --> H[Feedback "Conta criada!"] --> I[Configuração inicial]
+    F -- criada --> W[E-mail de boas-vindas em segundo plano<br/>modo http · falha não desfaz a conta]
 ```
 
 ## 3. Login (UC02) e recuperação de senha
@@ -60,6 +66,30 @@ flowchart TD
     E -- ready --> H[Página inicial]
     A --> R[Esqueci minha senha] --> S[Informar e-mail] --> T[Mensagem genérica<br/>não revela se o e-mail existe]
 ```
+
+### 3.0 Recuperação de senha
+
+```mermaid
+flowchart TD
+    A[/recuperar-senha/] --> B[E-mail] --> C["Resposta igual para qualquer e-mail:<br/>'Se existir uma conta…'"]
+    C -- modo http, conta existe --> D[E-mail com link<br/>vale 15 min · uso único]
+    C -- modo demonstração --> E[Simulação identificada na tela<br/>nenhum e-mail real é enviado]
+    D --> F[/redefinir-senha/:token/]
+    E --> F
+    F --> G{Situação do link}
+    G -- inválido / vencido / já usado --> H[Explicação + "Pedir um novo link"]
+    G -- válido --> I[Nova senha + confirmação<br/>mesma política do cadastro]
+    I -- erro de validação --> I
+    I -- ok --> J["'Senha redefinida com sucesso.' + Entrar"]
+    J --> K[Sessões antigas encerradas em todos os aparelhos]
+```
+
+- Um novo pedido invalida o link anterior; pedidos repetidos em menos de 1 minuto não geram outro e-mail.
+- A senha antiga deixa de funcionar na hora. Quem estava conectado em outro aparelho vê "Sua sessão expirou" na
+  próxima ação; se este navegador estava conectado à mesma conta, a sessão termina aqui e nas outras abas.
+- O link abre mesmo com uma sessão ativa; depois de entrar, o app nunca volta para um link de redefinição.
+
+Detalhes técnicos: [EMAIL-AND-AUTH.md](./EMAIL-AND-AUTH.md).
 
 Se a pessoa tentou abrir uma página protegida sem sessão (ou a sessão expirou), o login a leva de volta a essa
 página depois de entrar — se a conta já tiver concluído a configuração e o nivelamento.

@@ -16,8 +16,8 @@ Testes: `core/test` = `packages/core/test`, `api/test` = `apps/api/test`, `web/t
 
 | ID | Requisito | Status | Implementação | Verificação |
 | --- | --- | --- | --- | --- |
-| RF01 | Cadastro de usuário | ✅ | `core/application/services/authService.ts`, `POST /api/auth/register`, tela `/cadastro` | `services.test` (autenticação), `api.test` (cookie httpOnly), `web/test/auth.test` |
-| RF02 | Autenticação segura | ✅ | scrypt + JWT em cookie httpOnly/SameSite=Strict, rate limit (`api/security`, `api/http`); ciclo de vida da sessão no front-end (`web/app/session.tsx`, ver [ARCHITECTURE.md §6.1](./ARCHITECTURE.md)) | `api.test`, `security.test`, `auth.test`, `session.test`, `e2e` |
+| RF01 | Cadastro de usuário | ✅ | `core/application/services/authService.ts`, `POST /api/auth/register`, tela `/cadastro`; e-mail de boas-vindas em segundo plano (`api/email`) | `services.test` (autenticação), `api.test` (cookie httpOnly), `web/test/auth.test`, `api/passwordReset.test` (boas-vindas, falha de SMTP não desfaz a conta) |
+| RF02 | Autenticação segura | ✅ | scrypt + JWT com versão da sessão em cookie httpOnly/SameSite=Strict, rate limit (`api/security`, `api/http`); recuperação de senha com token de uso único guardado como hash ([EMAIL-AND-AUTH.md](./EMAIL-AND-AUTH.md)); ciclo de vida da sessão no front-end (`web/app/session.tsx`, ver [ARCHITECTURE.md §6.1](./ARCHITECTURE.md)) | `api.test`, `security.test`, `auth.test`, `session.test`, `e2e`; recuperação de senha e encerramento de sessões: `core/passwordReset.test`, `api/passwordReset.test`, `web/passwordReset.test`, `e2e` |
 | RF03 | Perfil do usuário | ✅ | `LearningProfile` (`core/domain/entities.ts`), `/configuracao`, `/perfil`, `/perfil/editar` | jornada em `services.test` e `api.test` |
 | RF04 | Definição de objetivo | ✅ | objetivos em `core/domain/profile.ts` (inclui os 5 exemplos da F1); etapa 1 da configuração | jornada |
 | RF05 | Nivelamento | ✅ | `core/domain/placement.ts` (3 etapas adaptativas, 12 perguntas), `/nivelamento` | `rules.test` (nivelamento), jornada |
@@ -43,12 +43,12 @@ Testes: `core/test` = `packages/core/test`, `api/test` = `apps/api/test`, `web/t
 | --- | --- | --- | --- | --- |
 | RNF01 | Usabilidade, foco em celular | ✅ | mobile first, uma ação principal por tela, linguagem simples ([UX-SPECIFICATION.md](./UX-SPECIFICATION.md)) | sem teste com usuários reais (roteiro proposto em UX-SPEC §12) |
 | RNF02 | Responsividade | ✅ | 3 layouts (barra inferior, trilho, barra lateral); telas com 2 colunas no desktop | verificado em 390, 820 e 1440px (capturas em `design/screenshots`); sem rolagem horizontal de 320 a 1920px, inclusive nas larguras equivalentes a zoom de 125%, 150% e 200% (verificação manual no Chromium) e em 320px nas telas principais (`e2e`) |
-| RNF03 | Desempenho | 🟡 | estado "IA preparando resposta"; histórico limitado a 12 mensagens; esforço `low` e timeout de 20 s no provedor real; correção de exercícios fechados sem IA | sem medição de latência com provedor real nem teste de carga; JavaScript da web em um único pacote (~208 KB gzip, sem divisão por rota) |
-| RNF04 | Segurança | ✅ | scrypt, JWT em cookie httpOnly (nunca no `localStorage`), CSRF por cabeçalho, helmet, CORS restrito, rate limit, zod, limite de 16 KB, checagem de dono (404), conta exibida × conta do cookie (`X-Session-User` → 401), cache privado por conta no front-end, logs sem dados sensíveis, chaves só no `.env` do servidor | `api.test`, `security.test`, `session.test`, `e2e` (cookie httpOnly/Strict, nenhuma requisição privada depois de sair) |
+| RNF03 | Desempenho | 🟡 | estado "IA preparando resposta"; histórico limitado a 12 mensagens; esforço `low` e timeout de 20 s no provedor real; correção de exercícios fechados sem IA | sem medição de latência com provedor real nem teste de carga; JavaScript da web em um único pacote (~219 KB gzip, sem divisão por rota) |
+| RNF04 | Segurança | ✅ | scrypt, JWT em cookie httpOnly (nunca no `localStorage`), CSRF por cabeçalho, helmet, CORS restrito, rate limit, zod, limite de 16 KB, checagem de dono (404), conta exibida × conta do cookie (`X-Session-User` → 401), cache privado por conta no front-end, token de redefinição de senha só como hash (validade curta, uso único), versão da sessão (troca de senha encerra as sessões), links de e-mail só com `APP_PUBLIC_URL`, credenciais SMTP só no servidor, logs sem dados sensíveis, chaves só no `.env` do servidor | `api.test`, `security.test`, `session.test`, `e2e` (cookie httpOnly/Strict, nenhuma requisição privada depois de sair) |
 | RNF05 | Privacidade / transparência | ✅ | página "Privacidade e dados", aceite dos termos, remoção de dados pessoais nas mensagens, contexto mínimo para a IA | texto informativo, não revisado juridicamente |
 | RNF06 | Escalabilidade | 🟡 | API sem estado de sessão (JWT), núcleo independente de banco (portas), provedor de IA substituível | SQLite é arquivo único: para várias instâncias é preciso trocar o adaptador (ex.: PostgreSQL) — ver ARCHITECTURE §10 |
 | RNF07 | Disponibilidade | ✅ | `FallbackAIService`: falha, timeout, recusa ou JSON inválido do provedor → modo demonstração | `ai.test` (fallback) |
-| RNF08 | Manutenibilidade | ✅ | monorepo com `core` (domínio e casos de uso sem framework), `api` e `web`; TypeScript estrito; 200 testes unitários/integração + 11 de ponta a ponta | — |
+| RNF08 | Manutenibilidade | ✅ | monorepo com `core` (domínio e casos de uso sem framework), `api` e `web`; TypeScript estrito; 276 testes unitários/integração + 16 de ponta a ponta | — |
 | RNF09 | Acessibilidade | 🟡 | WCAG 2.1 AA como meta: contraste verificado, foco visível, rótulos, `aria-live`, `lang="en"`, movimento reduzido, link de pular navegação, diálogos com título associado, campos sempre selecionáveis e editáveis, botões que quebram linha em telas estreitas | sem auditoria automatizada (ex.: axe) nem teste com leitor de tela real |
 | RNF10 | Compatibilidade | 🟡 | HTML/CSS padrão, sem APIs experimentais no navegador; fallback de hash quando o Web Crypto não está disponível; sincronização entre abas com `BroadcastChannel` quando disponível | testado apenas no Chromium (Playwright, inclusive a suíte `e2e`); Safari/Firefox e aparelhos reais não testados |
 
@@ -70,7 +70,7 @@ Testes: `core/test` = `packages/core/test`, `api/test` = `apps/api/test`, `web/t
 | UC | Caso de uso | Status | Tela | Fluxos alternativos | Verificação |
 | --- | --- | --- | --- | --- | --- |
 | UC01 | Criar conta | ✅ | `/cadastro` → `/configuracao` | A1 dados inválidos ✅ · A2 conta existente com opção de login ✅ | `services.test`, `api.test`, `auth.test` |
-| UC02 | Fazer login | ✅ | `/entrar` → Início ou etapa pendente | A1 credenciais inválidas (mensagem genérica) ✅ | `api.test`, `auth.test` |
+| UC02 | Fazer login | ✅ | `/entrar` → Início ou etapa pendente | A1 credenciais inválidas (mensagem genérica) ✅ · esqueci a senha (link por e-mail, `/redefinir-senha/:token`) ✅ | `api.test`, `auth.test`, `passwordReset.test` (core, API, web), `e2e` |
 | UC03 | Configurar perfil | ✅ | `/configuracao`, `/perfil/editar` | — | jornada |
 | UC04 | Realizar nivelamento | ✅ | `/nivelamento`, `/perfil/nivelamento` | resultado como estimativa ✅ · pular ✅ | `rules.test`, jornada |
 | UC05 | Iniciar aula | ✅ | `/aprender/aula/:id` (explicação, "Explicar de outro jeito", exemplos) | — | `ai.test`, jornada |
@@ -127,8 +127,10 @@ F1-UC05→UC11 (todos ✅).
 | Guia do Figma | ✅ | [FIGMA-GUIDE.md](../design/FIGMA-GUIDE.md) (sem arquivo Figma — ver §6) |
 | Especificação de telas | ✅ | [SCREEN-SPECIFICATIONS.md](../design/SCREEN-SPECIFICATIONS.md) |
 | Componentes | ✅ | [COMPONENTS.md](../design/COMPONENTS.md) |
+| Autenticação e e-mail | ✅ | [EMAIL-AND-AUTH.md](./EMAIL-AND-AUTH.md) |
+| Página pública | ✅ | `/` (`apps/web/src/features/landing`), ver [UX-SPECIFICATION.md §3.1](./UX-SPECIFICATION.md) |
 | `.env.example` sem segredos e `.gitignore` | ✅ | raiz do repositório |
-| Testes automatizados | ✅ | 148 (core) + 23 (API) + 29 (web) = 200, mais 11 de ponta a ponta (Playwright, modos demonstração e http) |
+| Testes automatizados | ✅ | 163 (core) + 60 (API) + 53 (web) = 276, mais 16 de ponta a ponta (Playwright, modos demonstração e http) |
 
 ## 8. Critérios de aceitação do MVP (F1 §24)
 
@@ -152,7 +154,7 @@ F1-UC05→UC11 (todos ✅).
 | --- | --- | --- | --- |
 | L1 | Protótipo no Figma | não criado (sem acesso) | seguir FIGMA-GUIDE.md e adicionar o link ao README |
 | L2 | Provedor real de IA | implementado (`AnthropicProvider`) e coberto por testes com provedor simulado, **mas não executado contra a API real** neste ambiente (sem chave) | configurar `ANTHROPIC_API_KEY` e validar com o roteiro de AI-PROMPT-STRATEGY §8 |
-| L3 | Recuperação de senha | tela e resposta neutra prontas; **e-mail não é enviado** | integrar serviço de e-mail transacional e token de redefinição |
+| L3 | Recuperação de senha e e-mails | **implementados** (link por e-mail com token guardado como hash, 15 min, uso único; boas-vindas). O envio por SMTP foi testado com o transporte do nodemailer em memória e com a caixa de saída local, **não contra um servidor SMTP real** neste ambiente. Sem confirmação de e-mail no cadastro e sem fila de envio | configurar SMTP (`SMTP_HOST`, `MAIL_FROM`, `APP_PUBLIC_URL`) e validar a entrega; fila com nova tentativa; confirmação de e-mail |
 | L4 | Lembretes de estudo | preferência salva, **sem envio** | notificações push ou e-mail |
 | L5 | Pronúncia, voz e áudio | fora do escopo do MVP (F1 §7) | campo `phonetic` já previsto |
 | L6 | Administração de conteúdo | sem telas (ator Administrador preparado com `role`) | CMS ou painel administrativo |
@@ -161,7 +163,8 @@ F1-UC05→UC11 (todos ✅).
 | L9 | Modo demonstração da IA | roteiros e 25 regras de erros comuns; não entende frases fora dos padrões | usar provedor real para conversa livre |
 | L10 | Política de privacidade | texto informativo do protótipo | revisão jurídica antes de uso real |
 | L11 | Aviso de sessão expirada | o motivo do fim da sessão fica na memória da página: depois de recarregar, a pessoa vai ao login **sem** o aviso "Sua sessão expirou" | guardar o motivo em `sessionStorage` se o aviso depois de recarregar for importante |
-| L12 | Tamanho do JavaScript | um único arquivo (~208 KB com gzip); o Vite avisa que passa de 500 KB sem compressão | dividir por rota com `React.lazy` |
+| L12 | Tamanho do JavaScript | um único arquivo (~219 KB com gzip, 712 KB sem compressão); o Vite avisa que passa de 500 KB | dividir por rota com `React.lazy` (a página pública e as telas autenticadas são boas fronteiras) |
+| L13 | Revogação de sessão no logout | sair remove o cookie, mas o token continua válido no servidor até vencer (72 h) ou até a senha mudar | lista de revogação ou versão da sessão também no logout |
 
 ## 10. Testes de regressão da auditoria de sessão
 
@@ -192,3 +195,55 @@ Os testes 16 e 17 ficam só no navegador real: o jsdom não aplica o CSS do app,
 Testes adicionais da mesma auditoria: saída em outra aba (`e2e` demo), conta exibida × cookie (`api.test`),
 armazenamento do modo demonstração consistente entre abas (`services.test`), autosave de preferências em sequência
 e clique duplo no nivelamento (`session.test`).
+
+## 11. Fase 2 — página pública, e-mail e recuperação de senha
+
+### 11.1 Testes pedidos e onde estão
+
+Abreviações: `core` = `packages/core/test/passwordReset.test.ts`, `api` = `apps/api/test/passwordReset.test.ts`,
+`email` = `apps/api/test/email.test.ts`, `web` = `apps/web/test/passwordReset.test.tsx`,
+`landing` = `apps/web/test/landing.test.tsx`, `e2e` = `e2e/*.spec.ts`.
+
+| # | Cenário | Onde |
+| --- | --- | --- |
+| 1 | Pedido com conta existente | `core` ("gera um link só quando a conta existe"), `api`, `e2e` http |
+| 2 | Pedido com e-mail inexistente | `core`, `api`, `web`, `e2e` http ("e-mail sem conta") |
+| 3 | Respostas externas iguais | `api` (mesmo status, corpo e cabeçalhos) |
+| 4 | E-mail/token só quando a conta existe | `core` (retorna `null`), `api` (caixa de saída só com o endereço existente), `e2e` http |
+| 5 | Token válido | `core`, `api`, `web` |
+| 6 | Token inválido | `core`, `api`, `web` |
+| 7 | Token adulterado | `core`, `api` |
+| 8 | Token vencido | `core` (inclusive o limite exato), `api`, `web` |
+| 9 | Uso único | `core` (inclusive envios simultâneos), `api`, `web`, `e2e` http |
+| 10 | Novo pedido invalida o anterior | `core`, `api` |
+| 11 | Senha nova funciona | `core`, `api`, `web`, `e2e` demo e http |
+| 12 | Senha antiga não funciona | `core`, `api`, `web`, `e2e` http |
+| 13 | Política de senha | `core`, `api`, `web` (mesma política do cadastro; erro não consome o link) |
+| 14 | Rate limit | `api` (429 no 11º pedido do mesmo IP) |
+| 15 | Não revela existência de conta | `api` (respostas iguais, nenhum e-mail para endereço desconhecido, logs sem token nem e-mail) |
+| — | E-mail: destinatário, assunto, template, URL, validade, boas-vindas, sem senha, sem hash, falha do mailer | `email`, `api` |
+| — | Falha de SMTP no cadastro (conta continua) e na recuperação (mesma resposta, sem detalhes) | `api` |
+| — | Sessões antigas encerradas após a troca de senha | `core` (versão da sessão), `api` (dois aparelhos, cookie antigo), `web`, `e2e` http |
+| — | Página pública: renderiza, cabeçalho, CTAs, links, Entrar, Criar conta, demonstração, âncoras, celular, sessão ativa em `/`, ausência de conteúdo falso | `landing`, `e2e` demo ("página pública no celular") e http |
+| — | Jornada página pública → cadastro → configuração → nivelamento → Início | `e2e` http |
+| — | Login → esqueci a senha → link pela caixa de saída de teste → senha nova → login; senha antiga recusada | `e2e` http |
+
+Nenhum teste envia e-mail de verdade: `MemoryMailer`/mailer falso nos testes de unidade e integração, caixa de
+saída local no servidor dos testes E2E.
+
+### 11.2 Critérios de aceitação
+
+| Grupo | Critério | Status | Evidência |
+| --- | --- | --- | --- |
+| Página pública | `/` completa: cabeçalho, hero, problema, como funciona, Aprender, Conversar, IA, Progresso, Segurança, chamada final, rodapé | ✅ | `features/landing`, `landing.test` |
+| | Responsiva e sem rolagem horizontal a partir de 320px | ✅ | `e2e` demo (320px e celular), verificação em 320/390/820/1440px |
+| | Acessível (menu com `aria-expanded`, Esc, foco no título da seção, movimento reduzido) | ✅ | `landing.test`, `e2e` demo |
+| | Identidade visual do English AI (mesmos tokens e componentes) | ✅ | `design/screenshots/*-01-pagina-publica.jpg` |
+| E-mail | Serviço centralizado (`EmailService`) | ✅ | `apps/api/src/email/` |
+| | Caixa de saída local e mailer em memória | ✅ | `OutboxMailer`, `MemoryMailer` |
+| | SMTP real configurável | ✅ (não executado contra servidor real — ver L3) | `SmtpMailer`, `email.test` |
+| | Template base, boas-vindas e recuperação | ✅ | `templates/` |
+| | Sem credenciais no front-end; `.env.example` só com exemplos | ✅ | `config/env.ts`, `.env.example` |
+| Recuperação de senha | Pedido real, anti-enumeração, token seguro, só hash no banco, validade, uso único | ✅ | §11.1 |
+| | Página de senha nova; senha nova funciona, antiga não; links inválidos tratados | ✅ | `/redefinir-senha/:token`, §11.1 |
+| Regressão | Logout, cache por conta, sessão entre abas, demo e http continuam funcionando; área interna não redesenhada | ✅ | os 200 testes e os 11 E2E anteriores continuam passando, sem alteração no corpo dos testes (só as linhas de import dos arquivos E2E ganharam os novos helpers); telas internas sem mudanças de estilo |

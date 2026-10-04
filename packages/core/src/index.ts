@@ -38,6 +38,8 @@ export * from './ai/llm/provider';
 export * from './application/ports';
 export * from './application/views';
 export { createAppServices, type AppServices } from './application/createAppServices';
+export * from './application/services/passwordResetService';
+export { generateSecureToken, hashToken, isWellFormedToken } from './application/secureToken';
 export { DAILY_GOAL_OPTIONS, DEFAULT_TIME_ZONE, defaultPreferences, defaultProfile } from './application/context';
 
 // Infraestrutura portátil

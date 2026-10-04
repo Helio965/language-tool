@@ -9,6 +9,7 @@ import type {
   ExerciseAttempt,
   LearningProfile,
   Message,
+  PasswordResetToken,
   Preferences,
   Progress,
   Review,
@@ -37,6 +38,16 @@ const toUser = (r: Row): UserRecord => ({
   role: str(r.role) as UserRecord['role'],
   createdAt: str(r.created_at),
   termsAcceptedAt: str(r.terms_accepted_at),
+  sessionVersion: num(r.session_version ?? 0),
+});
+
+const toPasswordReset = (r: Row): PasswordResetToken => ({
+  id: str(r.id),
+  userId: str(r.user_id),
+  tokenHash: str(r.token_hash),
+  createdAt: str(r.created_at),
+  expiresAt: str(r.expires_at),
+  usedAt: strOrNull(r.used_at),
 });
 
 const toProfile = (r: Row): LearningProfile => ({
@@ -176,6 +187,33 @@ export function createSqliteStore(db: DatabaseSync): DataStore {
             terms_accepted_at: user.termsAcceptedAt,
           },
         ),
+      updatePassword: async (userId, passwordHash) =>
+        run('UPDATE users SET password_hash = @passwordHash, session_version = session_version + 1 WHERE id = @userId', {
+          userId,
+          passwordHash,
+        }),
+    },
+    passwordResets: {
+      create: async (t) =>
+        run(
+          `INSERT INTO password_reset_tokens (id, user_id, token_hash, expires_at, used_at, created_at)
+           VALUES (@id, @user_id, @token_hash, @expires_at, @used_at, @created_at)`,
+          { id: t.id, user_id: t.userId, token_hash: t.tokenHash, expires_at: t.expiresAt, used_at: t.usedAt, created_at: t.createdAt },
+        ),
+      findByTokenHash: async (tokenHash) =>
+        one('SELECT * FROM password_reset_tokens WHERE token_hash = @tokenHash', { tokenHash }, toPasswordReset),
+      latestForUser: async (userId) =>
+        one(
+          'SELECT * FROM password_reset_tokens WHERE user_id = @userId ORDER BY created_at DESC, rowid DESC LIMIT 1',
+          { userId },
+          toPasswordReset,
+        ),
+      // Atômico no SQLite: só uma das requisições concorrentes encontra used_at vazio.
+      markUsed: async (id, usedAt) =>
+        db.prepare('UPDATE password_reset_tokens SET used_at = @usedAt WHERE id = @id AND used_at IS NULL').run({ id, usedAt }).changes === 1,
+      deleteForUser: async (userId) => run('DELETE FROM password_reset_tokens WHERE user_id = @userId', { userId }),
+      deleteExpired: async (beforeIso) =>
+        Number(db.prepare('DELETE FROM password_reset_tokens WHERE expires_at < @beforeIso').run({ beforeIso }).changes),
     },
     profiles: {
       get: async (userId) => one('SELECT * FROM learning_profiles WHERE user_id = @userId', { userId }, toProfile),

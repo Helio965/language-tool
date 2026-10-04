@@ -19,14 +19,18 @@ async function main() {
     corsOrigin: config.CORS_ORIGIN,
     secureCookies: config.isProduction,
     aiProvider: runtime.aiProvider,
+    email: runtime.email,
     ...(config.WEB_DIST_PATH ? { webDistPath: config.WEB_DIST_PATH } : {}),
   });
 
-  // Política de retenção: apaga periodicamente o conteúdo de conversas expiradas (RN07).
+  // Política de retenção: apaga periodicamente o conteúdo de conversas expiradas (RN07)
+  // e os pedidos de redefinição de senha vencidos (minimização de dados).
   const sweep = async () => {
     try {
       const purged = await runtime.services.conversation.purgeExpired();
       if (purged) logger.info('retention.purged', { conversations: purged });
+      const resets = await runtime.services.passwordReset.purgeExpired();
+      if (resets) logger.info('retention.purged', { passwordResets: resets });
     } catch (error) {
       logger.error('retention.failed', { name: error instanceof Error ? error.name : 'unknown' });
     }
@@ -36,15 +40,18 @@ async function main() {
   timer.unref();
 
   const server = app.listen(config.API_PORT, () => {
-    logger.info('server.started', { port: config.API_PORT, aiProvider: runtime.aiProvider, env: config.NODE_ENV });
+    logger.info('server.started', { port: config.API_PORT, aiProvider: runtime.aiProvider, mail: runtime.email.transport, env: config.NODE_ENV });
   });
 
   const shutdown = (signal: string) => {
     logger.info('server.stopping', { signal });
     clearInterval(timer);
     server.close(() => {
-      runtime.db.close();
-      process.exit(0);
+      // Termina os envios de e-mail em andamento antes de fechar o banco.
+      void runtime.email.idle().finally(() => {
+        runtime.db.close();
+        process.exit(0);
+      });
     });
   };
   process.on('SIGINT', () => shutdown('SIGINT'));

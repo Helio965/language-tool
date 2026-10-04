@@ -1,5 +1,5 @@
-import type { AccountState } from '@english-ai/core';
-import type { ApiClient } from './apiClient';
+import type { AccountState, ResetTokenStatus } from '@english-ai/core';
+import type { ApiClient, PasswordResetRequestResult } from './apiClient';
 import { ApiError } from './errors';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
@@ -55,7 +55,14 @@ export function createHttpClient(baseUrl = '/api'): ApiClient {
       await call('POST', '/auth/logout');
       boundUserId = null;
     },
-    requestPasswordReset: async (email) => (await call<{ message: string }>('POST', '/auth/password-reset', { email })).message,
+    requestPasswordReset: (email) => call<PasswordResetRequestResult>('POST', '/auth/password-reset', { email }),
+    checkPasswordResetToken: async (token) =>
+      (await call<{ status: ResetTokenStatus }>('POST', '/auth/password-reset/verify', { token })).status,
+    resetPassword: async (input) => {
+      const { sessionEnded } = await call<{ sessionEnded: boolean }>('POST', '/auth/password-reset/confirm', input);
+      if (sessionEnded) boundUserId = null;
+      return { sessionEnded };
+    },
     deleteAccount: async (password) => {
       await call('DELETE', '/me', { password });
       boundUserId = null;

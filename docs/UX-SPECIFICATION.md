@@ -35,8 +35,9 @@ que estudam pelo celular em sessões curtas e têm receio de errar ao falar ingl
 
 ```text
 Público
-├─ Boas-vindas (/)
+├─ Página pública (/) — apresentação do produto (ver §3.1)
 ├─ Criar conta (/cadastro) ─ Entrar (/entrar) ─ Recuperar senha (/recuperar-senha)
+├─ Redefinir senha (/redefinir-senha/:token) — link do e-mail; abre com ou sem sessão
 └─ Termos e privacidade (/termos-e-privacidade)
 
 Primeiro acesso (obrigatório, nesta ordem, nunca repetido)
@@ -54,12 +55,48 @@ App (navegação principal: 5 destinos)
     └─ atalhos: Vocabulário (/vocabulario) · Revisão (/revisao, /revisao/:id)
 ```
 
+### 3.1 Página pública (`/`)
+
+**Objetivo:** explicar o produto com clareza e levar ao cadastro, sem prometer o que não existe. Usa a mesma
+identidade do app (papel, azul-marinho, marca-texto amarelo, azul do Aprender, coral do Conversar, Fraunces e
+Atkinson Hyperlegible) — não é um segundo design system.
+
+| Ordem | Seção (âncora) | Conteúdo |
+| --- | --- | --- |
+| 1 | Hero (`#inicio`) | título "Aprenda inglês no seu ritmo, com uma IA que realmente explica", subtítulo, **Começar gratuitamente** · **Já tenho conta** · (demo) **Explorar demonstração com dados de exemplo**; fatos do conteúdo (aulas, exercícios, temas); prévia do app (aula e conversa) |
+| 2 | Problema (`#problema`) | 7 dificuldades comuns, cada uma com o que o produto faz |
+| 3 | Como funciona (`#como-funciona`) | 5 passos numerados: conta → objetivos → nivelamento → aprender ou conversar → evolução |
+| 4 | Modo Aprender (`#aprender`) | recursos + exemplo de exercício com o cartão de correção real |
+| 5 | Modo Conversação (`#conversar`) | princípio **Naturalidade > correção excessiva**, recursos e exemplo de conversa |
+| 6 | IA (`#ia`) | 7 capacidades + correção explicada ("I have 25 years.") + aviso de que a IA pode errar |
+| 7 | Progresso (`#progresso`) | métricas acompanhadas + prévia marcada como **Exemplo ilustrativo** |
+| 8 | Personalização (`#personalizacao`) | nível, objetivo, desempenho, erros recorrentes, vocabulário, progresso |
+| 9 | Privacidade e segurança (`#seguranca`) | 7 garantias + aviso de que o texto de privacidade é informativo |
+| 10 | Chamada final | "Seu próximo passo no inglês pode começar agora." + Criar conta · Entrar · (demo) Testar a demonstração |
+| 11 | Rodapé | Sobre o projeto (`#sobre`, inclusive o que ainda não faz parte do produto) · Produto · Conta · Informações · Legal |
+
+**Navegação.** Cabeçalho fixo: logo (volta ao topo), seções e **Entrar** / **Criar conta**. Abaixo de 1100px, as
+seções ficam num **menu** (botão com `aria-expanded`; Esc fecha e devolve o foco ao botão; escolher uma seção
+fecha o menu); abaixo de 600px, "Criar conta" vai para dentro do menu. Links de âncora atualizam o endereço
+(`/#aprender`), sem criar nova entrada no histórico, e levam o foco ao título da seção. A rolagem é suave só
+quando a pessoa não pediu movimento reduzido (`prefers-reduced-motion`). Chegar por `/#seguranca` abre direto
+na seção.
+
+**`/` × `/inicio`.** `/` é só para visitantes: com sessão, a guarda `PublicOnly` leva à etapa pendente
+(configuração, nivelamento) ou ao Início. `/inicio` é a área autenticada.
+
+**Honestidade (regra de conteúdo).** Nada de depoimentos, números de usuários, porcentagens de melhora, parceiros
+ou certificações. Números só do próprio conteúdo (calculados a partir do `core`); exemplos de correção gerados pelo
+verificador gramatical do projeto; prévias de dados marcadas como ilustrativas. Ações de demonstração aparecem só
+no modo demonstração.
+
 **Telas imersivas** (aula, conversa, revisão, edição de perfil): escondem a navegação principal e mostram uma
 barra de foco com "voltar", título e, quando faz sentido, progresso da etapa. Assim a pessoa não sai sem querer
 no meio de um exercício.
 
 **Guardas de fluxo:** quem não entrou vai para o login (e volta para a página pedida depois); quem não terminou
-a configuração ou o nivelamento é levado à etapa pendente; quem já entrou não vê telas públicas.
+a configuração ou o nivelamento é levado à etapa pendente; quem já entrou não vê telas públicas — exceto o link de
+redefinição de senha, que abre com ou sem sessão.
 
 ## 4. Padrões de interação
 
@@ -78,6 +115,7 @@ a configuração ou o nivelamento é levado à etapa pendente; quem já entrou n
 | Botões assíncronos | mostram o andamento ("Entrando…", "Saindo…", "Excluindo…"), não aceitam clique repetido e voltam ao normal se a ação falhar |
 | Sair da conta | leva ao login com o aviso discreto "Você saiu da sua conta."; nunca mostra "sessão expirou" |
 | Sair no primeiro acesso | na configuração inicial e no nivelamento, o "X" é **Sair da conta** (com confirmação); a etapa é retomada ao entrar de novo |
+| Âncoras da página pública | atualizam o endereço sem nova entrada no histórico, levam o foco ao título da seção e só animam a rolagem sem `prefers-reduced-motion` |
 | Seleção de texto | a interface (títulos, cards, menus, botões, estatísticas, mensagens) não é selecionável com o mouse; campos editáveis continuam selecionáveis para copiar, colar e corrigir. Áreas que precisem de cópia usam `.allow-text-selection` |
 
 ## 5. Estados de interface
@@ -211,7 +249,10 @@ Seguem DESIGN-SYSTEM §8. Exemplos-chave:
 | Botão do Modo Conversação | "Nova conversa" / "Encerrar e ver feedback" |
 | Erro de login | "E-mail ou senha incorretos. Tente novamente." (não revela se o e-mail existe) |
 | E-mail já cadastrado | "Já existe uma conta com este e-mail. Entrar com este e-mail" |
-| Recuperação de senha | "Se existir uma conta com este e-mail, enviaremos as instruções de recuperação." |
+| Recuperação de senha | "Se existir uma conta com este e-mail, enviaremos as instruções de recuperação." + (http) "Confira a caixa de entrada e a pasta de spam. O link vale por 15 minutos e só pode ser usado uma vez." |
+| Redefinição — link indisponível | "Este link venceu" · "Este link já foi usado" · "Link inválido", sempre com **Pedir um novo link** e **Voltar para o login** |
+| Redefinição — sucesso | "Senha redefinida com sucesso." + "Por segurança, as sessões abertas com a senha antiga foram encerradas." + **Entrar** |
+| Simulação (modo demonstração) | "Simulação do modo demonstração — Nenhum e-mail real é enviado na demonstração." |
 | Resultado do nivelamento | nível estimado + "Este resultado é uma estimativa pedagógica para personalizar seus estudos — não é uma certificação oficial de proficiência." |
 | Revisão | motivo explícito: "Você teve dificuldade com Simple Present nos últimos exercícios." |
 
@@ -221,7 +262,10 @@ Seguem DESIGN-SYSTEM §8. Exemplos-chave:
 - Página "Privacidade e dados" mostra o que é coletado, para quê e por quanto tempo; permite desativar o
   histórico, apagar todas as conversas e excluir a conta.
 - O chat lembra, no rodapé, para não compartilhar dados pessoais.
-- O modo demonstração guarda tudo apenas no navegador e diz isso na tela de boas-vindas ("os dados ficam apenas neste navegador e a IA é simulada").
+- O modo demonstração guarda tudo apenas no navegador e diz isso na página pública ("os dados ficam apenas neste navegador e a IA é simulada") e na barra lateral do app.
+- Na recuperação de senha, a resposta nunca revela se o e-mail tem conta. A demonstração mostra uma simulação
+  identificada e nunca finge que um e-mail real foi enviado.
+- Os e-mails (boas-vindas e recuperação) nunca contêm senha e dizem como ignorar a mensagem se ela não foi pedida.
 
 ## 12. Como validar a experiência (sugestão para a equipe)
 
