@@ -39,11 +39,12 @@ export function PlacementPage({ retake = false }: { retake?: boolean }) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
   const [error, setError] = useState<unknown>(null);
-  const [busy, setBusy] = useState(false);
+  // Ação em andamento (o carregamento aparece só no botão clicado; os outros ficam desabilitados).
+  const [busy, setBusy] = useState<'start' | 'skip' | 'finish' | null>(null);
 
   async function start() {
     if (busy) return;
-    setBusy(true);
+    setBusy('start');
     setError(null);
     setAnswers({});
     try {
@@ -52,13 +53,13 @@ export function PlacementPage({ retake = false }: { retake?: boolean }) {
     } catch (err) {
       setError(err);
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   }
 
   async function skip() {
     if (busy) return;
-    setBusy(true);
+    setBusy('skip');
     setError(null);
     try {
       const result = await api.skipPlacement();
@@ -66,7 +67,7 @@ export function PlacementPage({ retake = false }: { retake?: boolean }) {
     } catch (err) {
       setError(err);
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   }
 
@@ -99,7 +100,7 @@ export function PlacementPage({ retake = false }: { retake?: boolean }) {
 
   async function finish() {
     if (busy) return;
-    setBusy(true);
+    setBusy('finish');
     setError(null);
     try {
       // Atualiza a conta (nível, etapa pendente) e os dados que dependem do nível.
@@ -108,7 +109,7 @@ export function PlacementPage({ retake = false }: { retake?: boolean }) {
       if (retake) navigate('/perfil');
     } catch (err) {
       setError(err);
-      setBusy(false);
+      setBusy(null);
     }
   }
 
@@ -152,10 +153,10 @@ export function PlacementPage({ retake = false }: { retake?: boolean }) {
               </ul>
               <ActionError error={error} />
               <div className={styles.actions}>
-                <Button size="lg" onClick={start} loading={busy} loadingLabel="Preparando…" iconEnd={<ArrowRight aria-hidden="true" />}>
+                <Button size="lg" onClick={start} loading={busy === 'start'} disabled={busy !== null} loadingLabel="Preparando…" iconEnd={<ArrowRight aria-hidden="true" />}>
                   Começar nivelamento
                 </Button>
-                <Button size="lg" variant="secondary" onClick={skip} disabled={busy}>
+                <Button size="lg" variant="secondary" onClick={skip} loading={busy === 'skip'} disabled={busy !== null} loadingLabel="Salvando…">
                   Prefiro começar do zero
                 </Button>
               </div>
@@ -201,7 +202,7 @@ export function PlacementPage({ retake = false }: { retake?: boolean }) {
 
           {phase.kind === 'analyzing' && <LoadingState label="Analisando suas respostas…" />}
 
-          {phase.kind === 'result' && <Result result={phase.result} onContinue={() => void finish()} loading={busy} retake={retake} error={error} />}
+          {phase.kind === 'result' && <Result result={phase.result} onContinue={() => void finish()} loading={busy === 'finish'} retake={retake} error={error} />}
         </main>
       </div>
       <SignOutDialog

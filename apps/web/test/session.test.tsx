@@ -290,6 +290,41 @@ describe('"Sair" nas etapas do primeiro acesso', () => {
     await signIn(user, 'duda@example.com');
     await waitFor(() => expect(router.state.location.pathname).toBe('/nivelamento'));
   });
+
+  it('nivelamento: clique duplo em "Prefiro começar do zero" salva uma vez e só esse botão mostra carregamento', async () => {
+    const api = createTestApi();
+    let skips = 0;
+    const slowSkip: ApiClient = new Proxy(api, {
+      get(target, property, receiver) {
+        if (property === 'skipPlacement') {
+          return async () => {
+            skips++;
+            await new Promise((resolve) => setTimeout(resolve, 150));
+            return target.skipPlacement();
+          };
+        }
+        return Reflect.get(target, property, receiver);
+      },
+    });
+    const { user } = renderApp('/cadastro', slowSkip);
+    await signUp(user, 'Gil', 'gil@example.com');
+    await screen.findByRole('heading', { name: /principal objetivo/ });
+    await user.click(screen.getByText('Conversar', { selector: 'span' }));
+    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+    await user.click(screen.getByText('Básico', { selector: 'span' }));
+    await user.click(screen.getByRole('button', { name: 'Estudei na escola' }));
+    await user.click(screen.getByRole('button', { name: 'Continuar' }));
+    await user.click(screen.getByRole('button', { name: /Salvar e fazer o nivelamento/ }));
+
+    const skip = await screen.findByRole('button', { name: 'Prefiro começar do zero' });
+    await user.dblClick(skip);
+    expect(skip).toHaveTextContent('Salvando…');
+    expect(screen.getByRole('button', { name: 'Começar nivelamento' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Começar nivelamento' })).not.toHaveTextContent('Preparando…');
+
+    expect(await screen.findByRole('button', { name: 'Ir para o início' })).toBeEnabled();
+    expect(skips).toBe(1);
+  });
 });
 
 describe('Jornadas e recarregamento', () => {
