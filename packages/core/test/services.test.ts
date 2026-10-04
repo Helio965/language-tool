@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { AppError, PLACEMENT_QUESTIONS } from '../src';
+import { AppError, MemoryStorage, PLACEMENT_QUESTIONS } from '../src';
 import { createTestApp, VALID_REGISTRATION } from './helpers';
 
 const PROFILE = {
@@ -186,6 +186,25 @@ describe('Modo Conversação (UC09)', () => {
     clock.advanceDays(91);
     expect(await services.conversation.purgeExpired()).toBe(1);
     await expect(services.conversation.get(userId, conversation.id)).resolves.toMatchObject({ messages: [] });
+  });
+});
+
+describe('modo demonstração com várias abas (mesmo armazenamento)', () => {
+  it('cada aba enxerga e preserva o que a outra gravou', async () => {
+    const storage = new MemoryStorage();
+    const tabA = createTestApp({ storage, idPrefix: 'a' });
+    const tabB = createTestApp({ storage, idPrefix: 'b' });
+
+    await tabA.services.auth.register(VALID_REGISTRATION);
+    // A aba B já tinha lido a coleção de usuários antes? Não importa: a leitura revalida o armazenamento.
+    await tabB.services.auth.register({ ...VALID_REGISTRATION, name: 'Bia', email: 'bia@example.com' });
+    await tabA.services.auth.register({ ...VALID_REGISTRATION, name: 'Caio', email: 'caio@example.com' });
+
+    for (const tab of [tabA, tabB]) {
+      for (const email of ['alex@example.com', 'bia@example.com', 'caio@example.com']) {
+        await expect(tab.services.auth.login({ email, password: VALID_REGISTRATION.password })).resolves.toMatchObject({ user: { email } });
+      }
+    }
   });
 });
 

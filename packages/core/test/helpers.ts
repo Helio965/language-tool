@@ -14,7 +14,7 @@ export interface TestApp {
   clock: { now: Date; advanceDays(days: number): void; advanceMinutes(minutes: number): void };
 }
 
-export function createTestApp(options: { ai?: AIService } = {}): TestApp {
+export function createTestApp(options: { ai?: AIService; storage?: MemoryStorage; idPrefix?: string } = {}): TestApp {
   const catalog = createStaticCatalog();
   const clock = {
     now: new Date('2026-03-02T12:00:00.000Z'),
@@ -27,12 +27,12 @@ export function createTestApp(options: { ai?: AIService } = {}): TestApp {
   };
   let counter = 0;
   const services = createAppServices({
-    store: createDocumentStore(new MemoryStorage()),
+    store: createDocumentStore(options.storage ?? new MemoryStorage()),
     catalog,
     ai: options.ai ?? new MockAIService(catalog),
     passwordHasher: new Pbkdf2PasswordHasher(1_000),
     now: () => clock.now,
-    generateId: () => `id-${++counter}`,
+    generateId: () => `${options.idPrefix ?? 'id'}-${++counter}`,
   });
   return { services, clock };
 }
