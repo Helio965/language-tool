@@ -50,6 +50,9 @@ export function LessonPage() {
     return (
       <div className={styles.page}>
         <FocusBar backTo="/aprender" backLabel="Voltar à trilha" />
+        <h1 className="visually-hidden" data-page-title tabIndex={-1}>
+          Aula
+        </h1>
         <QueryErrorState error={query.error} onRetry={() => void query.refetch()} back={{ to: '/aprender', label: 'Voltar à trilha' }} />
       </div>
     );

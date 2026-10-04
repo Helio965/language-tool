@@ -37,6 +37,9 @@ export function ChatPage() {
     return (
       <>
         <FocusBar backTo="/conversar" backLabel="Voltar" icon="back" />
+        <h1 className="visually-hidden" data-page-title tabIndex={-1}>
+          Conversa
+        </h1>
         <QueryErrorState error={query.error} onRetry={() => void query.refetch()} back={{ to: '/conversar', label: 'Voltar ao Modo Conversação' }} />
       </>
     );

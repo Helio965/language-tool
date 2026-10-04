@@ -44,6 +44,9 @@ export function ReviewSessionPage() {
     return (
       <>
         <FocusBar backTo="/revisao" backLabel="Voltar à revisão" />
+        <h1 className="visually-hidden" data-page-title tabIndex={-1}>
+          Sessão de revisão
+        </h1>
         <QueryErrorState error={session.error} onRetry={() => void session.refetch()} back={{ to: '/revisao', label: 'Voltar à revisão' }} />
       </>
     );

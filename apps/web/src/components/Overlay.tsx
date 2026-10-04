@@ -1,5 +1,5 @@
 import { CheckCircle2, Info, X, XCircle } from 'lucide-react';
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { cx } from '../utils/cx';
 import styles from './Overlay.module.css';
 
@@ -23,6 +23,7 @@ export function Dialog({
   size?: 'md' | 'lg';
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  const titleId = useId();
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
@@ -40,7 +41,7 @@ export function Dialog({
     <dialog
       ref={ref}
       className={cx(styles.dialog, styles[size])}
-      aria-labelledby="dialog-title"
+      aria-labelledby={titleId}
       onCancel={(event) => {
         event.preventDefault();
         onClose();
@@ -52,7 +53,7 @@ export function Dialog({
       {open && (
         <div className={styles.panel}>
           <header className={styles.header}>
-            <h2 id="dialog-title">{title}</h2>
+            <h2 id={titleId}>{title}</h2>
             <button type="button" className={styles.close} onClick={onClose} aria-label="Fechar">
               <X aria-hidden="true" />
             </button>

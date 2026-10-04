@@ -28,7 +28,16 @@ export function HomePage() {
       </div>
     );
   }
-  if (query.isError) return <QueryErrorState error={query.error} onRetry={() => void query.refetch()} />;
+  if (query.isError) {
+    return (
+      <>
+        <h1 className="visually-hidden" data-page-title tabIndex={-1}>
+          Início
+        </h1>
+        <QueryErrorState error={query.error} onRetry={() => void query.refetch()} />
+      </>
+    );
+  }
   return <Dashboard data={query.data} />;
 }
 
