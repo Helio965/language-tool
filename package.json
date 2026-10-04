@@ -25,5 +25,8 @@
   "devDependencies": {
     "concurrently": "^10.0.5",
     "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "jsdom": "^29.0.0"
   }
 }
