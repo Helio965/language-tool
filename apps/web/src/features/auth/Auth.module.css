@@ -152,7 +152,7 @@
   overflow-wrap: anywhere;
 }
 
-.simulatedMail span {
+.simulatedMail p > span {
   font-weight: 700;
   color: var(--ink);
 }
@@ -187,4 +187,11 @@
   display: grid;
   gap: var(--space-2);
   width: 100%;
+}
+
+/* Títulos que recebem foco programático (anúncio do novo estado), como os títulos de página do app. */
+.head h1:focus,
+.success h1:focus,
+.resetState h1:focus {
+  outline: none;
 }
