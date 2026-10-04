@@ -67,7 +67,7 @@ A arquitetura segue a proposta conceitual dos documentos — **Aplicação → B
 │           ├── layouts/     estrutura das páginas (shell, auth)
 │           ├── features/    telas por funcionalidade (auth, onboarding, placement,
 │           │                home, learning, exercises, conversation, vocabulary,
-│           │                review, progress, profile, settings)
+│           │                review, progress, profile, settings, legal)
 │           ├── services/    ApiClient (demo e http)
 │           ├── mocks/       dados de demonstração (separados dos dados reais)
 │           ├── hooks/ utils/ styles/

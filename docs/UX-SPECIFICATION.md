@@ -17,7 +17,7 @@ que estudam pelo celular em sessões curtas e têm receio de errar ao falar ingl
 | **Bia**, 19, universitária | iniciante, estuda no ônibus | aulas curtas, explicações em português, feedback imediato |
 | **Carla**, 38, profissional | intermediária, quer inglês para o trabalho | conversas sobre trabalho, explicações em inglês, correção detalhada |
 
-## 2. Princípios de UX
+## 2. Princípios de UX (RNF01)
 
 1. **Simples por fora, estruturado por dentro.** Uma ação principal por tela; detalhes sob demanda.
 2. **Errar é seguro.** Linguagem acolhedora ("Vamos ajustar"), nenhum erro em vermelho alarmante, nenhuma
@@ -155,7 +155,7 @@ marca-texto (`--marker`) e o trecho original com sublinhado ondulado.
 - **Atualização:** os números refletem a última atividade assim que a pessoa volta à tela (cache invalidado ao
   concluir aula, revisão ou conversa).
 
-## 8. Acessibilidade (RNF03)
+## 8. Acessibilidade (RNF09)
 
 Meta: **WCAG 2.1 nível AA**.
 
@@ -174,7 +174,7 @@ Meta: **WCAG 2.1 nível AA**.
 | Cor | nenhuma informação transmitida só por cor |
 | Tabelas | política de dados com cabeçalhos (`scope`) e versão empilhada legível no celular |
 
-## 9. Responsividade
+## 9. Responsividade (RNF02)
 
 | Faixa | Navegação | Comportamento das telas |
 | --- | --- | --- |

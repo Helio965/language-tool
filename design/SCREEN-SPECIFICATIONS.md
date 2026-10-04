@@ -53,7 +53,7 @@ Termos de uso do protótipo + tabela "dado / para quê / por quanto tempo" (mesm
 - **Ação:** **Continuar** / **Salvar e fazer o nivelamento**. "Voltar" preserva as respostas.
 - Reaproveitada em `/perfil/editar` (modo edição, tela imersiva).
 
-### 6. Nivelamento — `/nivelamento` (UC04, RF05, RN01)
+### 6. Nivelamento — `/nivelamento` (UC04, RF05)
 
 | Pergunta | Resultado |
 | --- | --- |
@@ -67,7 +67,7 @@ Termos de uso do protótipo + tabela "dado / para quê / por quanto tempo" (mesm
 
 ## App
 
-### 7. Início — `/inicio` (RF06, RF15)
+### 7. Início — `/inicio` (RN01, RN06, RF16)
 
 | Celular | Tablet | Desktop |
 | --- | --- | --- |
@@ -79,14 +79,14 @@ Termos de uso do protótipo + tabela "dado / para quê / por quanto tempo" (mesm
 - **Estados:** usuário novo (primeira aula em destaque, sem cartões vazios); todas as aulas concluídas.
 - **Desktop:** coluna lateral "Resumo do dia" com meta, progresso e palavras.
 
-### 8. Aprender — `/aprender` (UC05, RF07)
+### 8. Aprender — `/aprender` (UC05, RF06, RF07, RN02, RN03)
 
 ![Trilha de aulas](./screenshots/mobile-10-aprender.jpg)
 
 Trilha por nível (Iniciante → Avançado) com estado de cada aula (concluída com nota, em andamento, próxima,
 disponível) e nota para níveis acima do estimado ("Recomendado depois de avançar…", sem bloquear).
 
-### 9. Aula — `/aprender/aula/:id` (UC05, UC06, UC07, RF07–RF10) — imersiva
+### 9. Aula — `/aprender/aula/:id` (UC05–UC07, RF06–RF11, RN05) — imersiva
 
 | Explicação | Feedback de exercício | Correção de escrita |
 | --- | --- | --- |
@@ -99,7 +99,7 @@ disponível) e nota para níveis acima do estimado ("Recomendado depois de avan�
   for baixa, próxima aula.
 - **Desktop:** sumário fixo das etapas à esquerda. [desktop-03](./screenshots/desktop-03-aula.jpg)
 
-### 10. Conversar — `/conversar` (UC09, RF11, RF12)
+### 10. Conversar — `/conversar` (UC09, RF12, RN06)
 
 ![Escolha de assunto](./screenshots/mobile-11-conversar.jpg)
 
@@ -107,7 +107,7 @@ disponível) e nota para níveis acima do estimado ("Recomendado depois de avan�
   "Para você" (interesses do perfil) e aviso quando acima do nível → conversas recentes (se o histórico estiver
   ativo) ou aviso de histórico desativado.
 
-### 11. Conversa — `/conversar/:id` (UC09, RF11–RF14, RN04) — imersiva
+### 11. Conversa — `/conversar/:id` (UC09, RF12–RF14, RN04) — imersiva
 
 | Celular | Desktop |
 | --- | --- |
@@ -142,7 +142,7 @@ Título ("Boa conversa! Veja o que praticar" ou "Conversa impecável!") → mens
 Especificação da visualização: [UX-SPECIFICATION.md §7](../docs/UX-SPECIFICATION.md#7-visualização-do-progresso).
 Tablet: [tablet-03](./screenshots/tablet-03-progresso.jpg).
 
-### 14. Revisão — `/revisao` e `/revisao/:id` (UC08, RF17)
+### 14. Revisão — `/revisao` e `/revisao/:id` (UC08, RF18)
 
 ![Fila de revisão](./screenshots/mobile-15-revisao.jpg)
 
@@ -151,21 +151,21 @@ Tablet: [tablet-03](./screenshots/tablet-03-progresso.jpg).
 - Sessão de revisão usa o mesmo `ExerciseRunner`; ao final mostra a nota e a próxima data (intervalos de
   1, 3, 7, 14 e 30 dias).
 
-### 15. Vocabulário — `/vocabulario` (RF18)
+### 15. Vocabulário — `/vocabulario` (UC10, RF08, RF17)
 
 ![Vocabulário](./screenshots/mobile-16-vocabulario.jpg)
 
 Busca, filtros (Todas, Para revisar, Aprendidas), lista com palavra + tradução + estado; diálogo com
 significado, exemplos, link para a aula e as ações "Quero revisar de novo" / "Já aprendi". Link direto: `/vocabulario?palavra=<id>`.
 
-### 16. Perfil — `/perfil` (UC10, RF19)
+### 16. Perfil — `/perfil` (UC03, RF03, RF04)
 
 ![Perfil](./screenshots/mobile-17-perfil.jpg)
 
 Nome, e-mail, nível estimado, objetivo e interesses → **Editar** · **Refazer** nivelamento → atalhos
 (Progresso, Vocabulário, Revisão, Preferências, Privacidade, Refazer nivelamento) → **Sair da conta**.
 
-### 17. Preferências — `/preferencias` (UC12)
+### 17. Preferências — `/preferencias` (UC12, RF19)
 
 ![Preferências](./screenshots/mobile-18-preferencias.jpg)
 
@@ -173,7 +173,7 @@ Idioma das explicações · intensidade das correções (com pré-visualização
 das respostas · tradução de apoio · meta diária · lembretes (salvos, envio fora do MVP) · salvar histórico de
 conversas. Cada alteração salva na hora com toast.
 
-### 18. Privacidade e dados — `/privacidade` (RF20, RNF05)
+### 18. Privacidade e dados — `/privacidade` (RF20, RNF05, RN07)
 
 ![Privacidade](./screenshots/mobile-19-privacidade.jpg)
 

@@ -33,7 +33,7 @@ O que a IA **não** faz no MVP:
   modelo não são confiáveis o suficiente para um produto educacional (Análise de requisitos, Risco 2).
 - **Não decide sozinha o que mostrar.** Ela identifica problemas; a **política de correção** (seção 6)
   decide se cada um aparece agora, no resumo ou não aparece.
-- **Não emite certificação.** O nível é sempre apresentado como **"nível estimado"** (RN01).
+- **Não emite certificação.** O nível é sempre apresentado como **"nível estimado"** (Especificação, UC04 — observação).
 
 ## 2. Personalidade — Lumi
 
