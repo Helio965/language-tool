@@ -32,7 +32,7 @@ import type {
   ExplainInput,
   GenerateExerciseInput,
 } from '../types';
-import { emptyConversationContext } from '../types';
+import { emptyConversationContext, nextScriptedQuestion } from '../types';
 import { parseJsonObject, type AIProvider } from './provider';
 import { CONVERSATION_SCHEMA, CORRECTION_SCHEMA, EXAMPLE_SCHEMA, OPENING_SCHEMA } from './schemas';
 
@@ -125,7 +125,7 @@ export class LLMAIService implements AIService {
 
   async conversation({ learner, topic, context, history, userMessage }: ConversationTurnInput): Promise<ConversationTurnOutput> {
     const band = policyFor(learner.level).band;
-    const next = topic.questions.find((question) => !context.askedQuestionIds.includes(question.id)) ?? null;
+    const next = nextScriptedQuestion(topic, context);
     const system = [
       buildSystemPrompt('conversation', learner, this.assistantName),
       conversationTaskPrompt(topic, context.facts, next ? (band === 'low' ? next.low : next.high) : null),

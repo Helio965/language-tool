@@ -2,7 +2,7 @@
  * Modo DEMONSTRAÇÃO da IA: respostas determinísticas, sem chamadas externas e sem custo.
  * Garante que o protótipo funcione sem chave de API (prompt do projeto, item 29).
  */
-import type { Bilingual, ConversationTopic, Example, Exercise, ScriptedQuestion } from '../../domain/content';
+import type { Bilingual, Example, Exercise, ScriptedQuestion } from '../../domain/content';
 import type { ConversationContext } from '../../domain/entities';
 import type { ContentCatalog } from '../../content/catalog';
 import { countWords } from '../../domain/text';
@@ -23,7 +23,7 @@ import type {
   GenerateExerciseInput,
   LearnerContext,
 } from '../types';
-import { emptyConversationContext } from '../types';
+import { emptyConversationContext, nextScriptedQuestion } from '../types';
 import {
   answerQuestion,
   extractFacts,
@@ -60,6 +60,20 @@ const FACT_REACTIONS: Record<string, (value: string) => Bilingual> = {
   food: (v) => ({ en: `${v}? Yum! Great choice.`, pt: `${v}? Hum! Ótima escolha.` }),
 };
 
+/** Continuação neutra depois de reformular a frase (evita "Oh, so… Oh, I love that."). */
+const RECAST_FOLLOW_UPS: Record<'low' | 'high', Bilingual[]> = {
+  low: [
+    { en: 'Cool!', pt: 'Que legal!' },
+    { en: 'Nice!', pt: 'Legal!' },
+    { en: 'Got it!', pt: 'Entendi!' },
+  ],
+  high: [
+    { en: 'Good to know.', pt: 'Bom saber.' },
+    { en: 'Got it.', pt: 'Entendi.' },
+    { en: 'Nice.', pt: 'Legal.' },
+  ],
+};
+
 const ELABORATE: Record<'low' | 'high', Bilingual> = {
   low: { en: 'Can you tell me a little more?', pt: 'Você pode me contar um pouco mais?' },
   high: { en: "Tell me more — I'm curious!", pt: 'Me conte mais — fiquei curiosa!' },
@@ -82,10 +96,6 @@ function pick<T>(list: readonly T[], index: number): T {
 
 function questionText(question: ScriptedQuestion, band: 'low' | 'high'): Bilingual {
   return { en: band === 'low' ? question.low : question.high, pt: question.lowPt };
-}
-
-function nextQuestion(topic: ConversationTopic, context: ConversationContext): ScriptedQuestion | null {
-  return topic.questions.find((question) => !context.askedQuestionIds.includes(question.id)) ?? null;
 }
 
 /** Frase corrigida (a que mudou), em 2ª pessoa — usada para reformular sem apontar o erro. */
@@ -202,7 +212,7 @@ export class MockAIService implements AIService {
     if (shortAnswer && context.turn % 2 === 0) {
       parts.push(ELABORATE[band]);
     } else {
-      const next = nextQuestion(topic, updated);
+      const next = nextScriptedQuestion(topic, updated);
       if (next) {
         updated.askedQuestionIds.push(next.id);
         parts.push(questionText(next, band));
@@ -220,13 +230,12 @@ export class MockAIService implements AIService {
     const recast = relevant.length ? recastSentence(message, applyIssues(message, relevant)) : null;
     const factKey = Object.keys(FACT_REACTIONS).find((key) => facts[key]);
     const factReaction = factKey ? FACT_REACTIONS[factKey]?.(facts[factKey] as string) : null;
-    const generic = pick(band === 'low' ? REACTIONS_LOW : REACTIONS_HIGH, turn);
     if (recast) {
       // Depois de reformular, só reage ao nome — os demais fatos repetiriam a frase sem correção.
-      const follow = factKey === 'name' && factReaction ? factReaction : generic;
-      return { en: `Oh, so ${recast}. ${follow.en}`, pt: `Entendi! ${follow.pt}` };
+      const follow = factKey === 'name' && factReaction ? factReaction : pick(RECAST_FOLLOW_UPS[band], turn);
+      return { en: `Oh, so ${recast}. ${follow.en}`, pt: `Ah, entendi. ${follow.pt}` };
     }
-    return factReaction ?? generic;
+    return factReaction ?? pick(band === 'low' ? REACTIONS_LOW : REACTIONS_HIGH, turn);
   }
 
   private reply(

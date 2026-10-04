@@ -160,6 +160,8 @@ export interface ScriptedQuestion {
   high: string;
   /** Tradução de apoio da versão "low". */
   lowPt: string;
+  /** Fatos que a pergunta pede (ex.: "age"); se o usuário já contou, a pergunta é pulada. */
+  asks?: string[];
 }
 
 export interface ConversationTopic {

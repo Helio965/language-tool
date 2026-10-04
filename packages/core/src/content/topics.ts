@@ -17,7 +17,7 @@ export const CONVERSATION_TOPICS: readonly ConversationTopic[] = [
     questions: [
       { id: 'free-1', low: 'How are you today?', high: "How's your day going so far?", lowPt: 'Como você está hoje?' },
       { id: 'free-2', low: 'What do you like to do?', high: 'What do you usually do to relax?', lowPt: 'O que você gosta de fazer?' },
-      { id: 'free-3', low: 'What is your favorite food?', high: "What's a dish you could eat every single day?", lowPt: 'Qual é a sua comida favorita?' },
+      { id: 'free-3', low: 'What is your favorite food?', high: "What's a dish you could eat every single day?", lowPt: 'Qual é a sua comida favorita?', asks: ['food'] },
       { id: 'free-4', low: 'Do you like music?', high: 'What kind of music have you been listening to lately?', lowPt: 'Você gosta de música?' },
       { id: 'free-5', low: 'Why do you study English?', high: 'What would you like to do once your English is more fluent?', lowPt: 'Por que você estuda inglês?' },
     ],
@@ -31,9 +31,9 @@ export const CONVERSATION_TOPICS: readonly ConversationTopic[] = [
     areas: ['everyday'],
     recommendedFrom: 'beginner',
     questions: [
-      { id: 'intro-1', low: 'Where are you from?', high: 'Where are you from, and what do you like most about it?', lowPt: 'De onde você é?' },
-      { id: 'intro-2', low: 'How old are you?', high: 'How long have you lived there?', lowPt: 'Quantos anos você tem?' },
-      { id: 'intro-3', low: 'What do you do? Are you a student?', high: 'What do you do for a living, or what are you studying?', lowPt: 'O que você faz? Você é estudante?' },
+      { id: 'intro-1', low: 'Where are you from?', high: 'Where are you from, and what do you like most about it?', lowPt: 'De onde você é?', asks: ['from', 'city'] },
+      { id: 'intro-2', low: 'How old are you?', high: 'How long have you lived there?', lowPt: 'Quantos anos você tem?', asks: ['age'] },
+      { id: 'intro-3', low: 'What do you do? Are you a student?', high: 'What do you do for a living, or what are you studying?', lowPt: 'O que você faz? Você é estudante?', asks: ['job'] },
       { id: 'intro-4', low: 'Do you have brothers or sisters?', high: 'Tell me a bit about your family.', lowPt: 'Você tem irmãos ou irmãs?' },
       { id: 'intro-5', low: 'What do you like to do on weekends?', high: 'What does a perfect weekend look like for you?', lowPt: 'O que você gosta de fazer nos fins de semana?' },
     ],
@@ -62,7 +62,7 @@ export const CONVERSATION_TOPICS: readonly ConversationTopic[] = [
     areas: ['food', 'travel'],
     recommendedFrom: 'beginner',
     questions: [
-      { id: 'food-1', low: 'What is your favorite food?', high: "What's your all-time favorite dish?", lowPt: 'Qual é a sua comida favorita?' },
+      { id: 'food-1', low: 'What is your favorite food?', high: "What's your all-time favorite dish?", lowPt: 'Qual é a sua comida favorita?', asks: ['food'] },
       { id: 'food-2', low: 'Do you like to cook?', high: "Do you enjoy cooking, or do you prefer eating out?", lowPt: 'Você gosta de cozinhar?' },
       { id: 'food-3', low: 'What do you usually order at a restaurant?', high: 'What do you usually order when you go out to eat?', lowPt: 'O que você geralmente pede em um restaurante?' },
       { id: 'food-4', low: 'Is there a food you don\'t like?', high: "Is there any food you just can't stand?", lowPt: 'Tem alguma comida de que você não gosta?' },
@@ -92,7 +92,7 @@ export const CONVERSATION_TOPICS: readonly ConversationTopic[] = [
     areas: ['business'],
     recommendedFrom: 'basic',
     questions: [
-      { id: 'work-1', low: 'What is your job?', high: 'What do you do, and what do you enjoy most about it?', lowPt: 'Qual é o seu trabalho?' },
+      { id: 'work-1', low: 'What is your job?', high: 'What do you do, and what do you enjoy most about it?', lowPt: 'Qual é o seu trabalho?', asks: ['job'] },
       { id: 'work-2', low: 'Do you like your job?', high: "What's the most challenging part of your job?", lowPt: 'Você gosta do seu trabalho?' },
       { id: 'work-3', low: 'Do you work from home?', high: 'Do you prefer working from home or at the office? Why?', lowPt: 'Você trabalha de casa?' },
       { id: 'work-4', low: 'What is your dream job?', high: 'Where do you see your career in five years?', lowPt: 'Qual é o trabalho dos seus sonhos?' },

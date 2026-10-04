@@ -2,7 +2,7 @@
  * Contrato da camada pedagógica de IA. A aplicação depende apenas desta interface —
  * nunca de um provedor específico (Análise de requisitos, Risco 3 — dependência externa).
  */
-import type { Bilingual, ConversationTopic, Example, Exercise, Lesson } from '../domain/content';
+import type { Bilingual, ConversationTopic, Example, Exercise, Lesson, ScriptedQuestion } from '../domain/content';
 import type { ConversationContext, CorrectionIntensity, MessageRole, ReplyLength } from '../domain/entities';
 import type { Level } from '../domain/levels';
 import type { Goal, InterestArea } from '../domain/profile';
@@ -106,4 +106,13 @@ export interface AIService {
 
 export function emptyConversationContext(): ConversationContext {
   return { facts: {}, askedQuestionIds: [], turn: 0, turnsSinceInlineCorrection: 2 };
+}
+
+/** Próxima pergunta do roteiro: ainda não feita e sobre algo que o usuário ainda não contou. */
+export function nextScriptedQuestion(topic: ConversationTopic, context: ConversationContext): ScriptedQuestion | null {
+  return (
+    topic.questions.find(
+      (question) => !context.askedQuestionIds.includes(question.id) && !(question.asks ?? []).some((fact) => context.facts[fact]),
+    ) ?? null
+  );
 }

@@ -62,6 +62,14 @@ describe('modo demonstração da IA', () => {
     expect(turn.reply).toContain('Bia');
   });
 
+  it('não pergunta algo que o usuário já contou', async () => {
+    const opening = await ai.startConversation({ learner, topic });
+    const turn = await ai.conversation({ learner, topic, context: opening.context, history: [], userMessage: 'I have 25 years.' });
+    expect(turn.context.facts.age).toBe('25');
+    expect(turn.reply).not.toContain('How old are you?');
+    expect(turn.reply).toContain('What do you do?');
+  });
+
   it('acolhe mensagens em português e incentiva o inglês', async () => {
     const turn = await ai.conversation({ learner, topic, context: emptyConversationContext(), history: [], userMessage: 'Eu não sei falar isso em inglês' });
     expect(turn.reply).toMatch(/try it in English/);
