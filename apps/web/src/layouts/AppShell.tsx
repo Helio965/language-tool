@@ -1,4 +1,4 @@
-import { BarChart3, BookOpen, Home, MessagesSquare, UserRound } from 'lucide-react';
+import { BarChart3, BookOpen, Home, MessagesSquare, MonitorSmartphone, UserRound } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { NavLink, Outlet, useLocation, useMatches } from 'react-router';
 import { Logo } from '../components/Brand';
@@ -59,9 +59,16 @@ export function AppShell() {
         </nav>
         <div className={styles.sideFooter}>
           <LevelBadge level={account.profile.estimatedLevel} />
-          <p className={styles.sideNote}>
-            {api.mode === 'demo' ? 'Modo demonstração · dados neste navegador' : 'Projeto acadêmico — MVP'}
-          </p>
+          {api.mode === 'demo' ? (
+            <p className={styles.demoNotice}>
+              <MonitorSmartphone aria-hidden="true" />
+              <span>
+                <strong>Modo demonstração</strong> Seus dados ficam salvos só neste navegador.
+              </span>
+            </p>
+          ) : (
+            <p className={styles.sideNote}>Projeto acadêmico — MVP</p>
+          )}
         </div>
       </aside>
 
