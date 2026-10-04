@@ -65,6 +65,7 @@ export function WelcomePage() {
               <Button variant="ghost" onClick={exploreDemo} loading={demoLoading} loadingLabel="Preparando demonstração…">
                 Explorar demonstração com dados de exemplo
               </Button>
+              <p className={styles.demoNote}>Modo demonstração: os dados ficam apenas neste navegador e a IA é simulada.</p>
               {error && <InlineAlert>{error}</InlineAlert>}
             </div>
           )}

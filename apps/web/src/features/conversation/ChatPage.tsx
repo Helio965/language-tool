@@ -122,7 +122,10 @@ function Chat({ conversation }: { conversation: ConversationView }) {
         icon="back"
         title={
           <span className={styles.barTitle}>
-            <AssistantAvatar size={26} /> {ASSISTANT_PERSONA.name} · {conversation.title}
+            <AssistantAvatar size={26} />
+            <span className={styles.barText}>
+              {ASSISTANT_PERSONA.name} · {conversation.title}
+            </span>
           </span>
         }
         action={

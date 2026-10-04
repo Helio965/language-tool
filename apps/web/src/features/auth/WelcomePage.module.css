@@ -91,6 +91,11 @@
   justify-items: start;
 }
 
+.demoNote {
+  font-size: var(--text-caption);
+  color: var(--ink-3);
+}
+
 .preview {
   position: relative;
   display: grid;
