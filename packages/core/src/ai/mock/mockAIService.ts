@@ -104,11 +104,12 @@ function recastSentence(original: string, corrected: string): string | null {
   const before = split(original);
   const after = split(corrected);
   const changed = after.find((sentence, index) => sentence !== before[index]);
-  if (!changed || countWords(changed) > 12) return null;
+  if (!changed) return null;
   // "Hi! My name is Bia and I am 25 years old." → usa só a oração que contém a correção.
   const clauses = changed.split(/,?\s+(?:and|but)\s+/i);
   const originalClauses = (before[after.indexOf(changed)] ?? '').split(/,?\s+(?:and|but)\s+/i);
   const clause = clauses.find((part, index) => part !== originalClauses[index]) ?? changed;
+  if (countWords(clause) > 12) return null;
   return toSecondPerson(clause.replace(/^[A-Z]/, (letter) => (/^(I|I'm)\b/.test(clause) ? letter : letter.toLowerCase())));
 }
 

@@ -62,6 +62,17 @@ describe('modo demonstração da IA', () => {
     expect(turn.reply).toContain('Bia');
   });
 
+  it('no recast de frases longas, retoma só a oração corrigida', async () => {
+    const turn = await ai.conversation({
+      learner,
+      topic: catalog.topic('daily-routine')!,
+      context: emptyConversationContext(),
+      history: [],
+      userMessage: 'I wake up at the morning and I go to work by bus.',
+    });
+    expect(turn.reply).toMatch(/^Oh, so you wake up in the morning\./);
+  });
+
   it('não pergunta algo que o usuário já contou', async () => {
     const opening = await ai.startConversation({ learner, topic });
     const turn = await ai.conversation({ learner, topic, context: opening.context, history: [], userMessage: 'I have 25 years.' });
