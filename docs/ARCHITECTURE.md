@@ -153,6 +153,7 @@ Principais rotas da API (todas sob `/api`):
 | Método | Rota | Caso de uso |
 |--------|------|-------------|
 | POST | `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/password-reset` | UC01, UC02 |
+| GET | `/auth/session` | estado da sessão (conta ou `null`, sem 401 para visitantes) |
 | GET/DELETE | `/me` | sessão, RF20 |
 | PUT | `/me/profile` | UC03 |
 | GET/PATCH | `/me/preferences` | UC12 |

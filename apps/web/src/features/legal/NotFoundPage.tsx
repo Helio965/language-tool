@@ -10,6 +10,7 @@ export function NotFoundPage() {
     <main id="conteudo" style={{ maxWidth: 560, margin: '0 auto', padding: 'var(--space-12) var(--gutter)' }}>
       <EmptyState
         title="Página não encontrada"
+        headingLevel={1}
         description="O endereço pode ter mudado ou não existe. Vamos voltar para um lugar conhecido?"
         action={<Button to={account ? '/inicio' : '/'}>{account ? 'Ir para o início' : 'Ir para a página inicial'}</Button>}
       />

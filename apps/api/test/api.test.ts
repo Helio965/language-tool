@@ -117,8 +117,11 @@ describe('API — autenticação (UC01, UC02)', () => {
     const agent = request.agent(ctx.app);
     await agent.post('/api/auth/login').set(CSRF).send({ email: 'ALEX@example.com', password: 'segura123' }).expect(200);
     await agent.get('/api/me').expect(200);
+    expect((await agent.get('/api/auth/session').expect(200)).body.account.user.email).toBe('alex@example.com');
     await agent.post('/api/auth/logout').set(CSRF).expect(204);
     await agent.get('/api/me').expect(401);
+    // Visitantes consultam a sessão sem erro.
+    expect((await agent.get('/api/auth/session').expect(200)).body).toEqual({ account: null });
   });
 
   it('recusa credenciais inválidas com mensagem genérica (UC02-A1)', async () => {

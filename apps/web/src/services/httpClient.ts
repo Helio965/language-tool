@@ -1,3 +1,4 @@
+import type { AccountState } from '@english-ai/core';
 import type { ApiClient } from './apiClient';
 import { ApiError } from './errors';
 
@@ -33,14 +34,7 @@ export function createHttpClient(baseUrl = '/api'): ApiClient {
 
   return {
     mode: 'http',
-    async getSession() {
-      try {
-        return await call('GET', '/me');
-      } catch (error) {
-        if (error instanceof ApiError && error.code === 'UNAUTHENTICATED') return null;
-        throw error;
-      }
-    },
+    getSession: async () => (await call<{ account: AccountState | null }>('GET', '/auth/session')).account,
     register: (input) => call('POST', '/auth/register', input),
     login: (input) => call('POST', '/auth/login', input),
     logout: () => call('POST', '/auth/logout'),

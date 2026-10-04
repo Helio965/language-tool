@@ -3,7 +3,7 @@
  */
 import { Router, type Response } from 'express';
 import { z } from 'zod';
-import { GOALS, INTEREST_AREAS, PRIOR_EXPERIENCES, type AccountState, type AppServices } from '@english-ai/core';
+import { AppError, GOALS, INTEREST_AREAS, PRIOR_EXPERIENCES, type AccountState, type AppServices } from '@english-ai/core';
 import type { SessionTokens } from '../../security/sessionTokens';
 import { requireAuth, SESSION_COOKIE, userIdOf } from '../middleware/security';
 import type { RequestHandler } from 'express';
@@ -77,6 +77,19 @@ export function authRoutes(deps: {
   router.post('/auth/password-reset', authLimiter, (req, res) => {
     resetSchema.parse(req.body);
     res.status(202).json({ message: 'Se existir uma conta com este e-mail, enviaremos as instruções de recuperação.' });
+  });
+
+  /** Estado da sessão sem erro: 200 com a conta ou null (visitantes não geram 401 no console). */
+  router.get('/auth/session', async (_req, res) => {
+    const userId = res.locals.userId;
+    if (typeof userId !== 'string') return void res.json({ account: null });
+    try {
+      res.json({ account: await services.auth.getAccount(userId) });
+    } catch (error) {
+      if (!(error instanceof AppError && error.code === 'UNAUTHENTICATED')) throw error;
+      res.clearCookie(SESSION_COOKIE, cookieOptions);
+      res.json({ account: null });
+    }
   });
 
   router.get('/me', requireAuth, async (_req, res) => {

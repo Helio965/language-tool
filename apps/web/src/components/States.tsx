@@ -32,18 +32,24 @@ export function EmptyState({
   description,
   action,
   illustration,
+  headingLevel = 2,
 }: {
   title: string;
   description?: ReactNode;
   action?: ReactNode;
   illustration?: ReactNode;
+  /** 1 quando o estado vazio é o conteúdo principal da página (ex.: 404). */
+  headingLevel?: 1 | 2;
 }) {
+  const Heading = headingLevel === 1 ? 'h1' : 'h2';
   return (
     <div className={styles.empty}>
       <div className={styles.emptyArt} aria-hidden="true">
         {illustration ?? <EmptyNotebook />}
       </div>
-      <h2 className={styles.emptyTitle}>{title}</h2>
+      <Heading className={styles.emptyTitle} {...(headingLevel === 1 ? { 'data-page-title': true, tabIndex: -1 } : {})}>
+        {title}
+      </Heading>
       {description && <p className={styles.emptyText}>{description}</p>}
       {action && <div className={styles.emptyAction}>{action}</div>}
     </div>
