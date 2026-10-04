@@ -28,9 +28,9 @@ interface SessionValue {
   signIn: (account: AccountState) => void;
   /** Atualiza a conta exibida, só se `userId` ainda for a conta conectada (respostas tardias não ressuscitam sessões). */
   updateAccount: (userId: string, update: (account: AccountState) => AccountState) => void;
-  /** Revalida a conta (perfil, nível, etapa pendente). */
+  /** Revalida a conta (perfil, nível, etapa pendente). Lança erro se não conseguir. */
   refresh: () => Promise<void>;
-  /** Revalida a conta e todos os dados privados dela. */
+  /** Revalida a conta e todos os dados privados dela. Lança erro se a conta não puder ser revalidada. */
   refreshUserData: () => Promise<void>;
   /** Logout intencional. Lança erro se o servidor não confirmar (a pessoa continua conectada). */
   logout: () => Promise<void>;
@@ -190,13 +190,14 @@ export function SessionProvider({ api: client, children }: { api: ApiClient; chi
   );
 
   const refresh = useCallback(async () => {
-    await queryClient.invalidateQueries({ queryKey: SESSION_KEY });
+    await queryClient.invalidateQueries({ queryKey: SESSION_KEY }, { throwOnError: true });
   }, [queryClient]);
 
   const refreshUserData = useCallback(async () => {
     const id = currentAccount()?.user.id;
     await Promise.all([
-      queryClient.invalidateQueries({ queryKey: SESSION_KEY }),
+      queryClient.invalidateQueries({ queryKey: SESSION_KEY }, { throwOnError: true }),
+      // Falhas nos dados privados aparecem nas próprias telas (com "Tentar de novo").
       id ? queryClient.invalidateQueries({ queryKey: userKeys(id).all }) : Promise.resolve(),
     ]);
   }, [queryClient, currentAccount]);

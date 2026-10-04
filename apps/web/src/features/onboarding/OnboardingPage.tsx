@@ -106,9 +106,9 @@ export function OnboardingPage({ mode = 'onboarding' }: { mode?: 'onboarding' | 
       if (mode === 'edit') {
         toast('Perfil de aprendizagem atualizado.');
         navigate('/perfil');
-      } else {
-        navigate('/nivelamento');
       }
+      // Primeiro acesso: com a conta atualizada (etapa = nivelamento), a guarda de rota leva ao
+      // nivelamento. Navegar aqui também criaria uma entrada duplicada no histórico.
     } catch (err) {
       setError(err);
       setSaving(false);

@@ -104,7 +104,8 @@ export function PlacementPage({ retake = false }: { retake?: boolean }) {
     try {
       // Atualiza a conta (nível, etapa pendente) e os dados que dependem do nível.
       await refreshUserData();
-      navigate(retake ? '/perfil' : '/inicio');
+      // Primeiro acesso: com a etapa concluída, a guarda de rota leva ao Início.
+      if (retake) navigate('/perfil');
     } catch (err) {
       setError(err);
       setBusy(false);
