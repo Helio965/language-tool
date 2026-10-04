@@ -109,15 +109,15 @@ Textos em **inglês** de conteúdo (exemplos, frases de exercício) usam o mesmo
 | Faixa | Largura | Navegação | Conteúdo |
 |-------|---------|-----------|----------|
 | Mobile | < 600px | barra inferior com 5 destinos | 1 coluna, margem 16–20px |
-| Tablet | 600–1023px | trilho lateral (ícones + rótulo) | 1–2 colunas, máx. 760px |
-| Desktop | ≥ 1024px | barra lateral de 248px com marca, navegação e nível | grade de 12 colunas, máx. 1120px; telas usam 2 colunas (conteúdo + painel de apoio) |
+| Tablet | 600–1023px | trilho lateral de 88px (ícones + rótulo) | 1–2 colunas, margem fluida (`--gutter`) |
+| Desktop | ≥ 1024px | barra lateral de 248px com marca, navegação e nível | conteúdo até 1120px (`--content-max`); telas usam 2 colunas (conteúdo + painel de apoio) |
 
 O desktop **não estica** o mobile: Início ganha coluna lateral de progresso; Aula ganha sumário fixo das etapas; Conversa ganha painel de "feedback da conversa"; Progresso organiza indicadores em grade.
 
 ## 7. Iconografia e imagem
 
 - Ícones de linha (Lucide), traço 2px, tamanho 20–24px, sempre com rótulo visível ou `aria-label`.
-- Símbolo da marca: dois balões sobrepostos (ultramar atrás, coral à frente) — ver `apps/web/src/components/Logo.tsx`.
+- Símbolo da marca: dois balões sobrepostos (ultramar atrás, coral à frente) — ver `apps/web/src/components/Brand.tsx`.
 - Avatar da IA: balão coral com uma pequena estrela de quatro pontas (centelha), indicando "IA".
 - Sem fotos de banco de imagens; ilustrações são composições geométricas simples feitas com as cores do sistema.
 
