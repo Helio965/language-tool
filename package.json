@@ -17,12 +17,14 @@
     "dev:api": "npm run dev -w @english-ai/api",
     "dev:full": "concurrently -k -n api,web -c blue,magenta \"npm run dev -w @english-ai/api\" \"npm run dev:http -w @english-ai/web\"",
     "build": "npm run typecheck && npm run build -w @english-ai/api && npm run build -w @english-ai/web",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present && tsc -p e2e/tsconfig.json",
     "test": "npm run test --workspaces --if-present",
     "start:api": "npm run start -w @english-ai/api",
-    "preview": "npm run preview -w @english-ai/web"
+    "preview": "npm run preview -w @english-ai/web",
+    "test:e2e": "playwright test -c e2e/playwright.config.ts"
   },
   "devDependencies": {
+    "@playwright/test": "1.56.1",
     "concurrently": "^10.0.5",
     "typescript": "^5.9.3"
   },
