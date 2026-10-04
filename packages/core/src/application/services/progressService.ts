@@ -87,6 +87,7 @@ export function createProgressService(
         goal: profile.goal,
         goalLabel: profile.goal ? GOAL_LABELS[profile.goal] : null,
         continueLesson,
+        reviewCount: queue.due.length,
         reviewDue: queue.due.slice(0, 3),
         recentWords,
         streakDays: data.totals.streakDays,

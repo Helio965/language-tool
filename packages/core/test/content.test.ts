@@ -53,6 +53,19 @@ describe('integridade do conteúdo pedagógico', () => {
     }
   });
 
+  it('conversa de prática de cada aula continua com perguntas de um assunto relacionado, sem repetir', () => {
+    for (const lesson of LESSONS) {
+      const practice = catalog.topic(`lesson:${lesson.id}`);
+      expect(practice, lesson.id).toBeDefined();
+      const questions = practice!.questions.map((question) => question.low);
+      expect(questions[0]).toBe(lesson.practice.question);
+      expect(questions.length, lesson.id).toBeGreaterThan(2);
+      expect(new Set(questions).size).toBe(questions.length);
+    }
+    const routine = catalog.topic('lesson:simple-present')!.questions.map((question) => question.low);
+    expect(routine.filter((question) => /wake up/i.test(question))).toHaveLength(1);
+  });
+
   it('aponta temas de revisão para aulas existentes', () => {
     for (const lessonId of Object.values(SKILL_LESSON)) expect(catalog.lesson(lessonId as string)).toBeDefined();
   });

@@ -57,7 +57,31 @@ export function buildVocabularyExercise(entry: VocabularyEntry, all: readonly Vo
   };
 }
 
+/** Assunto que dá continuidade à conversa de prática de cada aula ("Praticar isso"). */
+const PRACTICE_FOLLOW_UP: Record<string, string> = {
+  greetings: 'introductions',
+  alphabet: 'introductions',
+  'verb-to-be': 'introductions',
+  'numbers-age': 'introductions',
+  'colors-objects': 'free',
+  'simple-present': 'daily-routine',
+  'questions-negatives': 'food',
+  prepositions: 'daily-routine',
+  'simple-past': 'hobbies',
+  future: 'travel',
+  'present-perfect': 'travel',
+  'phrasal-verbs': 'work',
+};
+
+/** Evita perguntas quase iguais ("What time do you wake up?" × "What time do you usually wake up?"). */
+function isRepeat(candidate: string, asked: string): boolean {
+  const words = (text: string) => text.toLowerCase().match(/[a-z']+/g) ?? [];
+  const askedWords = new Set(words(asked));
+  return words(candidate).every((word) => askedWords.has(word));
+}
+
 function practiceTopic(lesson: Lesson): ConversationTopic {
+  const followUp = CONVERSATION_TOPICS.find((topic) => topic.id === (PRACTICE_FOLLOW_UP[lesson.id] ?? 'free'));
   return {
     id: `${LESSON_PRACTICE_PREFIX}${lesson.id}`,
     title: `Praticar: ${lesson.title}`,
@@ -68,6 +92,7 @@ function practiceTopic(lesson: Lesson): ConversationTopic {
     recommendedFrom: lesson.level,
     questions: [
       { id: `${lesson.id}-practice`, low: lesson.practice.question, high: lesson.practice.question, lowPt: lesson.practice.opener.pt },
+      ...(followUp?.questions ?? []).filter((question) => !isRepeat(question.low, lesson.practice.question)),
     ],
   };
 }

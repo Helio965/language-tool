@@ -49,6 +49,19 @@ describe('modo demonstração da IA', () => {
     expect(turn.reply).toContain('you are 25 years old');
   });
 
+  it('no recast, retoma só a frase com erro (não ecoa saudações)', async () => {
+    const turn = await ai.conversation({
+      learner,
+      topic,
+      context: emptyConversationContext(),
+      history: [],
+      userMessage: 'Hi! My name is Bia and I have 25 years.',
+    });
+    expect(turn.reply).toMatch(/^Oh, so you are 25 years old\./);
+    expect(turn.reply).not.toContain('so Hi');
+    expect(turn.reply).toContain('Bia');
+  });
+
   it('acolhe mensagens em português e incentiva o inglês', async () => {
     const turn = await ai.conversation({ learner, topic, context: emptyConversationContext(), history: [], userMessage: 'Eu não sei falar isso em inglês' });
     expect(turn.reply).toMatch(/try it in English/);

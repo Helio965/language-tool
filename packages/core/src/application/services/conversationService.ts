@@ -32,6 +32,7 @@ const GOAL_AREAS: Record<string, InterestArea[]> = {
 };
 
 const EPHEMERAL_HOURS = 24;
+const MAX_RECOMMENDED_TOPICS = 3;
 
 function preview(messages: Message[]): string {
   const last = messages.at(-1);
@@ -88,15 +89,26 @@ export function createConversationService(ctx: ServiceContext) {
   }
 
   return {
+    /** Assuntos com até 3 recomendações: interesses do perfil pesam mais que o objetivo. */
     async listTopics(userId: string): Promise<TopicView[]> {
       const profile = await loadProfile(ctx, userId);
       const level = profile.estimatedLevel ?? 'beginner';
-      const preferred = new Set<InterestArea>([...profile.interestAreas, ...(profile.goal ? GOAL_AREAS[profile.goal] ?? [] : [])]);
-      return ctx.catalog
-        .topics()
+      const interests = new Set<InterestArea>(profile.interestAreas);
+      const goalAreas = new Set<InterestArea>(profile.goal ? (GOAL_AREAS[profile.goal] ?? []) : []);
+      const topics = ctx.catalog.topics();
+      const score = (areas: readonly InterestArea[]) =>
+        areas.reduce((sum, area) => sum + (interests.has(area) ? 2 : 0) + (goalAreas.has(area) ? 1 : 0), 0);
+      const recommended = new Set(
+        topics
+          .filter((topic) => topic.id !== 'free' && score(topic.areas) > 0)
+          .sort((a, b) => score(b.areas) - score(a.areas))
+          .slice(0, MAX_RECOMMENDED_TOPICS)
+          .map((topic) => topic.id),
+      );
+      return topics
         .map((topic) => ({
           ...topic,
-          recommended: topic.id !== 'free' && topic.areas.some((area) => preferred.has(area)),
+          recommended: recommended.has(topic.id),
           aboveLevel: levelIndex(topic.recommendedFrom) > levelIndex(level),
         }))
         .sort((a, b) => Number(b.recommended) - Number(a.recommended));

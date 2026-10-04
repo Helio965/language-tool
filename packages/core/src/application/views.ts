@@ -237,6 +237,8 @@ export interface HomeDashboard {
   goal: Goal | null;
   goalLabel: string | null;
   continueLesson: LessonSummary | null;
+  /** Total de revisões pendentes e as primeiras da fila (para o atalho do Início). */
+  reviewCount: number;
   reviewDue: ReviewItemView[];
   recentWords: VocabularyItemView[];
   streakDays: number;

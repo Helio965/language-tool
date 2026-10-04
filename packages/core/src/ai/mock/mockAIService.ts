@@ -88,6 +88,20 @@ function nextQuestion(topic: ConversationTopic, context: ConversationContext): S
   return topic.questions.find((question) => !context.askedQuestionIds.includes(question.id)) ?? null;
 }
 
+/** Frase corrigida (a que mudou), em 2ª pessoa — usada para reformular sem apontar o erro. */
+function recastSentence(original: string, corrected: string): string | null {
+  const split = (text: string) => text.split(/(?<=[.!?])\s+/);
+  const before = split(original);
+  const after = split(corrected);
+  const changed = after.find((sentence, index) => sentence !== before[index]);
+  if (!changed || countWords(changed) > 12) return null;
+  // "Hi! My name is Bia and I am 25 years old." → usa só a oração que contém a correção.
+  const clauses = changed.split(/,?\s+(?:and|but)\s+/i);
+  const originalClauses = (before[after.indexOf(changed)] ?? '').split(/,?\s+(?:and|but)\s+/i);
+  const clause = clauses.find((part, index) => part !== originalClauses[index]) ?? changed;
+  return toSecondPerson(clause.replace(/^[A-Z]/, (letter) => (/^(I|I'm)\b/.test(clause) ? letter : letter.toLowerCase())));
+}
+
 function join(parts: Array<string | null | undefined>): string {
   return parts.filter((part): part is string => Boolean(part && part.trim())).join(' ');
 }
@@ -203,13 +217,14 @@ export class MockAIService implements AIService {
   /** Reação natural; quando há erro, "reformula" a frase corretamente (recast) sem interromper. */
   private reaction(message: string, facts: Record<string, string>, issues: GrammarIssue[], band: 'low' | 'high', turn: number): Bilingual {
     const relevant = issues.filter((issue) => issue.severity !== 'naturalness');
-    const corrected = relevant.length ? applyIssues(message, relevant) : null;
-    const recast = corrected && countWords(corrected) <= 12 ? toSecondPerson(corrected.split(/(?<=[.!?])\s/)[0] ?? corrected) : null;
+    const recast = relevant.length ? recastSentence(message, applyIssues(message, relevant)) : null;
     const factKey = Object.keys(FACT_REACTIONS).find((key) => facts[key]);
     const factReaction = factKey ? FACT_REACTIONS[factKey]?.(facts[factKey] as string) : null;
     const generic = pick(band === 'low' ? REACTIONS_LOW : REACTIONS_HIGH, turn);
     if (recast) {
-      return { en: `Oh, so ${recast}. ${(factReaction ?? generic).en}`, pt: `Entendi! ${(factReaction ?? generic).pt}` };
+      // Depois de reformular, só reage ao nome — os demais fatos repetiriam a frase sem correção.
+      const follow = factKey === 'name' && factReaction ? factReaction : generic;
+      return { en: `Oh, so ${recast}. ${follow.en}`, pt: `Entendi! ${follow.pt}` };
     }
     return factReaction ?? generic;
   }

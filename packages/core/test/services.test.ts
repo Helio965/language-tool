@@ -97,8 +97,11 @@ describe('jornada completa do MVP', () => {
     expect(progress.totals).toMatchObject({ lessonsCompleted: 1, exercisesDone: 6, accuracy: 0, studyMinutes: 9 });
     expect(progress.needsReview.map((item) => item.reason)).toEqual(expect.arrayContaining(['errors', 'low_score']));
 
-    // UC08 — revisão com motivo
+    // UC08 — revisão com motivo; o Início mostra o total pendente, igual à fila
     const queue = await services.review.queue(user.id);
+    const homeAfter = await services.progress.home(user.id);
+    expect(homeAfter.reviewCount).toBe(queue.due.length);
+    expect(homeAfter.reviewDue.length).toBeLessThanOrEqual(3);
     const skillReview = queue.due.find((item) => item.kind === 'skill')!;
     expect(skillReview.reasonText).toContain('Simple Present');
     const session = await services.review.startSession(user.id, skillReview.id);
@@ -138,6 +141,16 @@ describe('Modo Conversação (UC09)', () => {
     expect(summary.userMessages).toBe(2);
     expect(summary.corrections.map((c) => c.suggestion)).toEqual(['I am 25 years old.', 'My sister works in a bank.']);
     await expectAppError(services.conversation.send(userId, conversation.id, 'Hi'), 'CONVERSATION_ENDED');
+  });
+
+  it('recomenda no máximo 3 assuntos, priorizando os interesses do perfil', async () => {
+    const { services, userId } = await readyUser();
+    const topics = await services.conversation.listTopics(userId);
+    const recommended = topics.filter((topic) => topic.recommended);
+    expect(recommended.length).toBeGreaterThan(0);
+    expect(recommended.length).toBeLessThanOrEqual(3);
+    expect(topics.slice(0, recommended.length).every((topic) => topic.recommended)).toBe(true);
+    expect(recommended.some((topic) => topic.id === 'free')).toBe(false);
   });
 
   it('remove dados pessoais da mensagem e avisa o usuário', async () => {
