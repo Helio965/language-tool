@@ -1,0 +1,119 @@
+.list {
+  display: grid;
+  gap: var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 900px) {
+  .list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3) var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--marker);
+}
+
+.icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.text {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.text h2 {
+  font-family: var(--font-text);
+  font-variation-settings: normal;
+  font-size: 1.0625rem;
+  font-weight: 700;
+}
+
+.text p {
+  color: var(--ink-2);
+}
+
+.meta {
+  font-size: var(--text-caption);
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.go {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+
+@media (min-width: 600px) {
+  .go {
+    grid-column: 2;
+  }
+}
+
+.upcoming {
+  margin-top: var(--space-10);
+}
+
+.upcomingList {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.upcomingList li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--paper-deep);
+}
+
+.upcomingList svg {
+  width: 18px;
+  height: 18px;
+  color: var(--ink-2);
+}
+
+.upcomingList span:first-of-type {
+  flex: 1;
+}
+
+.when {
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+
+.completed {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-8);
+  font-size: var(--text-small);
+  color: var(--ink-3);
+}
+
+.completed svg {
+  width: 16px;
+  height: 16px;
+}
