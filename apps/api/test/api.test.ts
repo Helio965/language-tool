@@ -1,3 +1,6 @@
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { PLACEMENT_QUESTIONS } from '@english-ai/core';
@@ -24,7 +27,7 @@ const PROFILE = {
   interestAreas: ['technology'],
 };
 
-function setup(options: { rateLimited?: boolean } = {}) {
+function setup(options: { rateLimited?: boolean; webDistPath?: string } = {}) {
   const logs: string[] = [];
   const logger = createLogger({ sink: (line) => logs.push(line) });
   const config = loadConfig({ NODE_ENV: 'test', AUTH_TOKEN_SECRET: 'x'.repeat(48) });
@@ -37,6 +40,7 @@ function setup(options: { rateLimited?: boolean } = {}) {
     secureCookies: false,
     aiProvider: runtime.aiProvider,
     rateLimits: { disabled: !options.rateLimited },
+    ...(options.webDistPath ? { webDistPath: options.webDistPath } : {}),
   });
   return { app, logs };
 }
@@ -74,6 +78,18 @@ describe('API — infraestrutura e segurança', () => {
     await request(ctx.app).post('/api/auth/login').set(CSRF).set('Content-Type', 'application/json').send('{bad').expect(400);
     const res = await request(ctx.app).get('/api/nao-existe').expect(404);
     expect(res.body.error.code).toBe('NOT_FOUND');
+  });
+
+  it('serve o front-end compilado com fallback de SPA, mesmo em pasta com "." no caminho', async () => {
+    const dist = join(mkdtempSync(join(tmpdir(), 'english-ai-')), '.output', 'web');
+    mkdirSync(dist, { recursive: true });
+    writeFileSync(join(dist, 'index.html'), '<!doctype html><title>English AI</title>');
+    const { app } = setup({ webDistPath: dist });
+    for (const path of ['/', '/progresso', '/perfil/editar']) {
+      const response = await request(app).get(path).expect(200);
+      expect(response.text).toContain('<title>English AI</title>');
+    }
+    await request(app).get('/api/rota-inexistente').expect(404);
   });
 
   it('exige autenticação nas rotas protegidas', async () => {

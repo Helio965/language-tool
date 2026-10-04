@@ -73,7 +73,8 @@ export function createApp(options: AppOptions): Express {
   const dist = options.webDistPath ? resolve(options.webDistPath) : null;
   if (dist && existsSync(dist)) {
     app.use(express.static(dist, { index: false, maxAge: '1h' }));
-    app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(resolve(dist, 'index.html')));
+    // `root` limita a checagem de arquivos ocultos ao nome do arquivo (a pasta do build pode estar em um caminho com ".").
+    app.get(/^(?!\/api).*/, (_req, res) => res.sendFile('index.html', { root: dist }));
   }
 
   app.use(errorHandler(logger));
