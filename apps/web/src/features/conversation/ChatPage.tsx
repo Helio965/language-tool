@@ -74,6 +74,11 @@ function Chat({ conversation }: { conversation: ConversationView }) {
     },
   });
 
+  // Após uma falha, o campo volta a ficar habilitado: devolve o foco para reenviar.
+  useEffect(() => {
+    if (send.isError) inputRef.current?.focus();
+  }, [send.isError]);
+
   const end = useMutation({
     mutationFn: () => api.endConversation(conversation.id),
     onSuccess: async (data) => {

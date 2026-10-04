@@ -71,7 +71,7 @@ a configuração ou o nivelamento é levado à etapa pendente; quem já entrou n
 | Salvamento | preferências salvam na hora (toast "Preferência salva."); formulários longos salvam ao concluir |
 | Ações destrutivas | sempre com diálogo de confirmação; excluir conta exige a senha |
 | Tempo de espera da IA | estado explícito ("Lumi está preparando uma resposta…", "A IA está analisando sua frase…"); a mensagem enviada aparece imediatamente |
-| Falha ao enviar | o texto volta para o campo, com mensagem clara e possibilidade de reenviar |
+| Falha ao enviar | o texto volta para o campo (com o foco), com mensagem clara e possibilidade de reenviar |
 | Exercícios | responder → **Verificar** (desabilitado até haver resposta) → feedback → **Continuar** (recebe o foco) |
 | Conversa | Enter envia, Shift+Enter quebra linha; limite de 600 caracteres com contador nos últimos 100 |
 | Navegação | itens com `aria-current="page"`; título da página recebe o foco a cada troca de rota |
@@ -84,7 +84,7 @@ Toda tela que carrega dados implementa os quatro estados:
 | --- | --- | --- | --- |
 | **Carregando** | `Skeleton` (listas e cartões) ou `LoadingState` (tela/ação) | forma do conteúdo final, sem saltos de layout; `role="status"` | "Preparando sua aula…" |
 | **Vazio** | `EmptyState` | explica por que está vazio e oferece a próxima ação | Progresso sem atividade → "Começar minha primeira aula" |
-| **Erro** | `ErrorState` (tela) / `InlineAlert` (ação) | mensagem em linguagem comum + "Tentar novamente"; nunca mostra detalhes técnicos | "Sem conexão com o servidor. Verifique sua internet e tente de novo." |
+| **Erro** | `ErrorState` (tela) / `InlineAlert` (ação) | mensagem em linguagem comum + "Tentar de novo"; nunca mostra detalhes técnicos | "Sem conexão com o servidor. Verifique sua internet e tente de novo." |
 | **Sucesso** | toast, feedback do exercício, resumo | confirma o que aconteceu e indica o próximo passo | "Conta criada! Vamos personalizar seus estudos." |
 
 Estados específicos do domínio:

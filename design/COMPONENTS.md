@@ -125,7 +125,7 @@ explicação; "Ver no outro idioma" quando há apoio bilíngue.
 | **LoadingState** | carregamento de tela ou ação longa, com texto | `role="status"`, `aria-live="polite"` |
 | **Skeleton** | listas/cartões carregando | decorativo |
 | **EmptyState** | sem dados, com explicação e ação | — |
-| **ErrorState** | falha ao carregar, com "Tentar novamente" | `role="alert"` |
+| **ErrorState** | falha ao carregar, com "Tentar de novo" | `role="alert"` |
 | **InlineAlert** | mensagens dentro de formulários e fluxos | `error` → `role="alert"`; `info`/`success`/`almost` → `role="status"` |
 
 ## 7. Sobreposições — `Overlay.tsx`
