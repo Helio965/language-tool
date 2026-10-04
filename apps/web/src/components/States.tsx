@@ -56,14 +56,20 @@ export function EmptyState({
   );
 }
 
+/**
+ * Erro ao carregar. Só mostre "Tentar de novo" (`onRetry`) quando repetir pode resolver;
+ * para outros casos passe `actions` (ex.: voltar à lista). Ver app/QueryErrorState.tsx.
+ */
 export function ErrorState({
   title = 'Não foi possível carregar',
   message,
   onRetry,
+  actions,
 }: {
   title?: string;
   message: string;
   onRetry?: () => void;
+  actions?: ReactNode;
 }) {
   return (
     <div className={styles.error} role="alert">
@@ -72,10 +78,15 @@ export function ErrorState({
         <strong>{title}</strong>
         <p>{message}</p>
       </div>
-      {onRetry && (
-        <Button variant="secondary" size="sm" icon={<RotateCcw aria-hidden="true" />} onClick={onRetry}>
-          Tentar de novo
-        </Button>
+      {(onRetry || actions) && (
+        <div className={styles.errorActions}>
+          {onRetry && (
+            <Button variant="secondary" size="sm" icon={<RotateCcw aria-hidden="true" />} onClick={onRetry}>
+              Tentar de novo
+            </Button>
+          )}
+          {actions}
+        </div>
       )}
     </div>
   );

@@ -5,9 +5,9 @@ import { ASSISTANT_PERSONA, CORRECTION_INTENSITY_INFO, type TopicView } from '@e
 import { AssistantAvatar } from '../../components/Brand';
 import { Chip } from '../../components/Controls';
 import { ModeBadge, PageHeader, SectionTitle } from '../../components/Display';
-import { EmptyState, ErrorState, InlineAlert, Skeleton } from '../../components/States';
-import { useAccount, useApi } from '../../app/session';
-import { errorMessage } from '../../services';
+import { EmptyState, InlineAlert, Skeleton } from '../../components/States';
+import { ActionError, QueryErrorState } from '../../app/QueryErrorState';
+import { useAccount, useApi, useUserKeys } from '../../app/session';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { relativeDay } from '../../utils/format';
 import { TopicIcon } from './topicIcons';
@@ -19,8 +19,9 @@ export function ConversationHubPage() {
   const api = useApi();
   const account = useAccount();
   const navigate = useNavigate();
-  const topics = useQuery({ queryKey: ['topics'], queryFn: () => api.listTopics() });
-  const history = useQuery({ queryKey: ['conversations'], queryFn: () => api.listConversations() });
+  const keys = useUserKeys();
+  const topics = useQuery({ queryKey: keys.topics, queryFn: () => api.listTopics() });
+  const history = useQuery({ queryKey: keys.conversations, queryFn: () => api.listConversations() });
   const start = useMutation({
     mutationFn: (topicId: string) => api.startConversation(topicId),
     onSuccess: (conversation) => navigate(`/conversar/${conversation.id}`),
@@ -46,12 +47,12 @@ export function ConversationHubPage() {
         </Link>
       </div>
 
-      {start.isError && <InlineAlert>{errorMessage(start.error)}</InlineAlert>}
+      {start.isError && <ActionError error={start.error} />}
 
       <section aria-labelledby="topics-title" className={styles.section}>
         <SectionTitle id="topics-title">Sobre o que vamos conversar?</SectionTitle>
         {topics.isPending && <Skeleton lines={3} height={110} />}
-        {topics.isError && <ErrorState message={errorMessage(topics.error)} onRetry={() => topics.refetch()} />}
+        {topics.isError && <QueryErrorState error={topics.error} onRetry={() => void topics.refetch()} />}
         {topics.data && (
           <ul className={styles.topics}>
             {topics.data.map((topic) => (
@@ -75,7 +76,7 @@ export function ConversationHubPage() {
           <InlineAlert tone="info">O histórico está desativado: o conteúdo das conversas é apagado ao encerrar.</InlineAlert>
         )}
         {history.isPending && <Skeleton lines={2} height={64} />}
-        {history.isError && <ErrorState message={errorMessage(history.error)} onRetry={() => history.refetch()} />}
+        {history.isError && <QueryErrorState error={history.error} onRetry={() => void history.refetch()} />}
         {history.data && history.data.length === 0 && (
           <EmptyState title="Nenhuma conversa ainda" description="Suas conversas salvas aparecerão aqui para você revisar quando quiser." />
         )}

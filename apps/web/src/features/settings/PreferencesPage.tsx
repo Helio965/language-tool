@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router';
 import {
@@ -13,9 +13,8 @@ import { Chip, ChoiceGroup, SegmentedControl, Switch } from '../../components/Co
 import { CorrectionCard } from '../../components/CorrectionCard';
 import { Card, PageHeader } from '../../components/Display';
 import { useToast } from '../../components/Overlay';
-import { InlineAlert } from '../../components/States';
+import { ActionError } from '../../app/QueryErrorState';
 import { useAccount, useSession } from '../../app/session';
-import { errorMessage } from '../../services';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import styles from './Settings.module.css';
 
@@ -30,6 +29,8 @@ const SAMPLE: Correction = {
   ruleId: 'sample',
 };
 
+const PREFERENCES_MUTATION = ['update-preferences'] as const;
+
 const INTENSITY_PREVIEW: Record<CorrectionIntensity, string> = {
   light: 'Na conversa, este erro não interromperia: ele aparece só no resumo final.',
   balanced: 'Aparece de forma discreta, sem correções em mensagens seguidas.',
@@ -40,23 +41,34 @@ const INTENSITY_PREVIEW: Record<CorrectionIntensity, string> = {
 export function PreferencesPage() {
   useDocumentTitle('Preferências');
   const account = useAccount();
-  const { api, setAccount } = useSession();
+  const userId = account.user.id;
+  const { api, updateAccount, refresh } = useSession();
+  const queryClient = useQueryClient();
   const toast = useToast();
   const prefs = account.preferences;
 
   const update = useMutation({
+    mutationKey: PREFERENCES_MUTATION,
+    // Uma alteração por vez, na ordem dos cliques: uma resposta antiga nunca sobrescreve uma escolha nova.
+    scope: { id: `preferences:${userId}` },
     mutationFn: (input: PreferencesInput) => api.updatePreferences(input),
+    // A escolha aparece na hora; o servidor confirma em seguida.
+    onMutate: (input) => updateAccount(userId, (current) => ({ ...current, preferences: { ...current.preferences, ...input } })),
     onSuccess: (next: Preferences) => {
-      setAccount({ ...account, preferences: next });
+      // Só a última resposta da fila define o estado final (sem "piscar" valores intermediários).
+      if (queryClient.isMutating({ mutationKey: PREFERENCES_MUTATION }) > 1) return;
+      updateAccount(userId, (current) => ({ ...current, preferences: next }));
       toast('Preferência salva.');
     },
+    // Falhou: volta a mostrar o que está realmente salvo.
+    onError: () => void refresh(),
   });
   const save = (input: PreferencesInput) => update.mutate(input);
 
   return (
     <div className="reveal">
       <PageHeader title="Preferências" subtitle="Ajuste como a IA explica, corrige e conversa com você. As mudanças são salvas na hora." />
-      {update.isError && <InlineAlert>{errorMessage(update.error)}</InlineAlert>}
+      {update.isError && <ActionError error={update.error} suffix="A preferência anterior foi mantida." />}
       <div className={styles.stack}>
         <Card aria-labelledby="pref-explanations">
           <h2 id="pref-explanations" className={styles.title}>

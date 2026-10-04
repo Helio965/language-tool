@@ -1,6 +1,6 @@
 import { Check, Circle } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { passwordChecks, validateRegistration, type FieldErrors } from '@english-ai/core';
 import { Button } from '../../components/Button';
 import { Checkbox } from '../../components/Controls';
@@ -16,8 +16,7 @@ import styles from './Auth.module.css';
 /** UC01 — Criar conta: apenas os dados necessários, validação em tempo real e feedback claro. */
 export function RegisterPage() {
   useDocumentTitle('Criar conta');
-  const { api, setAccount } = useSession();
-  const navigate = useNavigate();
+  const { api, signIn } = useSession();
   const toast = useToast();
   const [form, setForm] = useState({ name: '', email: '', password: '', passwordConfirmation: '', acceptedTerms: false });
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -39,6 +38,7 @@ export function RegisterPage() {
 
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (loading) return;
     setSubmitted(true);
     setGeneralError(null);
     if (Object.keys(clientErrors).length) {
@@ -49,9 +49,9 @@ export function RegisterPage() {
     setLoading(true);
     try {
       const account = await api.register(form);
-      setAccount(account);
       toast('Conta criada! Vamos personalizar seus estudos.');
-      navigate('/configuracao');
+      // A guarda PublicOnly leva à configuração inicial (etapa pendente da conta nova).
+      signIn(account);
     } catch (error) {
       if (error instanceof ApiError && error.code === 'EMAIL_IN_USE') setEmailInUse(true);
       else if (error instanceof ApiError && Object.keys(error.fields).length) setServerErrors(error.fields);

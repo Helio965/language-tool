@@ -4,9 +4,9 @@ import { Link } from 'react-router';
 import type { ProgressOverview } from '@english-ai/core';
 import { Button } from '../../components/Button';
 import { Card, PageHeader, ProgressBar, SectionTitle, StatTile } from '../../components/Display';
-import { EmptyState, ErrorState, Skeleton } from '../../components/States';
-import { useApi } from '../../app/session';
-import { errorMessage } from '../../services';
+import { EmptyState, Skeleton } from '../../components/States';
+import { QueryErrorState } from '../../app/QueryErrorState';
+import { useApi, useUserKeys } from '../../app/session';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { formatMinutes, relativeDay } from '../../utils/format';
 import { cx } from '../../utils/cx';
@@ -16,13 +16,14 @@ import styles from './ProgressPage.module.css';
 export function ProgressPage() {
   useDocumentTitle('Progresso');
   const api = useApi();
-  const query = useQuery({ queryKey: ['progress'], queryFn: () => api.getProgress() });
+  const keys = useUserKeys();
+  const query = useQuery({ queryKey: keys.progress, queryFn: () => api.getProgress() });
 
   return (
     <div className="reveal">
       <PageHeader title="Seu progresso" subtitle="Acompanhe sua evolução de forma simples: o que você já fez e o que vale revisar." />
       {query.isPending && <Skeleton lines={4} height={80} />}
-      {query.isError && <ErrorState message={errorMessage(query.error)} onRetry={() => query.refetch()} />}
+      {query.isError && <QueryErrorState error={query.error} onRetry={() => void query.refetch()} />}
       {query.data && !query.data.hasActivity && (
         <EmptyState
           title="Nada por aqui ainda"

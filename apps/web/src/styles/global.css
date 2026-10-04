@@ -98,6 +98,24 @@ svg {
   color: var(--ink);
 }
 
+/* Sessão: verificação que falhou (sem conexão) e encerramento em andamento */
+.session-check-failed {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: var(--space-6) var(--gutter);
+}
+
+.session-check-failed > * {
+  width: min(100%, 520px);
+}
+
+.session-ending {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
+}
+
 /* Utilitários */
 .visually-hidden {
   position: absolute !important;

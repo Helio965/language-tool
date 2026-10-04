@@ -1,14 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Trash2, UserX } from 'lucide-react';
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router';
 import { Button } from '../../components/Button';
 import { Card, PageHeader } from '../../components/Display';
 import { Dialog, useToast } from '../../components/Overlay';
-import { InlineAlert } from '../../components/States';
+import { ActionError } from '../../app/QueryErrorState';
 import { PasswordField } from '../../components/TextField';
-import { useSession } from '../../app/session';
-import { errorMessage } from '../../services';
+import { useSession, useUserKeys } from '../../app/session';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { DataPolicy } from '../legal/DataPolicy';
 import styles from './Settings.module.css';
@@ -16,9 +14,9 @@ import styles from './Settings.module.css';
 /** Privacidade e dados — RN07 (controle do histórico) e RF20 (exclusão de dados). */
 export function PrivacyPage() {
   useDocumentTitle('Privacidade e dados');
-  const { api, setAccount } = useSession();
+  const { api, endSession } = useSession();
+  const keys = useUserKeys();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const toast = useToast();
   const [confirmHistory, setConfirmHistory] = useState(false);
   const [confirmAccount, setConfirmAccount] = useState(false);
@@ -29,22 +27,32 @@ export function PrivacyPage() {
     onSuccess: async (count) => {
       setConfirmHistory(false);
       toast(count ? `${count} ${count === 1 ? 'conversa apagada' : 'conversas apagadas'}.` : 'Não havia conversas para apagar.');
-      await queryClient.invalidateQueries();
+      await queryClient.invalidateQueries({ queryKey: keys.all });
     },
   });
 
   const deleteAccount = useMutation({
     mutationFn: () => api.deleteAccount(password),
-    onSuccess: () => {
-      queryClient.clear();
-      setAccount(null);
-      navigate('/', { replace: true });
-    },
+    // A sessão termina como "excluída": as guardas levam à página inicial e os dados privados saem do cache.
+    onSuccess: () => endSession('deleted'),
+    onError: () => setPassword(''),
   });
 
   function submitDelete(event: FormEvent) {
     event.preventDefault();
-    if (password) deleteAccount.mutate();
+    if (password && !deleteAccount.isPending) deleteAccount.mutate();
+  }
+
+  function openHistoryDialog() {
+    clearHistory.reset();
+    setConfirmHistory(true);
+  }
+
+  function closeAccountDialog() {
+    if (deleteAccount.isPending) return;
+    setConfirmAccount(false);
+    setPassword('');
+    deleteAccount.reset();
   }
 
   return (
@@ -65,7 +73,7 @@ export function PrivacyPage() {
           <p className={styles.description}>
             Apaga o conteúdo de todas as conversas. Seus números de progresso (quantidade de conversas e tempo) continuam.
           </p>
-          <Button variant="secondary" icon={<Trash2 aria-hidden="true" />} onClick={() => setConfirmHistory(true)}>
+          <Button variant="secondary" icon={<Trash2 aria-hidden="true" />} onClick={openHistoryDialog}>
             Apagar histórico de conversas
           </Button>
         </Card>
@@ -85,11 +93,11 @@ export function PrivacyPage() {
 
       <Dialog
         open={confirmHistory}
-        onClose={() => setConfirmHistory(false)}
+        onClose={() => !clearHistory.isPending && setConfirmHistory(false)}
         title="Apagar o histórico de conversas?"
         footer={
           <>
-            <Button variant="secondary" onClick={() => setConfirmHistory(false)}>
+            <Button variant="secondary" onClick={() => setConfirmHistory(false)} disabled={clearHistory.isPending}>
               Cancelar
             </Button>
             <Button variant="danger" onClick={() => clearHistory.mutate()} loading={clearHistory.isPending} loadingLabel="Apagando…">
@@ -99,16 +107,16 @@ export function PrivacyPage() {
         }
       >
         <p>O conteúdo de todas as conversas será apagado. Essa ação não pode ser desfeita.</p>
-        {clearHistory.isError && <InlineAlert>{errorMessage(clearHistory.error)}</InlineAlert>}
+        {clearHistory.isError && <ActionError error={clearHistory.error} />}
       </Dialog>
 
-      <Dialog open={confirmAccount} onClose={() => setConfirmAccount(false)} title="Excluir sua conta?">
+      <Dialog open={confirmAccount} onClose={closeAccountDialog} title="Excluir sua conta?">
         <form className={styles.stack} onSubmit={submitDelete}>
           <p>Para confirmar, digite sua senha. Todos os seus dados serão removidos permanentemente.</p>
           <PasswordField label="Senha" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
-          {deleteAccount.isError && <InlineAlert>{errorMessage(deleteAccount.error)}</InlineAlert>}
+          {deleteAccount.isError && <ActionError error={deleteAccount.error} />}
           <div className={styles.dangerActions}>
-            <Button variant="secondary" onClick={() => setConfirmAccount(false)}>
+            <Button variant="secondary" onClick={closeAccountDialog} disabled={deleteAccount.isPending}>
               Cancelar
             </Button>
             <Button type="submit" variant="danger" disabled={!password} loading={deleteAccount.isPending} loadingLabel="Excluindo…">

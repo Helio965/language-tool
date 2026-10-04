@@ -16,9 +16,9 @@ import { CorrectionCard } from '../../components/CorrectionCard';
 import { Card, ModeBadge } from '../../components/Display';
 import { FocusBar } from '../../components/FocusBar';
 import { Dialog } from '../../components/Overlay';
-import { ErrorState, InlineAlert, LoadingState } from '../../components/States';
-import { useAccount, useApi } from '../../app/session';
-import { errorMessage } from '../../services';
+import { LoadingState } from '../../components/States';
+import { ActionError, QueryErrorState } from '../../app/QueryErrorState';
+import { useAccount, useApi, useSession, useUserKeys } from '../../app/session';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { cx } from '../../utils/cx';
 import { ConversationSummary } from './ConversationSummary';
@@ -28,7 +28,8 @@ import styles from './ChatPage.module.css';
 export function ChatPage() {
   const { conversationId = '' } = useParams();
   const api = useApi();
-  const query = useQuery({ queryKey: ['conversation', conversationId], queryFn: () => api.getConversation(conversationId) });
+  const keys = useUserKeys();
+  const query = useQuery({ queryKey: keys.conversation(conversationId), queryFn: () => api.getConversation(conversationId) });
   useDocumentTitle(query.data ? `Conversa: ${query.data.title}` : 'Conversa');
 
   if (query.isPending) return <LoadingState label="Abrindo a conversa…" />;
@@ -36,7 +37,7 @@ export function ChatPage() {
     return (
       <>
         <FocusBar backTo="/conversar" backLabel="Voltar" icon="back" />
-        <ErrorState message={errorMessage(query.error)} onRetry={() => query.refetch()} />
+        <QueryErrorState error={query.error} onRetry={() => void query.refetch()} back={{ to: '/conversar', label: 'Voltar ao Modo Conversação' }} />
       </>
     );
   }
@@ -47,6 +48,8 @@ function Chat({ conversation }: { conversation: ConversationView }) {
   const api = useApi();
   const account = useAccount();
   const queryClient = useQueryClient();
+  const keys = useUserKeys();
+  const { refreshUserData } = useSession();
   const [messages, setMessages] = useState<Message[]>(conversation.messages);
   const [draft, setDraft] = useState('');
   const [pendingText, setPendingText] = useState<string | null>(null);
@@ -66,7 +69,7 @@ function Chat({ conversation }: { conversation: ConversationView }) {
     onSuccess: (result) => {
       setMessages((current) => [...current, result.userMessage, result.assistantMessage]);
       setPendingText(null);
-      void queryClient.invalidateQueries({ queryKey: ['conversations'] });
+      void queryClient.invalidateQueries({ queryKey: keys.conversations });
     },
     onError: (_error, text) => {
       setPendingText(null);
@@ -84,7 +87,7 @@ function Chat({ conversation }: { conversation: ConversationView }) {
     onSuccess: async (data) => {
       setSummary(data);
       setConfirmEnd(false);
-      await queryClient.invalidateQueries();
+      await refreshUserData();
     },
   });
 
@@ -182,7 +185,7 @@ function Chat({ conversation }: { conversation: ConversationView }) {
             )}
           </div>
 
-          {send.isError && <InlineAlert>{errorMessage(send.error)} Sua mensagem voltou para o campo de texto.</InlineAlert>}
+          {send.isError && <ActionError error={send.error} suffix="Sua mensagem voltou para o campo de texto." />}
 
           {ended ? (
             <Card tone="talk" className={styles.endedNote}>
@@ -275,7 +278,7 @@ function Chat({ conversation }: { conversation: ConversationView }) {
         {!prefs.saveConversationHistory && (
           <p className={styles.dialogNote}>Como o histórico está desativado, o conteúdo desta conversa será apagado ao encerrar.</p>
         )}
-        {end.isError && <InlineAlert>{errorMessage(end.error)}</InlineAlert>}
+        {end.isError && <ActionError error={end.error} />}
       </Dialog>
     </div>
   );

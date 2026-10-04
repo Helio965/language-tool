@@ -122,6 +122,14 @@
   color: var(--ink);
 }
 
+.error > .errorActions {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
 .inline {
   padding: var(--space-3) var(--space-4);
   border-radius: var(--radius-m);

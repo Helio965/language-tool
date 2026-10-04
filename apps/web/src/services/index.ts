@@ -12,4 +12,4 @@ export function createApiClient(): ApiClient {
 }
 
 export type { ApiClient } from './apiClient';
-export { ApiError, errorMessage } from './errors';
+export { ApiError, errorMessage, toApiError } from './errors';

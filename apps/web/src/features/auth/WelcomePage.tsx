@@ -1,30 +1,28 @@
 import { ArrowRight, BookOpen, MessagesSquare, Sparkles } from 'lucide-react';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { ASSISTANT_PERSONA } from '@english-ai/core';
 import { AssistantAvatar, Logo } from '../../components/Brand';
 import { Button } from '../../components/Button';
 import { InlineAlert } from '../../components/States';
-import { pathForStep, useSession } from '../../app/session';
+import { useSession } from '../../app/session';
 import { errorMessage } from '../../services';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import styles from './WelcomePage.module.css';
 
 export function WelcomePage() {
   useDocumentTitle('Aprenda inglês com IA');
-  const { api, setAccount } = useSession();
-  const navigate = useNavigate();
+  const { api, signIn } = useSession();
   const [demoLoading, setDemoLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function exploreDemo() {
-    if (!api.startDemo) return;
+    if (!api.startDemo || demoLoading) return;
     setDemoLoading(true);
     setError(null);
     try {
-      const account = await api.startDemo();
-      setAccount(account);
-      navigate(pathForStep(account.nextStep));
+      // A guarda PublicOnly leva à etapa pendente da conta de demonstração.
+      signIn(await api.startDemo());
     } catch (err) {
       setError(errorMessage(err));
       setDemoLoading(false);

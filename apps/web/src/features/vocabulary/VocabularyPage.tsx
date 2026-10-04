@@ -7,10 +7,10 @@ import { Button } from '../../components/Button';
 import { Chip } from '../../components/Controls';
 import { PageHeader, SectionTitle } from '../../components/Display';
 import { Dialog, useToast } from '../../components/Overlay';
-import { EmptyState, ErrorState, InlineAlert, Skeleton } from '../../components/States';
+import { EmptyState, Skeleton } from '../../components/States';
+import { ActionError, QueryErrorState } from '../../app/QueryErrorState';
 import { TextField } from '../../components/TextField';
-import { useApi } from '../../app/session';
-import { errorMessage } from '../../services';
+import { useApi, useUserKeys } from '../../app/session';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { relativeDay } from '../../utils/format';
 import styles from './VocabularyPage.module.css';
@@ -22,19 +22,19 @@ export function VocabularyPage() {
   useDocumentTitle('Vocabulário');
   const api = useApi();
   const queryClient = useQueryClient();
+  const keys = useUserKeys();
   const toast = useToast();
   const [params, setParams] = useSearchParams();
   const [filter, setFilter] = useState<Filter>('all');
   const [search, setSearch] = useState('');
-  const query = useQuery({ queryKey: ['vocabulary'], queryFn: () => api.getVocabulary() });
+  const query = useQuery({ queryKey: keys.vocabulary, queryFn: () => api.getVocabulary() });
   const selectedId = params.get('palavra');
 
   const setStatus = useMutation({
     mutationFn: ({ id, status }: { id: string; status: 'learning' | 'learned' }) => api.setWordStatus(id, status),
     onSuccess: async (item) => {
       toast(item.status === 'learned' ? `“${item.word}” marcada como aprendida.` : `“${item.word}” está na sua revisão.`);
-      await queryClient.invalidateQueries({ queryKey: ['vocabulary'] });
-      await queryClient.invalidateQueries({ queryKey: ['home'] });
+      await Promise.all([queryClient.invalidateQueries({ queryKey: keys.vocabulary }), queryClient.invalidateQueries({ queryKey: keys.home })]);
     },
   });
 
@@ -54,7 +54,7 @@ export function VocabularyPage() {
     <div className="reveal">
       <PageHeader title="Vocabulário" subtitle="As palavras e expressões das suas aulas, com significado, exemplo e revisão." />
       {query.isPending && <Skeleton lines={5} height={56} />}
-      {query.isError && <ErrorState message={errorMessage(query.error)} onRetry={() => query.refetch()} />}
+      {query.isError && <QueryErrorState error={query.error} onRetry={() => void query.refetch()} />}
       {query.data && (
         <>
           <div className={styles.counts}>
@@ -164,7 +164,7 @@ export function VocabularyPage() {
         }
       >
         {selected && <WordDetails item={selected} />}
-        {setStatus.isError && <InlineAlert>{errorMessage(setStatus.error)}</InlineAlert>}
+        {setStatus.isError && <ActionError error={setStatus.error} />}
       </Dialog>
     </div>
   );

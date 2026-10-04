@@ -1,34 +1,32 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
-import { MemoryStorage } from '@english-ai/core';
+import { MemoryStorage, type KeyValueStorage } from '@english-ai/core';
+import { AppProviders, createQueryClient } from '../src/app/App';
 import { routes } from '../src/app/router';
-import { SessionProvider } from '../src/app/session';
-import { ToastProvider } from '../src/components/Overlay';
 import { createDemoClient } from '../src/services/demoClient';
 import type { ApiClient } from '../src/services';
 
 /** Cliente de demonstração isolado por teste e sem o atraso artificial da IA. */
-export function createTestApi(): ApiClient {
-  return createDemoClient({ aiDelayMs: 0, storage: new MemoryStorage() });
+export function createTestApi(storage: KeyValueStorage = new MemoryStorage()): ApiClient {
+  return createDemoClient({ aiDelayMs: 0, storage });
 }
 
-/** Renderiza o app completo (rotas, guards, sessão) em uma rota inicial. */
-export function renderApp(path: string, api: ApiClient = createTestApi()) {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false }, mutations: { retry: false } } });
-  const router = createMemoryRouter(routes, { initialEntries: [path] });
+/**
+ * Renderiza o app completo (mesmos provedores do App real: cache, toasts, sessão, rotas e guardas)
+ * em uma rota inicial. `initialEntries` permite simular histórico para testar o botão Voltar.
+ */
+export function renderApp(path: string | string[], api: ApiClient = createTestApi()) {
+  const queryClient = createQueryClient();
+  const entries = Array.isArray(path) ? path : [path];
+  const router = createMemoryRouter(routes, { initialEntries: entries, initialIndex: entries.length - 1 });
   const user = userEvent.setup();
-  render(
-    <QueryClientProvider client={queryClient}>
-      <SessionProvider api={api}>
-        <ToastProvider>
-          <RouterProvider router={router} />
-        </ToastProvider>
-      </SessionProvider>
-    </QueryClientProvider>,
+  const view = render(
+    <AppProviders api={api} queryClient={queryClient}>
+      <RouterProvider router={router} />
+    </AppProviders>,
   );
-  return { api, router, user };
+  return { api, router, user, queryClient, view };
 }
 
 /** Conta pronta para usar o app (perfil salvo e nivelamento pulado). */

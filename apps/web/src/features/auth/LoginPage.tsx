@@ -1,12 +1,12 @@
 import { useState, type FormEvent } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { validateLogin } from '@english-ai/core';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Display';
 import { InlineAlert } from '../../components/States';
 import { PasswordField, TextField } from '../../components/TextField';
 import { AuthLayout } from '../../layouts/AuthLayout';
-import { pathForStep, useSession } from '../../app/session';
+import { useSession } from '../../app/session';
 import { errorMessage } from '../../services';
 import { DEMO_ACCOUNT } from '../../mocks/demoSeed';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
@@ -15,10 +15,9 @@ import styles from './Auth.module.css';
 /** UC02 — Fazer login. Após entrar, retoma a etapa pendente (sem repetir etapas). */
 export function LoginPage() {
   useDocumentTitle('Entrar');
-  const { api, setAccount } = useSession();
-  const navigate = useNavigate();
+  const { api, signIn, endReason } = useSession();
   const location = useLocation();
-  const state = (location.state ?? {}) as { email?: string; from?: string };
+  const state = (location.state ?? {}) as { email?: string };
   const [email, setEmail] = useState(state.email ?? '');
   const [password, setPassword] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -28,15 +27,14 @@ export function LoginPage() {
 
   async function submit(event: FormEvent) {
     event.preventDefault();
+    if (loading) return;
     setSubmitted(true);
     setError(null);
     if (Object.keys(validateLogin({ email, password })).length) return;
     setLoading(true);
     try {
-      const account = await api.login({ email, password });
-      setAccount(account);
-      const destination = account.nextStep === 'ready' && state.from ? state.from : pathForStep(account.nextStep);
-      navigate(destination, { replace: true });
+      // A guarda PublicOnly leva à etapa pendente ou à página que a pessoa tentava abrir.
+      signIn(await api.login({ email, password }));
     } catch (err) {
       setError(errorMessage(err));
       setPassword('');
@@ -51,7 +49,11 @@ export function LoginPage() {
         <p className="muted">Entre para continuar de onde parou.</p>
       </div>
       <form className={styles.form} onSubmit={submit} noValidate>
-        {error && <InlineAlert>{error}</InlineAlert>}
+        {error ? (
+          <InlineAlert>{error}</InlineAlert>
+        ) : (
+          endReason === 'expired' && <InlineAlert tone="info">Sua sessão expirou. Entre novamente para continuar.</InlineAlert>
+        )}
         <TextField
           label="E-mail"
           type="email"
