@@ -34,7 +34,8 @@ describe('Esqueci minha senha', () => {
     const { user, router } = renderApp('/entrar', api);
 
     await user.click(await screen.findByRole('link', { name: 'Esqueci minha senha' }));
-    await user.type(await screen.findByLabelText('E-mail'), EMAIL);
+    await screen.findByRole('heading', { level: 1, name: 'Recuperar senha' });
+    await user.type(screen.getByLabelText('E-mail'), EMAIL);
     await user.click(screen.getByRole('button', { name: 'Enviar link de redefinição' }));
 
     expect(await screen.findByText('Se existir uma conta com este e-mail, enviaremos as instruções de recuperação.')).toBeInTheDocument();
@@ -48,7 +49,8 @@ describe('Esqueci minha senha', () => {
     expect(await screen.findByRole('heading', { name: 'Senha redefinida com sucesso.' })).toBeInTheDocument();
 
     await user.click(screen.getByRole('link', { name: 'Entrar' }));
-    await user.type(await screen.findByLabelText('E-mail'), EMAIL);
+    await screen.findByRole('heading', { level: 1, name: 'Que bom te ver de novo' });
+    await user.type(screen.getByLabelText('E-mail'), EMAIL);
     await user.type(screen.getByLabelText('Senha', { selector: 'input' }), OLD);
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
     expect(await screen.findByText('E-mail ou senha incorretos. Tente novamente.')).toBeInTheDocument();

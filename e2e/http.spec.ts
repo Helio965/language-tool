@@ -194,6 +194,8 @@ test('esqueci a senha: link por e-mail, senha nova, sessões antigas encerradas 
   await page.context().clearCookies();
   await page.goto('/entrar');
   await page.getByRole('link', { name: 'Esqueci minha senha' }).click();
+  // O login também tem um campo "E-mail": espera a nova tela antes de digitar.
+  await expect(page.getByRole('heading', { level: 1, name: 'Recuperar senha' })).toBeVisible();
   await page.getByLabel('E-mail').fill(email);
   await page.getByRole('button', { name: 'Enviar link de redefinição' }).click();
   await expect(page.getByText('Se existir uma conta com este e-mail, enviaremos as instruções de recuperação.')).toBeVisible();

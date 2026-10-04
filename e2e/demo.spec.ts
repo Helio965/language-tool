@@ -145,6 +145,8 @@ test('demonstração: recuperação de senha simulada, sem fingir que um e-mail 
   await signOut(page);
 
   await page.getByRole('link', { name: 'Esqueci minha senha' }).click();
+  // O login também tem um campo "E-mail": espera a nova tela antes de digitar.
+  await expect(page.getByRole('heading', { level: 1, name: 'Recuperar senha' })).toBeVisible();
   await page.getByLabel('E-mail').fill(DEMO.email);
   await page.getByRole('button', { name: 'Enviar link de redefinição' }).click();
   const simulation = page.getByRole('region', { name: /Simulação do modo demonstração/ });
