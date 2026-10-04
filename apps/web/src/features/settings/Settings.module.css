@@ -1,0 +1,144 @@
+.stack {
+  display: grid;
+  gap: var(--space-5);
+  max-width: 820px;
+}
+
+.title {
+  margin-bottom: var(--space-2);
+  font-size: 1.25rem;
+}
+
+.description {
+  margin-bottom: var(--space-4);
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+
+.preview {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border-radius: var(--radius-l);
+  background: var(--paper);
+}
+
+.previewNote {
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+
+.row {
+  display: grid;
+  gap: var(--space-2);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.rowLabel {
+  font-weight: 700;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.privacyLink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  font-weight: 700;
+}
+
+.privacyLink svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Privacidade */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-small);
+}
+
+.table th,
+.table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+
+.table thead th {
+  font-size: var(--text-caption);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+/* No celular, cada linha vira um bloco legível */
+@media (max-width: 599px) {
+  .table thead {
+    display: none;
+  }
+  .table tr {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .table th,
+  .table td {
+    padding: 0;
+    border: 0;
+  }
+  .table td::before {
+    content: attr(data-label) ': ';
+    font-weight: 700;
+    color: var(--ink-2);
+  }
+}
+
+.list {
+  display: grid;
+  gap: var(--space-2);
+  padding-left: var(--space-5);
+}
+
+.danger {
+  border-color: #f2c4d1;
+}
+
+.dangerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.publicPage {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--gutter) var(--space-12);
+}
+
+.publicTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-8);
+}
+
+.publicTop a {
+  text-decoration: none;
+}

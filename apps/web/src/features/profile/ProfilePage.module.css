@@ -1,0 +1,157 @@
+.grid {
+  display: grid;
+  gap: var(--space-5);
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  .identity {
+    grid-column: 1 / -1;
+  }
+}
+
+.identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--marker);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.name {
+  font-size: 1.5rem;
+}
+
+.badges {
+  margin-top: var(--space-2);
+}
+
+.cardHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.cardTitle {
+  font-size: 1.25rem;
+}
+
+.facts {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.facts div {
+  display: grid;
+  gap: 2px;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.facts div:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.facts dt {
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+
+.facts dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: 4px !important;
+}
+
+.links {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 64px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.link:hover {
+  border-color: var(--line-input);
+}
+
+.linkIcon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-m);
+  background: var(--paper);
+}
+
+.linkIcon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.linkText {
+  display: grid;
+  flex: 1;
+}
+
+.linkText span {
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+
+.chevron {
+  width: 20px;
+  height: 20px;
+  color: var(--ink-3);
+}
+
+.footer {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+}
+
+@media (min-width: 1024px) {
+  .footer {
+    grid-column: 1 / -1;
+  }
+}
+
+.about {
+  font-size: var(--text-caption);
+  color: var(--ink-3);
+}
