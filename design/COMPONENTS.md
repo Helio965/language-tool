@@ -38,6 +38,11 @@ Rótulo sempre visível acima do campo; dica e erro abaixo, ligados por `aria-de
 Estados: vazio, preenchido, foco, erro (`aria-invalid`, borda e mensagem em `--error`), desabilitado.
 `PasswordField` acrescenta o botão "Mostrar/Ocultar senha".
 
+### PasswordChecklist — `features/auth/PasswordChecklist.tsx`
+
+Requisitos da senha ao vivo (✓ atendido / ○ pendente, com texto para leitor de tela), usados como dica do campo
+de senha no **cadastro** e na **redefinição de senha** — uma única política (`passwordChecks` do core).
+
 ### Checkbox — `Controls.tsx`
 
 Caixa 22px + texto (pode conter link). Mostra erro abaixo quando obrigatório (aceite dos termos).
@@ -149,10 +154,27 @@ Componentes de erro com regra de produto (`apps/web/src/app/`):
 | Componente | Função |
 | --- | --- |
 | **AppShell** | navegação principal responsiva (barra inferior / trilho / barra lateral), link "Pular para o conteúdo", foco no título a cada rota; esconde a navegação em rotas imersivas; no modo demonstração, a barra lateral mostra o aviso "Modo demonstração — seus dados ficam salvos só neste navegador" |
-| **AuthLayout** | telas públicas com marca e coluna de apoio no desktop |
+| **AuthLayout** | telas de conta (entrar, cadastro, recuperar e redefinir senha) com marca e coluna de apoio no desktop |
 | **FocusBar** (`components/FocusBar.tsx`) | barra das telas imersivas: voltar/sair, título, barra de progresso da etapa e ação à direita (ex.: "Encerrar") |
 
-## 9. Checklist para um componente novo
+## 9. Página pública — `features/landing/`
+
+Composição da página `/` com os mesmos tokens e componentes do app (Button, CorrectionCard, ProgressBar,
+ProgressRing, StatTile, Logo, AssistantAvatar):
+
+| Peça | Função |
+| --- | --- |
+| **LandingHeader** | cabeçalho fixo: logo, seções, Entrar/Criar conta; abaixo de 1100px, **Menu de seções** (`aria-expanded`, `aria-controls`, Esc fecha e devolve o foco) |
+| **LandingSections** | hero, problema, como funciona, Aprender, Conversar, IA, progresso, personalização, segurança e chamada final; cada seção tem `id` de âncora e título focável |
+| **LandingFooter** | Sobre o projeto (com o que ainda não existe) e colunas Produto, Conta, Informações, Legal |
+| **useSectionNavigation** | âncoras acessíveis: atualiza o endereço sem nova entrada no histórico, leva o foco ao título, rola suavemente só sem `prefers-reduced-motion` |
+| **landingContent.ts** | textos e fatos; números calculados a partir do conteúdo do core |
+
+Padrões visuais novos (só nesta página): seções com fundo de ponta a ponta alternando papel e superfície,
+cartões de passo numerados com ícone em círculo amarelo, chamada final em azul-marinho com botão marca-texto, e o
+selo tracejado **Exemplo ilustrativo** para prévias com dados fictícios.
+
+## 10. Checklist para um componente novo
 
 - [ ] usa só tokens (cor, espaço, raio, sombra, tipografia);
 - [ ] funciona com teclado e tem foco visível;

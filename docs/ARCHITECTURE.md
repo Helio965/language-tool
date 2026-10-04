@@ -54,18 +54,19 @@ A arquitetura segue a proposta conceitual dos documentos — **Aplicação → B
 │   ├── api/                 Backend HTTP (Express + SQLite)
 │   │   └── src/
 │   │       ├── config/      leitura e validação de variáveis de ambiente
-│   │       ├── db/          conexão, schema.sql, seed do conteúdo
+│   │       ├── db/          conexão, schema.sql, migrações aditivas, seed do conteúdo
+│   │       ├── email/       EmailService, mailers (SMTP, caixa de saída local, memória) e templates
 │   │       ├── repositories/ implementação SQLite das portas do core
 │   │       ├── security/    hash de senha (scrypt) e tokens de sessão
 │   │       ├── ai/          provedores reais de IA (chave só no servidor)
-│   │       ├── http/        app, rotas, middlewares, tratamento de erros
+│   │       ├── http/        app, rotas (auth, password, learning, conversation), middlewares, erros
 │   │       └── logger.ts    logs estruturados com redação de dados sensíveis
 │   └── web/                 Aplicação React (Vite)
 │       └── src/
 │           ├── app/         rotas, provedores, guardas de navegação
 │           ├── components/  componentes reutilizáveis (design system)
 │           ├── layouts/     estrutura das páginas (shell, auth)
-│           ├── features/    telas por funcionalidade (auth, onboarding, placement,
+│           ├── features/    telas por funcionalidade (landing, auth, onboarding, placement,
 │           │                home, learning, exercises, conversation, vocabulary,
 │           │                review, progress, profile, settings, legal)
 │           ├── services/    ApiClient (demo e http)
@@ -98,8 +99,9 @@ e2e/                         testes ponta a ponta (Playwright) nos modos demo e 
 ### 4.2 Backend (`apps/api`)
 
 - **Express 5 + TypeScript**, executado com Node 22.
-- Responsabilidades: autenticação e sessão, validação de entrada (zod), controle de acesso por dono do recurso, limitação de taxa, logs, persistência e acesso ao provedor de IA.
+- Responsabilidades: autenticação e sessão, validação de entrada (zod), controle de acesso por dono do recurso, limitação de taxa, logs, persistência, envio de e-mails e acesso ao provedor de IA.
 - Regras de negócio **não** ficam nas rotas: as rotas chamam os casos de uso do `core`.
+- **E-mails** (`src/email/`): as rotas chamam o `EmailService`, que renderiza um template e entrega a um `Mailer` (SMTP em produção, caixa de saída local em desenvolvimento, memória nos testes). Envio em segundo plano e à prova de falhas. Detalhes em [EMAIL-AND-AUTH.md](./EMAIL-AND-AUTH.md).
 
 ### 4.3 Núcleo (`packages/core`)
 
@@ -110,7 +112,7 @@ e2e/                         testes ponta a ponta (Playwright) nos modos demo e 
 ### 4.4 Banco de dados
 
 - **SQLite** (módulo nativo `node:sqlite`) no MVP: zero instalação, arquivo local em `data/` (ignorado pelo git).
-- Esquema relacional em `apps/api/src/db/schema.sql`, com chaves estrangeiras e `ON DELETE CASCADE` (exclusão de dados — RF20).
+- Esquema relacional em `apps/api/src/db/schema.sql`, com chaves estrangeiras e `ON DELETE CASCADE` (exclusão de dados — RF20). O esquema é idempotente; alterações em bancos já existentes são **migrações aditivas** em `database.ts` (ex.: `users.session_version`), que nunca apagam dados.
 - Repositórios assíncronos: migrar para **PostgreSQL** exige apenas novas implementações das portas.
 - Conteúdo pedagógico é versionado em código e sincronizado no banco na inicialização (seed idempotente), mantendo a integridade referencial de progresso e tentativas.
 
@@ -153,7 +155,8 @@ Principais rotas da API (todas sob `/api`):
 
 | Método | Rota | Caso de uso |
 |--------|------|-------------|
-| POST | `/auth/register`, `/auth/login`, `/auth/logout`, `/auth/password-reset` | UC01, UC02 |
+| POST | `/auth/register`, `/auth/login`, `/auth/logout` | UC01, UC02 |
+| POST | `/auth/password-reset`, `/auth/password-reset/verify`, `/auth/password-reset/confirm` | UC02 — recuperação de senha |
 | GET | `/auth/session` | estado da sessão (conta ou `null`, sem 401 para visitantes) |
 | GET/DELETE | `/me` | sessão, RF20 |
 | PUT | `/me/profile` | UC03 |
@@ -169,11 +172,12 @@ Principais rotas da API (todas sob `/api`):
 ## 6. Autenticação
 
 - **Senhas**: `scrypt` (N=16384, r=8, p=1, salt aleatório de 16 bytes) com comparação em tempo constante. Nunca são registradas em log nem retornadas.
-- **Sessão**: JWT assinado (HS256) com `sub` = id do usuário e expiração (`AUTH_TOKEN_TTL_HOURS`), em **cookie httpOnly**, `SameSite=Strict`, `Secure` em produção e `path=/api`. O token não fica acessível ao JavaScript (mitiga XSS).
+- **Sessão**: JWT assinado (HS256) com `sub` = id do usuário, `sv` = versão da sessão e expiração (`AUTH_TOKEN_TTL_HOURS`), em **cookie httpOnly**, `SameSite=Strict`, `Secure` em produção e `path=/api`. O token não fica acessível ao JavaScript (mitiga XSS). O middleware `authenticate` aceita o token só se `sv` for igual a `users.session_version`: redefinir a senha (ou excluir a conta) encerra todas as sessões abertas, em qualquer aparelho.
 - **CSRF**: `SameSite=Strict` + CORS restrito à origem do front-end + cabeçalho obrigatório `X-Requested-With` em requisições que alteram dados (formulários de outros sites não conseguem enviá-lo).
 - **Login sem enumeração por tempo**: quando o e-mail não existe, um hash fictício é verificado para equalizar o tempo de resposta.
 - **Conta já existente (UC01-A2)**: o caso de uso exige avisar o usuário; a exposição é mitigada com limitação de tentativas.
-- **Recuperação de senha**: no MVP a rota responde sempre a mesma mensagem genérica e **não envia e-mail** (não há serviço de e-mail configurado). Ver §12.
+- **Recuperação de senha**: resposta sempre igual (anti-enumeração); se a conta existir, um link com token aleatório de 256 bits é enviado por e-mail. O banco guarda só o hash SHA-256; o link vale 15 minutos, é de uso único e um novo pedido invalida o anterior. A senha nova segue a política do cadastro. Fluxo completo em [EMAIL-AND-AUTH.md](./EMAIL-AND-AUTH.md).
+- **Boas-vindas**: depois do cadastro, um e-mail é enviado em segundo plano; falha de envio nunca desfaz a conta.
 - **Modo demonstração**: contas ficam apenas no navegador, com senha em PBKDF2 (Web Crypto). É um protótipo — não é autenticação de produção.
 
 ### 6.1 Sessão e cache no front-end
@@ -229,6 +233,12 @@ acabou de entrar para a etapa pendente ou para a página que tentava abrir — s
 IA e limite de requisições; "Voltar" para não encontrado/sem acesso; e, para sessão, um aviso neutro enquanto a
 sessão é revalidada. `ActionError` omite erros de sessão (o aviso aparece uma vez, no login).
 
+**Redefinição de senha.** A página `/redefinir-senha/:token` fica fora das guardas (o link precisa abrir mesmo
+com uma sessão ativa). Se a sessão deste navegador era da mesma conta, a API remove o cookie e a tela chama
+`endSession('signed_out')`, que também avisa as outras abas; em outros aparelhos, a próxima chamada privada
+recebe 401 (versão da sessão antiga) e segue o fluxo normal de sessão expirada. Depois do login, o app nunca
+devolve a pessoa para um link de redefinição (`safeReturnPath`).
+
 **Modo demonstração com várias abas.** O armazenamento do modo demo (`createDocumentStore`) revalida cada
 leitura contra o `localStorage`; antes, cada aba trabalhava com uma cópia em memória e podia apagar o que a
 outra aba gravou.
@@ -248,6 +258,11 @@ outra aba gravou.
 | Cabeçalhos HTTP | `helmet` (CSP, HSTS em produção, `X-Content-Type-Options`, etc.) |
 | Logs com dados pessoais | logger com redação de campos sensíveis; conteúdo de mensagens nunca é registrado |
 | Segredo de sessão ausente | obrigatório em produção (a API não sobe sem ele); em desenvolvimento é gerado temporariamente com aviso |
+| Link de redefinição vazado ou reaproveitado | token de 256 bits, banco guarda só o hash, validade de 15 min, uso único atômico, um link ativo por conta, token só no corpo das requisições e nunca em logs |
+| Enumeração de contas pela recuperação | mesma resposta e mesmo status com ou sem conta; envio do e-mail em segundo plano; limite de 10 pedidos por IP a cada 15 min |
+| Sessões antigas após troca de senha | versão da sessão no token, conferida a cada requisição |
+| Links forjados nos e-mails | links montados com `APP_PUBLIC_URL`, nunca com o cabeçalho `Host` |
+| Credenciais SMTP | só no `.env` do servidor; log da conversa SMTP desligado; caixa de saída local proibida em produção |
 
 ## 8. Privacidade (LGPD)
 
@@ -280,7 +295,8 @@ Itens que dependem de decisão jurídica/organizacional (encarregado de dados, b
 - **Erros de domínio** (`AppError`) têm código estável (`VALIDATION`, `EMAIL_IN_USE`, `INVALID_CREDENTIALS`, `NOT_FOUND`, `RATE_LIMITED`, `AI_UNAVAILABLE`…). A API converte em status HTTP; o front-end converte em mensagens em português, sem termos técnicos.
 - Erros inesperados retornam `500 INTERNAL` com mensagem genérica; detalhes ficam só no log do servidor.
 - **Logs** estruturados em JSON (`logger.ts`): evento, rota, status, duração e id do usuário — sem senhas, tokens, e-mails ou conteúdo de mensagens.
-- **Configuração** centralizada em `apps/api/src/config/env.ts`, validada na inicialização; exemplo documentado em `.env.example`.
+- **Configuração** centralizada em `apps/api/src/config/env.ts`, validada na inicialização (inclusive as regras de e-mail em produção); exemplo documentado em `.env.example`.
+- **E-mails** registram só eventos (`email.sent`, `email.failed` com o código do erro, `email.skipped`), nunca destinatário, link ou resposta do servidor SMTP.
 
 ## 12. Decisões técnicas, limitações e evolução
 
@@ -295,11 +311,15 @@ Itens que dependem de decisão jurídica/organizacional (encarregado de dados, b
 | Política de correção em código | garante RN04 independentemente do modelo |
 | Cookie httpOnly em vez de token no `localStorage` | reduz impacto de XSS |
 | Sessão como query permanente + dados privados em `['user', userId, ...]` | logout/expiração/troca de conta sem estados órfãos nem vazamento de cache (§6.1) |
+| Token de redefinição aleatório guardado como hash (com estado) | permite uso único e invalidar links anteriores — impossível com token assinado sem estado |
+| Versão da sessão no JWT | encerra sessões após troca de senha sem lista de revogação; uma consulta por chave primária por requisição |
+| Envio de e-mail atrás de `Mailer` | SMTP em produção, caixa de saída local em desenvolvimento e memória nos testes, sem mudar as rotas |
 | Fuso `America/Sao_Paulo` para "dias de estudo" | público principal brasileiro (configurável) |
 
 ### Limitações atuais
 
-- Recuperação de senha sem envio real de e-mail.
+- Envio de e-mail no próprio processo da API, sem fila nem nova tentativa automática; sem confirmação de e-mail no cadastro.
+- Sair da conta remove o cookie, mas não revoga o token no servidor (ele vale até vencer ou até a senha mudar).
 - Lembretes de estudo apenas como preferência salva (sem envio de notificações).
 - Rate limit em memória (uma instância).
 - Sem telas de administração de conteúdo (ator Administrador apenas preparado).
@@ -311,4 +331,4 @@ Itens que dependem de decisão jurídica/organizacional (encarregado de dados, b
 - Fase 3: revisão automática mais sofisticada, exercícios adaptativos gerados por IA com validação, gamificação.
 - Fase 4: voz, pronúncia, listening (campo `phonetic` e interface `AIProvider` já preparados).
 - Fase 5: trilhas de inglês profissional e para tecnologia.
-- Infra: PostgreSQL, Redis, envio de e-mail, PWA/app nativo, painel administrativo.
+- Infra: PostgreSQL, Redis, fila de e-mails com nova tentativa, confirmação de e-mail, PWA/app nativo, painel administrativo.

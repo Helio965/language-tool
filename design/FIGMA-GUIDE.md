@@ -95,7 +95,7 @@ Fontes gratuitas no Google Fonts: **Fraunces** (títulos) e **Atkinson Hyperlegi
 
 | Estilo | Fonte | Celular | Desktop | Uso |
 | --- | --- | --- | --- | --- |
-| `display` | Fraunces | 32 | 44 | boas-vindas, resultado |
+| `display` | Fraunces | 32 | 44 | página pública, resultado |
 | `h1` | Fraunces | 26 | 32 | título da página |
 | `h2` | Fraunces | 21 | 24 | seções |
 | `h3` | Atkinson, bold | 18 | 18 | títulos de cartão |
@@ -149,7 +149,7 @@ Pessoa 2):
 
 | Fluxo | Telas (frames) | Interações |
 | --- | --- | --- |
-| **Cadastro** | 01 Boas-vindas → 02 Cadastro (vazio → erros → preenchido) → 05 Configuração (3 etapas) → 06 Nivelamento (intro → pergunta → resultado) → 07 Início | *On tap*, *Smart animate* nas etapas |
+| **Cadastro** | 01 Página pública → 02 Cadastro (vazio → erros → preenchido) → 05 Configuração (3 etapas) → 06 Nivelamento (intro → pergunta → resultado) → 07 Início | *On tap*, *Smart animate* nas etapas |
 | **Login** | 01 → 03 Entrar (erro) → 07 Início | — |
 | **Modo Aprender** | 07 Início → 09 Aula (apresentação → explicação → exemplos → vocabulário → exercício → feedback correto/incorreto → resumo) | overlay do feedback deslizando de baixo |
 | **Modo Conversação** | 10 Conversar → 11 Conversa (abertura → digitando → resposta com correção recolhida → "Por quê?" aberto) → diálogo Encerrar → 12 Feedback | *After delay* 800ms para o indicador "digitando" |

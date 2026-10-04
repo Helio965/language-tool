@@ -7,7 +7,8 @@
 
 | Entidade | Origem nos documentos | Atributos dos documentos | Atributos de apoio (decisão técnica) |
 |----------|----------------------|--------------------------|--------------------------------------|
-| **User** | §20 Usuário | id, nome, e-mail, credenciais, preferências | `role` (ator Administrador, D7), `terms_accepted_at` (privacidade) |
+| **User** | §20 Usuário | id, nome, e-mail, credenciais, preferências | `role` (ator Administrador, D7), `terms_accepted_at` (privacidade), `session_version` (encerra sessões ao redefinir a senha) |
+| **PasswordResetToken** | UC02 (recuperação de senha) | — | hash SHA-256 do token, validade, uso único (`used_at`), criação — ver [EMAIL-AND-AUTH.md](./EMAIL-AND-AUTH.md) |
 | **LearningProfile** | §20 Perfil de aprendizagem, UC03, UC04 | nível, objetivo, dificuldades, progresso | nível percebido, experiência anterior, interesses (UC03), pontuação e data do nivelamento |
 | **Preference** | UC12, RF19 | idioma das explicações, intensidade das correções, preferências de conversação, histórico, notificações, aprendizagem | meta diária |
 | **Lesson** | §20 Aula | título, nível, conteúdo, tópico, exercícios | ordem (RN02), minutos estimados |
@@ -33,6 +34,7 @@ erDiagram
     USER ||--o{ USER_VOCABULARY : "estuda"
     USER ||--o{ REVIEW : "revisa"
     USER ||--o{ CONVERSATION : "conversa"
+    USER ||--o{ PASSWORD_RESET_TOKEN : "pede redefinição"
     LESSON ||--o{ EXERCISE : "contém"
     LESSON ||--o{ PROGRESS : "é acompanhada em"
     LESSON }o--o{ VOCABULARY : "apresenta (lesson_vocabulary)"
@@ -48,6 +50,15 @@ erDiagram
         text role
         text created_at
         text terms_accepted_at
+        int session_version
+    }
+    PASSWORD_RESET_TOKEN {
+        text id PK
+        text user_id FK
+        text token_hash UK "SHA-256; o token só existe no e-mail"
+        text expires_at
+        text used_at "nulo até ser usado"
+        text created_at
     }
     LEARNING_PROFILE {
         text user_id PK,FK
@@ -184,7 +195,9 @@ erDiagram
 
 - **Exercícios de nivelamento e de vocabulário** não são linhas de `EXERCISE`: são gerados a partir do catálogo (`placement:*`, `vocab:*`). Por isso `exercise_attempt.exercise_id` **não** tem chave estrangeira — apenas `lesson_id` tem. Essa decisão evita criar uma entidade extra de "Nivelamento" não prevista nos documentos; o resultado do nivelamento fica no `LEARNING_PROFILE`.
 - **Review.ref_id** é polimórfico (id de aula, tag de tema ou `vocabulary`), conforme `kind`.
-- **Exclusão de dados (RF20):** todas as tabelas do usuário usam `ON DELETE CASCADE` a partir de `USER`.
+- **Exclusão de dados (RF20):** todas as tabelas do usuário usam `ON DELETE CASCADE` a partir de `USER` (inclusive `PASSWORD_RESET_TOKEN`).
+- **Recuperação de senha:** `PASSWORD_RESET_TOKEN` guarda só o hash do token; no máximo um pedido ativo por conta (um novo pedido apaga os anteriores); pedidos vencidos há mais de um dia são removidos pela limpeza periódica. `USER.session_version` sobe a cada redefinição e invalida os tokens de sessão emitidos antes.
+- **Migrações:** o esquema é idempotente (`CREATE … IF NOT EXISTS`); colunas novas em bancos existentes entram por migrações aditivas em `apps/api/src/db/database.ts` (ex.: `session_version` com padrão 0), sem apagar dados.
 - **Retenção (RN07):** ao expirar ou ao ser apagada, uma conversa perde as mensagens e os fatos do contexto; ficam só metadados sem conteúdo (`user_message_count`, `corrected_skills`) para o progresso.
 - **Campos JSON**: listas pequenas e de leitura conjunta (interesses, exemplos, correções). Em PostgreSQL, viram `jsonb`.
 - **Datas** em ISO 8601 UTC (texto) para portabilidade entre navegador, API e banco.
@@ -336,6 +349,7 @@ classDiagram
       +reviews
       +conversations
       +messages
+      +passwordResets
       +deleteUserData(userId)
     }
     class SqliteDataStore
@@ -349,6 +363,9 @@ classDiagram
 | Tabela | Índice | Motivo |
 |--------|--------|--------|
 | users | `UNIQUE(email)` | login e verificação de conta existente (UC01-A2) |
+| password_reset_tokens | `UNIQUE(token_hash)` | busca do link pelo hash |
+| password_reset_tokens | `(user_id, created_at)` | pedido mais recente da conta (intervalo mínimo entre e-mails) |
+| password_reset_tokens | `(expires_at)` | limpeza de pedidos vencidos |
 | exercise_attempts | `(user_id, created_at)` | progresso, dificuldades recentes |
 | reviews | `(user_id, status, due_at)` | fila de revisão |
 | conversations | `(user_id, updated_at)` | histórico |
