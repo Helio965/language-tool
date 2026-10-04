@@ -95,9 +95,6 @@ export function buildSystemPrompt(mode: PromptMode, learner: LearnerContext, ass
   );
 }
 
-const ISSUE_SCHEMA =
-  '{"span": "trecho exato da mensagem do usuário", "replacement": "substituição", "severity": "meaning|grammar|naturalness", "skill": "uma das tags", "explanation_pt": "...", "explanation_en": "..."}';
-
 export function conversationTaskPrompt(topic: ConversationTopic, facts: Record<string, string>, suggestedQuestion: string | null): string {
   const known = Object.entries(facts)
     .map(([key, value]) => `${key}: ${value}`)
@@ -106,9 +103,9 @@ export function conversationTaskPrompt(topic: ConversationTopic, facts: Record<s
     `Assunto da conversa: ${topic.titleEn} (${topic.title}).`,
     known ? `O que o usuário já contou: ${known}.` : '',
     suggestedQuestion ? `Sugestão de próxima pergunta (adapte se fizer sentido): "${suggestedQuestion}".` : '',
-    'Responda SOMENTE com JSON válido, sem texto extra, no formato:',
-    `{"reply": "sua resposta em inglês", "translation": "tradução em português ou null", "facts": {"chave": "valor"}, "issues": [${ISSUE_SCHEMA}]}`,
-    `Tags de skill válidas: ${Object.keys(SKILL_LABELS).join(', ')}.`,
+    'Responda no formato JSON definido: "reply" (sua resposta em inglês), "translation" (tradução de apoio ou string vazia),',
+    '"facts" (fatos novos que o usuário contou, como {"key": "city", "value": "Recife"}) e "issues" (problemas na mensagem do usuário).',
+    'Em "issues", "span" deve ser um trecho copiado exatamente da mensagem do usuário. Se não houver problemas, use uma lista vazia.',
   ]
     .filter(Boolean)
     .join('\n');
@@ -119,7 +116,7 @@ export function conversationStartPrompt(topic: ConversationTopic, firstQuestion:
     `Inicie uma conversa sobre: ${topic.titleEn} (${topic.title}).`,
     'Cumprimente o usuário pelo primeiro nome, apresente-se em uma frase e faça uma pergunta simples.',
     firstQuestion ? `Pergunta sugerida: "${firstQuestion}".` : '',
-    'Responda SOMENTE com JSON: {"reply": "...", "translation": "... ou null"}',
+    'Responda no formato JSON definido: "reply" e "translation" (tradução de apoio ou string vazia).',
   ]
     .filter(Boolean)
     .join('\n');
@@ -140,7 +137,7 @@ export function exampleTaskPrompt(lesson: Lesson): string {
   return [
     `Aula: ${lesson.title} (${lesson.topic}). Exemplos já mostrados: ${lesson.examples.map((e) => e.en).join(' | ')}.`,
     'Crie UM exemplo novo, curto e correto que use o conteúdo da aula.',
-    'Responda SOMENTE com JSON: {"en": "frase em inglês", "pt": "tradução", "highlight": "trecho a destacar"}',
+    'Responda no formato JSON definido: "en" (frase em inglês), "pt" (tradução) e "highlight" (trecho da frase a destacar).',
   ].join('\n');
 }
 
@@ -149,7 +146,7 @@ export function correctTaskPrompt(exercise: Exercise, answer: string): string {
     `Exercício (${exercise.instruction}): ${exercise.prompt}`,
     `Resposta do usuário: "${answer}"`,
     'Avalie se a resposta é gramaticalmente correta e adequada ao exercício.',
-    'Responda SOMENTE com JSON:',
-    `{"feedback": "comentário curto e encorajador", "issues": [${ISSUE_SCHEMA}]}`,
+    'Responda no formato JSON definido: "feedback" (comentário curto e encorajador) e "issues" (problemas encontrados,',
+    'com "span" copiado exatamente da resposta do usuário; lista vazia se estiver correta).',
   ].join('\n');
 }

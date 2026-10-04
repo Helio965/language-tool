@@ -10,8 +10,10 @@ export interface AIProviderMessage {
 export interface AIProviderRequest {
   system: string;
   messages: AIProviderMessage[];
-  maxTokens: number;
-  temperature?: number;
+  /** Esquema JSON da resposta (saída estruturada), quando a tarefa exige JSON. */
+  jsonSchema?: Record<string, unknown>;
+  /** Limite opcional; cada provedor define um padrão seguro. */
+  maxTokens?: number;
 }
 
 export interface AIProvider {

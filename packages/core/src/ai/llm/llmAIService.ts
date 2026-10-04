@@ -34,6 +34,7 @@ import type {
 } from '../types';
 import { emptyConversationContext } from '../types';
 import { parseJsonObject, type AIProvider } from './provider';
+import { CONVERSATION_SCHEMA, CORRECTION_SCHEMA, EXAMPLE_SCHEMA, OPENING_SCHEMA } from './schemas';
 
 interface RawIssue {
   span?: unknown;
@@ -76,11 +77,18 @@ export function toGrammarIssues(raw: unknown, message: string): GrammarIssue[] {
 }
 
 function sanitizeFacts(raw: unknown): Record<string, string> {
-  if (!raw || typeof raw !== 'object') return {};
-  const entries = Object.entries(raw as Record<string, unknown>)
-    .filter(([key, value]) => /^[a-z_]{2,20}$/.test(key) && typeof value === 'string' && value.length <= 60)
+  const pairs: Array<[unknown, unknown]> = Array.isArray(raw)
+    ? raw.map((item) => [(item as { key?: unknown })?.key, (item as { value?: unknown })?.value])
+    : raw && typeof raw === 'object'
+      ? Object.entries(raw as Record<string, unknown>)
+      : [];
+  const entries = pairs
+    .filter((pair): pair is [string, string] => {
+      const [key, value] = pair;
+      return typeof key === 'string' && /^[a-z_]{2,20}$/.test(key) && typeof value === 'string' && value.length <= 60;
+    })
     .slice(0, 10);
-  return Object.fromEntries(entries) as Record<string, string>;
+  return Object.fromEntries(entries);
 }
 
 export class LLMAIService implements AIService {
@@ -105,8 +113,7 @@ export class LLMAIService implements AIService {
     const raw = await this.provider.complete({
       system: buildSystemPrompt('conversation', learner, this.assistantName),
       messages: [{ role: 'user', content: conversationStartPrompt(topic, first ? (band === 'low' ? first.low : first.high) : null) }],
-      maxTokens: 300,
-      temperature: 0.7,
+      jsonSchema: OPENING_SCHEMA,
     });
     const parsed = parseJsonObject<{ reply?: unknown; translation?: unknown }>(raw);
     const context = emptyConversationContext();
@@ -126,8 +133,7 @@ export class LLMAIService implements AIService {
     const raw = await this.provider.complete({
       system,
       messages: [...history.map((turn) => ({ role: turn.role, content: turn.content })), { role: 'user', content: userMessage }],
-      maxTokens: 600,
-      temperature: 0.7,
+      jsonSchema: CONVERSATION_SCHEMA,
     });
     const parsed = parseJsonObject<{ reply?: unknown; translation?: unknown; facts?: unknown; issues?: unknown }>(raw);
     const reply = text(parsed.reply);
@@ -146,8 +152,6 @@ export class LLMAIService implements AIService {
     const raw = await this.provider.complete({
       system: buildSystemPrompt('learn', learner, this.assistantName),
       messages: [{ role: 'user', content: explainTaskPrompt(lesson, style, learner.explanationLanguage) }],
-      maxTokens: 400,
-      temperature: 0.6,
     });
     const result = withAssistantName(raw.trim(), this.assistantName).slice(0, MAX_TEXT);
     if (!result) throw new Error('Empty AI explanation');
@@ -158,8 +162,7 @@ export class LLMAIService implements AIService {
     const raw = await this.provider.complete({
       system: buildSystemPrompt('learn', learner, this.assistantName),
       messages: [{ role: 'user', content: exampleTaskPrompt(lesson) }],
-      maxTokens: 200,
-      temperature: 0.8,
+      jsonSchema: EXAMPLE_SCHEMA,
     });
     const parsed = parseJsonObject<{ en?: unknown; pt?: unknown; highlight?: unknown }>(raw);
     const en = text(parsed.en);
@@ -172,8 +175,7 @@ export class LLMAIService implements AIService {
     const raw = await this.provider.complete({
       system: buildSystemPrompt('learn', learner, this.assistantName),
       messages: [{ role: 'user', content: correctTaskPrompt(exercise, answer) }],
-      maxTokens: 500,
-      temperature: 0.2,
+      jsonSchema: CORRECTION_SCHEMA,
     });
     const parsed = parseJsonObject<{ feedback?: unknown; issues?: unknown }>(raw);
     const issues = resolveOverlaps([...checkGrammar(answer), ...toGrammarIssues(parsed.issues, answer)]);
