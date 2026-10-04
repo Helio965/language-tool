@@ -1,3 +1,6 @@
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import request from 'supertest';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { PLACEMENT_QUESTIONS } from '@english-ai/core';
@@ -24,7 +27,7 @@ const PROFILE = {
   interestAreas: ['technology'],
 };
 
-function setup(options: { rateLimited?: boolean } = {}) {
+function setup(options: { rateLimited?: boolean; webDistPath?: string } = {}) {
   const logs: string[] = [];
   const logger = createLogger({ sink: (line) => logs.push(line) });
   const config = loadConfig({ NODE_ENV: 'test', AUTH_TOKEN_SECRET: 'x'.repeat(48) });
@@ -37,6 +40,7 @@ function setup(options: { rateLimited?: boolean } = {}) {
     secureCookies: false,
     aiProvider: runtime.aiProvider,
     rateLimits: { disabled: !options.rateLimited },
+    ...(options.webDistPath ? { webDistPath: options.webDistPath } : {}),
   });
   return { app, logs };
 }
@@ -74,6 +78,18 @@ describe('API — infraestrutura e segurança', () => {
     await request(ctx.app).post('/api/auth/login').set(CSRF).set('Content-Type', 'application/json').send('{bad').expect(400);
     const res = await request(ctx.app).get('/api/nao-existe').expect(404);
     expect(res.body.error.code).toBe('NOT_FOUND');
+  });
+
+  it('serve o front-end compilado com fallback de SPA, mesmo em pasta com "." no caminho', async () => {
+    const dist = join(mkdtempSync(join(tmpdir(), 'english-ai-')), '.output', 'web');
+    mkdirSync(dist, { recursive: true });
+    writeFileSync(join(dist, 'index.html'), '<!doctype html><title>English AI</title>');
+    const { app } = setup({ webDistPath: dist });
+    for (const path of ['/', '/progresso', '/perfil/editar']) {
+      const response = await request(app).get(path).expect(200);
+      expect(response.text).toContain('<title>English AI</title>');
+    }
+    await request(app).get('/api/rota-inexistente').expect(404);
   });
 
   it('exige autenticação nas rotas protegidas', async () => {
@@ -206,6 +222,25 @@ describe('API — jornada do MVP', () => {
     expect(reviews.due.length).toBeGreaterThan(0);
     const vocabulary = (await agent.get('/api/vocabulary').expect(200)).body;
     expect(vocabulary.counts.studied).toBeGreaterThan(0);
+  });
+
+  it('não entrega dados de outra conta quando a interface espera a anterior (troca de conta em outra aba)', async () => {
+    const { app } = setup();
+    const agent = request.agent(app);
+    const alex = (await agent.post('/api/auth/register').set(CSRF).send(USER).expect(201)).body;
+    await agent.put('/api/me/profile').set(CSRF).send(PROFILE).expect(200);
+    const asAlex = { ...CSRF, 'X-Session-User': alex.user.id };
+    await agent.get('/api/me').set(asAlex).expect(200);
+
+    // Mesmo navegador (mesmo cookie): outra aba entra com a conta da Bia.
+    await agent.post('/api/auth/register').set(CSRF).send({ ...USER, name: 'Bia', email: 'bia@example.com' }).expect(201);
+    const denied = await agent.get('/api/me').set(asAlex).expect(401);
+    expect(denied.body.error.code).toBe('UNAUTHENTICATED');
+    // A interface revalida a sessão e descobre quem está conectado agora.
+    const session = await agent.get('/api/auth/session').set(asAlex).expect(200);
+    expect(session.body.account.user.email).toBe('bia@example.com');
+    // Sem o cabeçalho (ou com o id certo), a sessão funciona normalmente.
+    await agent.get('/api/me').set({ ...CSRF, 'X-Session-User': session.body.account.user.id }).expect(200);
   });
 
   it('impede acesso a conversas de outro usuário e respeita a exclusão de dados (RF20)', async () => {

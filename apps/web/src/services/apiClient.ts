@@ -47,6 +47,12 @@ export interface ApiClient {
   deleteAccount(password: string): Promise<void>;
   /** Apenas no modo demonstração: entra (ou cria) a conta de exemplo. */
   startDemo?(): Promise<AccountState>;
+  /**
+   * Conta que a interface está exibindo. Chamadas privadas feitas para outra conta (ex.: login em
+   * outra aba) são recusadas com UNAUTHENTICATED, para que dados de uma conta nunca apareçam na tela
+   * de outra. Login, cadastro, demonstração, logout e exclusão atualizam o vínculo automaticamente.
+   */
+  bindSession(userId: string | null): void;
 
   // Perfil e preferências (UC03, UC12)
   saveProfile(input: ProfileInput): Promise<LearningProfile>;

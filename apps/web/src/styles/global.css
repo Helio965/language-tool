@@ -93,9 +93,53 @@ svg {
   border-radius: 6px;
 }
 
-::selection {
+/*
+ * Seleção de texto: a interface (títulos, cards, menus, botões, estatísticas, mensagens) não é
+ * selecionável com o mouse — clicar e arrastar não "pinta" a tela. Campos editáveis continuam
+ * selecionáveis para copiar, colar e corrigir o que foi digitado. Para uma área que precise
+ * permitir cópia, use a classe .allow-text-selection.
+ */
+body {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+input,
+textarea,
+select,
+[contenteditable]:not([contenteditable='false']),
+.allow-text-selection,
+.allow-text-selection * {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* O marca-texto da seleção só aparece onde selecionar é permitido. */
+input::selection,
+textarea::selection,
+[contenteditable]:not([contenteditable='false'])::selection,
+.allow-text-selection::selection,
+.allow-text-selection *::selection {
   background: var(--marker);
   color: var(--ink);
+}
+
+/* Sessão: verificação que falhou (sem conexão) e encerramento em andamento */
+.session-check-failed {
+  display: grid;
+  place-items: center;
+  min-height: 100dvh;
+  padding: var(--space-6) var(--gutter);
+}
+
+.session-check-failed > * {
+  width: min(100%, 520px);
+}
+
+.session-ending {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-2);
 }
 
 /* Utilitários */

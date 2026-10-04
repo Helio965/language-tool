@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   ArrowRight,
   BookMarked,
@@ -19,9 +19,9 @@ import { AssistantAvatar } from '../../components/Brand';
 import { Button } from '../../components/Button';
 import { Card, Highlight, ModeBadge, ProgressRing } from '../../components/Display';
 import { FocusBar } from '../../components/FocusBar';
-import { ErrorState, InlineAlert, LoadingState } from '../../components/States';
-import { useApi } from '../../app/session';
-import { errorMessage } from '../../services';
+import { InlineAlert, LoadingState } from '../../components/States';
+import { ActionError, QueryErrorState } from '../../app/QueryErrorState';
+import { useApi, useSession, useUserKeys } from '../../app/session';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { cx } from '../../utils/cx';
 import { ExerciseRunner, type ExerciseOutcome } from '../exercises/ExerciseRunner';
@@ -41,7 +41,8 @@ type StepId = (typeof STEPS)[number]['id'];
 export function LessonPage() {
   const { lessonId = '' } = useParams();
   const api = useApi();
-  const query = useQuery({ queryKey: ['lesson', lessonId], queryFn: () => api.getLesson(lessonId) });
+  const keys = useUserKeys();
+  const query = useQuery({ queryKey: keys.lesson(lessonId), queryFn: () => api.getLesson(lessonId) });
   useDocumentTitle(query.data?.title ?? 'Aula');
 
   if (query.isPending) return <LoadingState label="Preparando sua aula…" />;
@@ -49,7 +50,10 @@ export function LessonPage() {
     return (
       <div className={styles.page}>
         <FocusBar backTo="/aprender" backLabel="Voltar à trilha" />
-        <ErrorState message={errorMessage(query.error)} onRetry={() => query.refetch()} />
+        <h1 className="visually-hidden" data-page-title tabIndex={-1}>
+          Aula
+        </h1>
+        <QueryErrorState error={query.error} onRetry={() => void query.refetch()} back={{ to: '/aprender', label: 'Voltar à trilha' }} />
       </div>
     );
   }
@@ -58,7 +62,7 @@ export function LessonPage() {
 
 function Lesson({ lesson }: { lesson: LessonView }) {
   const api = useApi();
-  const queryClient = useQueryClient();
+  const { refreshUserData } = useSession();
   const navigate = useNavigate();
   const [step, setStep] = useState<StepId>('intro');
   const [exerciseIndex, setExerciseIndex] = useState(0);
@@ -79,7 +83,7 @@ function Lesson({ lesson }: { lesson: LessonView }) {
     onSuccess: async (data) => {
       setResult(data);
       setStep('summary');
-      await queryClient.invalidateQueries();
+      await refreshUserData();
     },
   });
 
@@ -151,7 +155,7 @@ function Lesson({ lesson }: { lesson: LessonView }) {
               {lesson.aboveLevel && (
                 <InlineAlert tone="info">Esta aula está acima do seu nível estimado. Tudo bem explorar — as explicações ajudam no caminho.</InlineAlert>
               )}
-              {start.isError && <InlineAlert>{errorMessage(start.error)}</InlineAlert>}
+              {start.isError && <ActionError error={start.error} />}
               <Button size="lg" variant="accent" onClick={() => start.mutate()} loading={start.isPending} iconEnd={<ArrowRight aria-hidden="true" />}>
                 {lesson.status === 'in_progress' ? 'Continuar aula' : lesson.status === 'completed' ? 'Refazer aula' : 'Começar aula'}
               </Button>
@@ -201,7 +205,7 @@ function Lesson({ lesson }: { lesson: LessonView }) {
                 finishLabel="Ver resumo da aula"
               />
               {complete.isPending && <LoadingState label="Registrando seu progresso…" />}
-              {complete.isError && <InlineAlert>{errorMessage(complete.error)}</InlineAlert>}
+              {complete.isError && <ActionError error={complete.error} />}
             </section>
           )}
 
@@ -281,7 +285,7 @@ function Lesson({ lesson }: { lesson: LessonView }) {
                   Voltar à trilha
                 </Button>
               </div>
-              {practice.isError && <InlineAlert>{errorMessage(practice.error)}</InlineAlert>}
+              {practice.isError && <ActionError error={practice.error} />}
             </section>
           )}
         </div>
@@ -358,7 +362,7 @@ function ExplanationStep({ lesson, onNext }: { lesson: LessonView; onNext: () =>
           <p className="muted">{ASSISTANT_PERSONA.name} está pensando em outra forma de explicar…</p>
         </div>
       )}
-      {explain.isError && <InlineAlert>{errorMessage(explain.error)}</InlineAlert>}
+      {explain.isError && <ActionError error={explain.error} />}
 
       <div className={styles.rowActions}>
         <Button variant="secondary" icon={<Sparkles aria-hidden="true" />} onClick={() => explain.mutate()} disabled={explain.isPending}>
@@ -395,7 +399,7 @@ function ExamplesStep({ lesson, onNext }: { lesson: LessonView; onNext: () => vo
           </li>
         ))}
       </ul>
-      {more.isError && <InlineAlert>{errorMessage(more.error)}</InlineAlert>}
+      {more.isError && <ActionError error={more.error} />}
       <div className={styles.rowActions}>
         <Button variant="secondary" icon={<Shuffle aria-hidden="true" />} onClick={() => more.mutate()} loading={more.isPending} loadingLabel="Criando exemplo…">
           Me dê outro exemplo

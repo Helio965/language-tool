@@ -3,9 +3,9 @@ import { BookOpen, CalendarClock, Library, RefreshCcw, Target } from 'lucide-rea
 import type { ReviewItemView } from '@english-ai/core';
 import { Button } from '../../components/Button';
 import { PageHeader, SectionTitle } from '../../components/Display';
-import { EmptyState, ErrorState, Skeleton } from '../../components/States';
-import { useApi } from '../../app/session';
-import { errorMessage } from '../../services';
+import { EmptyState, Skeleton } from '../../components/States';
+import { QueryErrorState } from '../../app/QueryErrorState';
+import { useApi, useUserKeys } from '../../app/session';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { relativeDay } from '../../utils/format';
 import styles from './ReviewPage.module.css';
@@ -16,7 +16,8 @@ const KIND_ICON = { lesson: BookOpen, skill: Target, vocabulary: Library } as co
 export function ReviewPage() {
   useDocumentTitle('Revisão');
   const api = useApi();
-  const query = useQuery({ queryKey: ['reviews'], queryFn: () => api.getReviews() });
+  const keys = useUserKeys();
+  const query = useQuery({ queryKey: keys.reviews, queryFn: () => api.getReviews() });
   const due = query.data?.due ?? [];
 
   return (
@@ -32,7 +33,7 @@ export function ReviewPage() {
         }
       />
       {query.isPending && <Skeleton lines={3} height={84} />}
-      {query.isError && <ErrorState message={errorMessage(query.error)} onRetry={() => query.refetch()} />}
+      {query.isError && <QueryErrorState error={query.error} onRetry={() => void query.refetch()} />}
       {query.data && due.length === 0 && (
         <EmptyState
           title="Tudo em dia!"

@@ -7,9 +7,9 @@ import { AssistantAvatar } from '../../components/Brand';
 import { Button } from '../../components/Button';
 import { Chip } from '../../components/Controls';
 import { Card, LevelBadge, PageHeader, ProgressBar, ProgressRing, SectionTitle } from '../../components/Display';
-import { ErrorState, Skeleton } from '../../components/States';
-import { useApi } from '../../app/session';
-import { errorMessage } from '../../services';
+import { Skeleton } from '../../components/States';
+import { QueryErrorState } from '../../app/QueryErrorState';
+import { useApi, useUserKeys } from '../../app/session';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { greeting, plural, relativeDay } from '../../utils/format';
 import styles from './HomePage.module.css';
@@ -17,7 +17,8 @@ import styles from './HomePage.module.css';
 export function HomePage() {
   useDocumentTitle('Início');
   const api = useApi();
-  const query = useQuery({ queryKey: ['home'], queryFn: () => api.getHome() });
+  const keys = useUserKeys();
+  const query = useQuery({ queryKey: keys.home, queryFn: () => api.getHome() });
 
   if (query.isPending) {
     return (
@@ -27,7 +28,16 @@ export function HomePage() {
       </div>
     );
   }
-  if (query.isError) return <ErrorState message={errorMessage(query.error)} onRetry={() => query.refetch()} />;
+  if (query.isError) {
+    return (
+      <>
+        <h1 className="visually-hidden" data-page-title tabIndex={-1}>
+          Início
+        </h1>
+        <QueryErrorState error={query.error} onRetry={() => void query.refetch()} />
+      </>
+    );
+  }
   return <Dashboard data={query.data} />;
 }
 

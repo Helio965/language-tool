@@ -75,6 +75,10 @@ a configuração ou o nivelamento é levado à etapa pendente; quem já entrou n
 | Exercícios | responder → **Verificar** (desabilitado até haver resposta) → feedback → **Continuar** (recebe o foco) |
 | Conversa | Enter envia, Shift+Enter quebra linha; limite de 600 caracteres com contador nos últimos 100 |
 | Navegação | itens com `aria-current="page"`; título da página recebe o foco a cada troca de rota |
+| Botões assíncronos | mostram o andamento ("Entrando…", "Saindo…", "Excluindo…"), não aceitam clique repetido e voltam ao normal se a ação falhar |
+| Sair da conta | leva ao login com o aviso discreto "Você saiu da sua conta."; nunca mostra "sessão expirou" |
+| Sair no primeiro acesso | na configuração inicial e no nivelamento, o "X" é **Sair da conta** (com confirmação); a etapa é retomada ao entrar de novo |
+| Seleção de texto | a interface (títulos, cards, menus, botões, estatísticas, mensagens) não é selecionável com o mouse; campos editáveis continuam selecionáveis para copiar, colar e corrigir. Áreas que precisem de cópia usam `.allow-text-selection` |
 
 ## 5. Estados de interface
 
@@ -84,8 +88,19 @@ Toda tela que carrega dados implementa os quatro estados:
 | --- | --- | --- | --- |
 | **Carregando** | `Skeleton` (listas e cartões) ou `LoadingState` (tela/ação) | forma do conteúdo final, sem saltos de layout; `role="status"` | "Preparando sua aula…" |
 | **Vazio** | `EmptyState` | explica por que está vazio e oferece a próxima ação | Progresso sem atividade → "Começar minha primeira aula" |
-| **Erro** | `ErrorState` (tela) / `InlineAlert` (ação) | mensagem em linguagem comum + "Tentar de novo"; nunca mostra detalhes técnicos | "Sem conexão com o servidor. Verifique sua internet e tente de novo." |
+| **Erro** | `QueryErrorState` (tela) / `ActionError` (ação) | mensagem em linguagem comum + a ação que faz sentido para o tipo de erro (tabela abaixo); nunca mostra detalhes técnicos | "Sem conexão com o servidor. Verifique sua internet e tente de novo." |
 | **Sucesso** | toast, feedback do exercício, resumo | confirma o que aconteceu e indica o próximo passo | "Conta criada! Vamos personalizar seus estudos." |
+
+Erros não terminam em beco sem saída — a ação depende do tipo:
+
+| Tipo de erro | O que a pessoa vê | Ação |
+| --- | --- | --- |
+| Sem conexão / erro do servidor / IA indisponível | "Não foi possível carregar" + mensagem | **Tentar de novo** |
+| Muitas tentativas | "Muitas tentativas em pouco tempo" + pedido para aguardar | **Tentar de novo** |
+| Sessão expirada | aviso neutro "Verificando sua sessão…" (sem caixa vermelha) e, em seguida, **um** aviso no login: "Sua sessão expirou. Entre novamente para continuar." | **Entrar novamente** (automático); depois do login, volta à página |
+| Não encontrado (aula, conversa ou revisão inexistente) | "Não encontramos este conteúdo" | **Voltar** à lista correspondente |
+| Sem acesso | "Acesso não permitido" | **Voltar ao início** |
+| Não foi possível verificar a conta ao abrir o app | "Não foi possível verificar sua conta" | **Tentar de novo** |
 
 Estados específicos do domínio:
 
@@ -170,7 +185,9 @@ Meta: **WCAG 2.1 nível AA**.
 | Idioma | `lang="pt-BR"` na página e `lang="en"` em frases em inglês, para pronúncia correta no leitor de tela |
 | Alvos de toque | 44×44px em botões, campos, navegação e opções (`--touch`); botões pequenos de ações secundárias têm 36px, acima do mínimo de 24px da WCAG 2.2 (2.5.8) |
 | Movimento | `prefers-reduced-motion` desativa animações não essenciais |
-| Texto | tamanhos em `rem`; layout suporta zoom de 200% sem perda de conteúdo; fonte Atkinson Hyperlegible para leitura |
+| Texto | tamanhos em `rem`; sem rolagem horizontal de 320px a 1920px (verificado também em 640, 853 e 1024px, que equivalem a zoom de 200%, 150% e 125% numa tela de 1280px); fonte Atkinson Hyperlegible para leitura |
+| Seleção de texto | restrita a campos editáveis só por CSS (`user-select`), sem bloquear eventos: foco, teclado, leitores de tela e copiar/colar nos campos funcionam normalmente |
+| Diálogos | `<dialog>` nativo modal (foco preso), título ligado por `aria-labelledby` com id único, fecha com Esc, X e clique fora |
 | Cor | nenhuma informação transmitida só por cor |
 | Tabelas | política de dados com cabeçalhos (`scope`) e versão empilhada legível no celular |
 

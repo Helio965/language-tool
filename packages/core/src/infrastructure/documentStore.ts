@@ -53,26 +53,32 @@ const COLLECTIONS: CollectionName[] = [
 ];
 
 export function createDocumentStore(storage: KeyValueStorage, namespace = 'english-ai:v1'): DataStore {
-  const cache = new Map<CollectionName, unknown[]>();
+  /**
+   * Cache do último JSON lido de cada coleção. A leitura sempre confere o conteúdo atual do
+   * armazenamento: se outra aba gravou algo, o cache é descartado. Sem isso, cada aba trabalharia
+   * com uma cópia antiga e, ao gravar, apagaria o que a outra aba salvou.
+   */
+  const cache = new Map<CollectionName, { raw: string | null; rows: unknown[] }>();
   const key = (name: CollectionName) => `${namespace}:${name}`;
 
   function read<K extends CollectionName>(name: K): Collections[K][] {
-    if (!cache.has(name)) {
-      let parsed: Collections[K][] = [];
-      try {
-        const raw = storage.getItem(key(name));
-        parsed = raw ? (JSON.parse(raw) as Collections[K][]) : [];
-      } catch {
-        parsed = [];
-      }
-      cache.set(name, parsed);
+    const raw = storage.getItem(key(name));
+    const cached = cache.get(name);
+    if (cached && cached.raw === raw) return cached.rows as Collections[K][];
+    let parsed: Collections[K][] = [];
+    try {
+      parsed = raw ? (JSON.parse(raw) as Collections[K][]) : [];
+    } catch {
+      parsed = [];
     }
-    return cache.get(name) as Collections[K][];
+    cache.set(name, { raw, rows: parsed });
+    return parsed;
   }
 
   function write<K extends CollectionName>(name: K, rows: Collections[K][]): void {
-    cache.set(name, rows);
-    storage.setItem(key(name), JSON.stringify(rows));
+    const raw = JSON.stringify(rows);
+    storage.setItem(key(name), raw);
+    cache.set(name, { raw, rows });
   }
 
   function upsert<K extends CollectionName>(name: K, row: Collections[K], same: (a: Collections[K], b: Collections[K]) => boolean): void {

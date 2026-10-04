@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import { ArrowRight, Clock, Compass, Info, ListChecks } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -13,9 +12,10 @@ import { Button } from '../../components/Button';
 import { Card } from '../../components/Display';
 import { ChoiceGroup } from '../../components/Controls';
 import { FocusBar } from '../../components/FocusBar';
-import { InlineAlert, LoadingState } from '../../components/States';
+import { LoadingState } from '../../components/States';
+import { ActionError } from '../../app/QueryErrorState';
+import { SignOutDialog } from '../../app/SignOutDialog';
 import { useSession } from '../../app/session';
-import { errorMessage } from '../../services';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { cx } from '../../utils/cx';
 import styles from './PlacementPage.module.css';
@@ -32,37 +32,42 @@ type Phase =
  */
 export function PlacementPage({ retake = false }: { retake?: boolean }) {
   useDocumentTitle('Nivelamento');
-  const { api, refresh } = useSession();
-  const queryClient = useQueryClient();
+  const { api, refreshUserData } = useSession();
   const navigate = useNavigate();
+  const [confirmExit, setConfirmExit] = useState(false);
   const [phase, setPhase] = useState<Phase>({ kind: 'intro' });
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<unknown>(null);
+  // Ação em andamento (o carregamento aparece só no botão clicado; os outros ficam desabilitados).
+  const [busy, setBusy] = useState<'start' | 'skip' | 'finish' | null>(null);
 
   async function start() {
-    setBusy(true);
+    if (busy) return;
+    setBusy('start');
     setError(null);
+    setAnswers({});
     try {
       const step = await api.startPlacement();
       if (step.status === 'continue') setPhase({ kind: 'question', ...step, index: 0 });
     } catch (err) {
-      setError(errorMessage(err));
+      setError(err);
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   }
 
   async function skip() {
-    setBusy(true);
+    if (busy) return;
+    setBusy('skip');
+    setError(null);
     try {
       const result = await api.skipPlacement();
       setPhase({ kind: 'result', result });
     } catch (err) {
-      setError(errorMessage(err));
+      setError(err);
     } finally {
-      setBusy(false);
+      setBusy(null);
     }
   }
 
@@ -88,33 +93,44 @@ export function PlacementPage({ retake = false }: { retake?: boolean }) {
         setPhase({ kind: 'result', result: step.result });
       }
     } catch (err) {
-      setError(errorMessage(err));
+      setError(err);
       setPhase({ kind: 'intro' });
     }
   }
 
-  const exitTo = retake ? '/perfil' : undefined;
-
   async function finish() {
-    setBusy(true);
-    await refresh();
-    await queryClient.invalidateQueries();
-    navigate(retake ? '/perfil' : '/inicio');
+    if (busy) return;
+    setBusy('finish');
+    setError(null);
+    try {
+      // Atualiza a conta (nível, etapa pendente) e os dados que dependem do nível.
+      await refreshUserData();
+      // Primeiro acesso: com a etapa concluída, a guarda de rota leva ao Início.
+      if (retake) navigate('/perfil');
+    } catch (err) {
+      setError(err);
+      setBusy(null);
+    }
   }
+
+  // Refazer (a partir do Perfil): sair volta ao perfil sem mudar o nível atual.
+  // Primeiro acesso: o nivelamento é obrigatório; sair significa sair da conta e retomar depois.
+  const exit = retake
+    ? { backTo: '/perfil', backLabel: 'Sair do nivelamento (seu nível atual continua o mesmo)' }
+    : { onBack: () => setConfirmExit(true), backLabel: 'Sair da conta' };
 
   return (
     <div className={`${styles.page} dotted-paper`}>
       <div className={styles.inner}>
         {phase.kind === 'question' ? (
           <FocusBar
-            backTo={exitTo ?? '/'}
-            backLabel="Sair do nivelamento"
+            {...exit}
             title={`Etapa ${phase.stageNumber} de até ${phase.totalStages} · Atividade ${phase.index + 1} de ${phase.questions.length}`}
             progress={((phase.stageNumber - 1) * phase.questions.length + phase.index) / (phase.totalStages * phase.questions.length)}
             progressLabel="Progresso do nivelamento"
           />
         ) : (
-          <FocusBar backTo={exitTo} title="Nivelamento" />
+          <FocusBar {...(phase.kind === 'intro' ? exit : {})} title="Nivelamento" />
         )}
 
         <main id="conteudo" className={styles.content}>
@@ -135,12 +151,12 @@ export function PlacementPage({ retake = false }: { retake?: boolean }) {
                   <Info aria-hidden="true" /> Não é prova oficial: é um ponto de partida que se ajusta conforme você estuda.
                 </li>
               </ul>
-              {error && <InlineAlert>{error}</InlineAlert>}
+              <ActionError error={error} />
               <div className={styles.actions}>
-                <Button size="lg" onClick={start} loading={busy} loadingLabel="Preparando…" iconEnd={<ArrowRight aria-hidden="true" />}>
+                <Button size="lg" onClick={start} loading={busy === 'start'} disabled={busy !== null} loadingLabel="Preparando…" iconEnd={<ArrowRight aria-hidden="true" />}>
                   Começar nivelamento
                 </Button>
-                <Button size="lg" variant="secondary" onClick={skip} disabled={busy}>
+                <Button size="lg" variant="secondary" onClick={skip} loading={busy === 'skip'} disabled={busy !== null} loadingLabel="Salvando…">
                   Prefiro começar do zero
                 </Button>
               </div>
@@ -186,9 +202,14 @@ export function PlacementPage({ retake = false }: { retake?: boolean }) {
 
           {phase.kind === 'analyzing' && <LoadingState label="Analisando suas respostas…" />}
 
-          {phase.kind === 'result' && <Result result={phase.result} onContinue={finish} loading={busy} retake={retake} />}
+          {phase.kind === 'result' && <Result result={phase.result} onContinue={() => void finish()} loading={busy === 'finish'} retake={retake} error={error} />}
         </main>
       </div>
+      <SignOutDialog
+        open={confirmExit}
+        onClose={() => setConfirmExit(false)}
+        description="Seu perfil já está salvo. Quando você entrar de novo, o nivelamento recomeça do início — leva cerca de 3 minutos."
+      />
     </div>
   );
 }
@@ -198,11 +219,13 @@ function Result({
   onContinue,
   retake,
   loading,
+  error,
 }: {
   result: PlacementResultView;
   onContinue: () => void;
   retake: boolean;
   loading: boolean;
+  error: unknown;
 }) {
   return (
     <div className={`${styles.stack} reveal`}>
@@ -244,6 +267,7 @@ function Result({
           proficiência.
         </span>
       </p>
+      <ActionError error={error} />
       <Button size="lg" onClick={onContinue} loading={loading} iconEnd={<ArrowRight aria-hidden="true" />}>
         {retake ? 'Voltar ao perfil' : 'Ir para o início'}
       </Button>

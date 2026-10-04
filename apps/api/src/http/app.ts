@@ -8,7 +8,7 @@ import type { AppServices } from '@english-ai/core';
 import type { Logger } from '../logger';
 import type { SessionTokens } from '../security/sessionTokens';
 import { errorHandler, notFound } from './middleware/errors';
-import { authenticate, createRateLimiters, CSRF_HEADER, requireCsrfHeader, type RateLimitOptions } from './middleware/security';
+import { authenticate, createRateLimiters, CSRF_HEADER, requireCsrfHeader, SESSION_USER_HEADER, type RateLimitOptions } from './middleware/security';
 import { authRoutes } from './routes/authRoutes';
 import { conversationRoutes } from './routes/conversationRoutes';
 import { learningRoutes } from './routes/learningRoutes';
@@ -38,7 +38,7 @@ export function createApp(options: AppOptions): Express {
     cors({
       origin: options.corsOrigin.split(',').map((origin) => origin.trim()),
       credentials: true,
-      allowedHeaders: ['Content-Type', CSRF_HEADER],
+      allowedHeaders: ['Content-Type', CSRF_HEADER, SESSION_USER_HEADER],
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     }),
   );
@@ -73,7 +73,8 @@ export function createApp(options: AppOptions): Express {
   const dist = options.webDistPath ? resolve(options.webDistPath) : null;
   if (dist && existsSync(dist)) {
     app.use(express.static(dist, { index: false, maxAge: '1h' }));
-    app.get(/^(?!\/api).*/, (_req, res) => res.sendFile(resolve(dist, 'index.html')));
+    // `root` limita a checagem de arquivos ocultos ao nome do arquivo (a pasta do build pode estar em um caminho com ".").
+    app.get(/^(?!\/api).*/, (_req, res) => res.sendFile('index.html', { root: dist }));
   }
 
   app.use(errorHandler(logger));

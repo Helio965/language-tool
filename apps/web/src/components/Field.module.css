@@ -3,6 +3,11 @@
   gap: var(--space-2);
 }
 
+/* Itens do grid podem encolher abaixo do conteúdo intrínseco (campos em telas de 320px). */
+.field > * {
+  min-width: 0;
+}
+
 .label {
   font-weight: 700;
   font-size: var(--text-small);
@@ -33,6 +38,7 @@
 
 .input {
   flex: 1;
+  width: 100%;
   min-width: 0;
   height: 100%;
   min-height: 49px;

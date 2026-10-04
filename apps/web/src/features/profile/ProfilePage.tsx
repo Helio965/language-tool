@@ -1,6 +1,6 @@
 import { BarChart3, ChevronRight, GraduationCap, Library, LogOut, PencilLine, RefreshCcw, Settings, ShieldCheck } from 'lucide-react';
-import type { ReactNode } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useState, type ReactNode } from 'react';
+import { Link } from 'react-router';
 import {
   GOAL_LABELS,
   INTEREST_AREA_LABELS,
@@ -10,6 +10,7 @@ import {
 import { Button } from '../../components/Button';
 import { Chip } from '../../components/Controls';
 import { Card, LevelBadge, PageHeader } from '../../components/Display';
+import { ActionError } from '../../app/QueryErrorState';
 import { useAccount, useSession } from '../../app/session';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import styles from './ProfilePage.module.css';
@@ -19,7 +20,8 @@ export function ProfilePage() {
   useDocumentTitle('Perfil');
   const account = useAccount();
   const { logout, api } = useSession();
-  const navigate = useNavigate();
+  const [signingOut, setSigningOut] = useState(false);
+  const [signOutError, setSignOutError] = useState<unknown>(null);
   const { user, profile } = account;
   const initials = user.name
     .split(/\s+/)
@@ -27,9 +29,18 @@ export function ProfilePage() {
     .map((part) => part[0]?.toUpperCase())
     .join('');
 
+  /** Logout intencional: as guardas levam ao login quando a sessão termina. */
   async function signOut() {
-    await logout();
-    navigate('/', { replace: true });
+    if (signingOut) return;
+    setSigningOut(true);
+    setSignOutError(null);
+    try {
+      await logout();
+    } catch (error) {
+      // O servidor não confirmou a saída: a pessoa continua conectada e pode tentar de novo.
+      setSignOutError(error);
+      setSigningOut(false);
+    }
   }
 
   return (
@@ -103,7 +114,8 @@ export function ProfilePage() {
         </nav>
 
         <div className={styles.footer}>
-          <Button variant="secondary" icon={<LogOut aria-hidden="true" />} onClick={signOut}>
+          <ActionError error={signOutError} />
+          <Button variant="secondary" icon={<LogOut aria-hidden="true" />} onClick={signOut} loading={signingOut} loadingLabel="Saindo…">
             Sair da conta
           </Button>
           <p className={styles.about}>

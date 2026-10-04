@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { ArrowRight, CalendarClock } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useParams } from 'react-router';
@@ -6,9 +6,9 @@ import type { ReviewResult } from '@english-ai/core';
 import { Button } from '../../components/Button';
 import { Card, ProgressRing } from '../../components/Display';
 import { FocusBar } from '../../components/FocusBar';
-import { ErrorState, InlineAlert, LoadingState } from '../../components/States';
-import { useApi } from '../../app/session';
-import { errorMessage } from '../../services';
+import { LoadingState } from '../../components/States';
+import { ActionError, QueryErrorState } from '../../app/QueryErrorState';
+import { useApi, useSession, useUserKeys } from '../../app/session';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { relativeDay } from '../../utils/format';
 import { ExerciseRunner, type ExerciseOutcome } from '../exercises/ExerciseRunner';
@@ -19,11 +19,12 @@ export function ReviewSessionPage() {
   useDocumentTitle('Sessão de revisão');
   const { reviewId = '' } = useParams();
   const api = useApi();
-  const queryClient = useQueryClient();
   const [index, setIndex] = useState(0);
   const [result, setResult] = useState<ReviewResult | null>(null);
   const startedAt = useRef(Date.now());
-  const session = useQuery({ queryKey: ['review-session', reviewId], queryFn: () => api.startReview(reviewId), staleTime: Infinity, gcTime: 0 });
+  const { refreshUserData } = useSession();
+  const keys = useUserKeys();
+  const session = useQuery({ queryKey: keys.reviewSession(reviewId), queryFn: () => api.startReview(reviewId), staleTime: Infinity, gcTime: 0 });
 
   const complete = useMutation({
     mutationFn: (outcomes: ExerciseOutcome[]) =>
@@ -34,7 +35,7 @@ export function ReviewSessionPage() {
       }),
     onSuccess: async (data) => {
       setResult(data);
-      await queryClient.invalidateQueries();
+      await refreshUserData();
     },
   });
 
@@ -43,7 +44,10 @@ export function ReviewSessionPage() {
     return (
       <>
         <FocusBar backTo="/revisao" backLabel="Voltar à revisão" />
-        <ErrorState message={errorMessage(session.error)} onRetry={() => session.refetch()} />
+        <h1 className="visually-hidden" data-page-title tabIndex={-1}>
+          Sessão de revisão
+        </h1>
+        <QueryErrorState error={session.error} onRetry={() => void session.refetch()} back={{ to: '/revisao', label: 'Voltar à revisão' }} />
       </>
     );
   }
@@ -74,7 +78,7 @@ export function ReviewSessionPage() {
             finishLabel="Ver resultado"
           />
           {complete.isPending && <LoadingState label="Atualizando seu progresso…" />}
-          {complete.isError && <InlineAlert>{errorMessage(complete.error)}</InlineAlert>}
+          {complete.isError && <ActionError error={complete.error} />}
         </div>
       ) : (
         <div className={`${styles.content} reveal`}>

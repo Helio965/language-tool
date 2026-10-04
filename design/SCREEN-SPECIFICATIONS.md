@@ -34,7 +34,12 @@ Larguras de captura: celular 390px · tablet 820px · desktop 1440px.
 ### 3. Entrar — `/entrar` (UC02, RF02) e Recuperar senha — `/recuperar-senha`
 
 - E-mail + senha; erro genérico "E-mail ou senha incorretos" (não revela se a conta existe); senha limpa após
-  erro; volta para a página que a pessoa tentou abrir.
+  erro; volta para a página que a pessoa tentou abrir (só caminhos internos do app; nunca para `/entrar`,
+  `/cadastro` ou `/recuperar-senha`).
+- **Sessão expirada:** um único aviso informativo "Sua sessão expirou. Entre novamente para continuar." acima do
+  formulário; depois do login a pessoa volta à página em que estava. Quando a pessoa **escolheu sair**, o aviso
+  não aparece (só o toast "Você saiu da sua conta.").
+- Botão em carregamento "Entrando…"; um segundo clique/Enter durante o envio é ignorado.
 - Cartão com a conta de demonstração (modo demo).
 - Recuperação: mensagem neutra "Se existir uma conta com este e-mail…" (envio simulado no MVP).
 
@@ -50,8 +55,12 @@ Termos de uso do protótipo + tabela "dado / para quê / por quanto tempo" (mesm
 
 - **Três etapas com barra de progresso:** (1) objetivo principal; (2) como descreve o próprio inglês +
   experiência anterior; (3) interesses (conversação, profissional, áreas como Viagens, Tecnologia, Comida).
-- **Ação:** **Continuar** / **Salvar e fazer o nivelamento**. "Voltar" preserva as respostas.
-- Reaproveitada em `/perfil/editar` (modo edição, tela imersiva).
+- **Ação:** **Continuar** / **Salvar e fazer o nivelamento** (em carregamento "Salvando…"; erro aparece na
+  própria tela, com a ação ainda disponível). "Voltar" preserva as respostas.
+- **Sair (primeiro acesso):** o "X" da primeira etapa abre o diálogo "Sair da conta?" (**Continuar aqui** /
+  **Sair da conta**). Sair leva ao login; ao entrar de novo, a pessoa volta a esta etapa.
+- Reaproveitada em `/perfil/editar` (modo edição, tela imersiva): o "X" vira **Cancelar edição** e volta ao
+  perfil sem salvar; **Salvar** volta ao perfil com toast.
 
 ### 6. Nivelamento — `/nivelamento` (UC04, RF05)
 
@@ -64,6 +73,12 @@ Termos de uso do protótipo + tabela "dado / para quê / por quanto tempo" (mesm
 - **Perguntas:** etapas progressivas (Iniciante → Básico → Intermediário); avança de etapa com 3 de 4 acertos.
 - **Resultado:** "Seu nível estimado" + comparação com a autoavaliação + aviso de que não é certificação.
 - **Ação:** **Ir para o início**. Refazer pelo perfil (`/perfil/nivelamento`).
+- **Sair:** no primeiro acesso, o "X" da barra (introdução e perguntas) abre o diálogo "Sair da conta?" (ao entrar
+  de novo, a pessoa retoma o nivelamento). Ao **refazer** pelo perfil, o mesmo "X" volta ao perfil sem alterar o
+  nível.
+- **Começar nivelamento** mostra "Preparando…" e desabilita **Prefiro começar do zero** (e vice-versa); **Ir para o
+  início** mostra carregamento. Nenhum aceita clique duplo, e uma falha aparece na tela com a ação disponível de
+  novo.
 
 ## App
 
@@ -165,6 +180,11 @@ significado, exemplos, link para a aula e as ações "Quero revisar de novo" / "
 Nome, e-mail, nível estimado, objetivo e interesses → **Editar** · **Refazer** nivelamento → atalhos
 (Progresso, Vocabulário, Revisão, Preferências, Privacidade, Refazer nivelamento) → **Sair da conta**.
 
+**Sair da conta:** o botão mostra "Saindo…" e não aceita clique duplo; em seguida a pessoa vai para `/entrar` com
+o toast "Você saiu da sua conta." (nunca "Sua sessão expirou"). Os dados da conta saem da memória do app, e
+Voltar/Avançar do navegador não reabrem telas privadas. Se a saída falhar (sem conexão), a mensagem aparece abaixo
+do botão e a pessoa continua na conta.
+
 ### 17. Preferências — `/preferencias` (UC12, RF19)
 
 ![Preferências](./screenshots/mobile-18-preferencias.jpg)
@@ -179,6 +199,10 @@ conversas. Cada alteração salva na hora com toast.
 
 Tabela de dados coletados (empilhada no celular) → o que vai para a IA → direitos → **Apagar todas as
 conversas** → **Excluir minha conta** (diálogo com senha).
+
+Depois de excluir: a pessoa vai para a página de boas-vindas com o toast "Sua conta e seus dados foram
+excluídos."; Voltar não reabre telas privadas. Senha errada: mensagem no diálogo e campo limpo. Fechar e reabrir
+um diálogo começa do zero; **Cancelar** fica desabilitado enquanto a exclusão está em andamento.
 
 ### 19. Página não encontrada — `*`
 

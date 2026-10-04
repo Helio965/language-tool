@@ -4,9 +4,9 @@ import { Link } from 'react-router';
 import { LEVEL_LABELS, LEVELS, type LessonSummary } from '@english-ai/core';
 import { Chip } from '../../components/Controls';
 import { Card, LevelBadge, ModeBadge, PageHeader, ProgressBar } from '../../components/Display';
-import { ErrorState, Skeleton } from '../../components/States';
-import { useAccount, useApi } from '../../app/session';
-import { errorMessage } from '../../services';
+import { Skeleton } from '../../components/States';
+import { QueryErrorState } from '../../app/QueryErrorState';
+import { useAccount, useApi, useUserKeys } from '../../app/session';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { cx } from '../../utils/cx';
 import styles from './LearnPage.module.css';
@@ -16,8 +16,9 @@ export function LearnPage() {
   useDocumentTitle('Aprender');
   const api = useApi();
   const account = useAccount();
-  const lessons = useQuery({ queryKey: ['lessons'], queryFn: () => api.listLessons() });
-  const reviews = useQuery({ queryKey: ['reviews'], queryFn: () => api.getReviews() });
+  const keys = useUserKeys();
+  const lessons = useQuery({ queryKey: keys.lessons, queryFn: () => api.listLessons() });
+  const reviews = useQuery({ queryKey: keys.reviews, queryFn: () => api.getReviews() });
   const level = account.profile.estimatedLevel;
 
   return (
@@ -30,7 +31,7 @@ export function LearnPage() {
       <div className={styles.layout}>
         <div className={styles.trail}>
           {lessons.isPending && <Skeleton lines={5} height={84} />}
-          {lessons.isError && <ErrorState message={errorMessage(lessons.error)} onRetry={() => lessons.refetch()} />}
+          {lessons.isError && <QueryErrorState error={lessons.error} onRetry={() => void lessons.refetch()} />}
           {lessons.data &&
             LEVELS.map((lvl) => {
               const group = lessons.data.filter((lesson) => lesson.level === lvl);

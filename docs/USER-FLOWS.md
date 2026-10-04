@@ -61,6 +61,27 @@ flowchart TD
     A --> R[Esqueci minha senha] --> S[Informar e-mail] --> T[Mensagem genérica<br/>não revela se o e-mail existe]
 ```
 
+Se a pessoa tentou abrir uma página protegida sem sessão (ou a sessão expirou), o login a leva de volta a essa
+página depois de entrar — se a conta já tiver concluído a configuração e o nivelamento.
+
+### 3.1 Sair, sessão expirada e exclusão
+
+```mermaid
+flowchart TD
+    A[Perfil → Sair da conta] --> B[Botão em carregamento<br/>clique duplo bloqueado]
+    B --> C{Servidor confirmou?}
+    C -- não --> D[Mensagem de erro<br/>a pessoa continua conectada] --> A
+    C -- sim --> E[Dados privados removidos<br/>telas privadas desmontadas] --> F["/entrar + aviso 'Você saiu da sua conta.'"]
+    G[Qualquer tela: o servidor deixa de reconhecer a sessão] --> H[Revalida a sessão uma vez]
+    H -- outra conta entrou neste navegador --> I[Telas remontam com a conta atual]
+    H -- sem sessão --> J["/entrar com UM aviso: 'Sua sessão expirou…'"] --> K[Depois do login, volta à página]
+    L[Privacidade → Excluir conta → senha] --> M[Conta e dados apagados] --> N[Página inicial + aviso]
+```
+
+- "Sair" nunca mostra "sessão expirou"; o botão Voltar do navegador não revela telas privadas depois de sair ou
+  excluir a conta (as guardas levam ao login).
+- Abas do mesmo navegador acompanham login, logout e exclusão feitos em outra aba.
+
 ## 4. Configuração inicial (UC03)
 
 Três passos curtos com indicador de progresso; "Voltar" preserva as escolhas.
@@ -70,6 +91,11 @@ Três passos curtos com indicador de progresso; "Voltar" preserva as escolhas.
 3. **Interesses** — interesse em conversação, interesse profissional e até 3 áreas.
 
 Resultado: perfil salvo → Nivelamento. Depois, o mesmo formulário fica em **Perfil → Editar perfil de aprendizagem**.
+
+**Sair durante o primeiro acesso.** Configuração inicial e nivelamento são etapas obrigatórias: não há outra
+tela para onde voltar. Por isso o "X" se chama **Sair da conta**, pede confirmação e realmente encerra a sessão;
+ao entrar de novo, a pessoa retoma a etapa pendente. Na edição do perfil, o "X" é **Cancelar edição** (volta ao
+Perfil sem salvar); ao refazer o nivelamento pelo Perfil, sair volta ao Perfil mantendo o nível atual.
 
 ## 5. Nivelamento (UC04)
 
@@ -151,5 +177,5 @@ Progresso (aba principal ou Perfil → Seu progresso) → resumo (nível estimad
 
 ## 11. Preferências e dados (UC12, RF20)
 
-Perfil → Preferências → idioma das explicações · intensidade das correções · preferências de conversa · histórico · lembretes · meta diária → salvo automaticamente com confirmação.
+Perfil → Preferências → idioma das explicações · intensidade das correções · preferências de conversa · histórico · lembretes · meta diária → salvo automaticamente com confirmação. A escolha aparece na hora; as alterações são enviadas em ordem, uma por vez, e se uma falhar a tela volta a mostrar o que está salvo.
 Perfil → Privacidade e dados → o que coletamos → apagar histórico de conversas → excluir conta (confirmação com senha).

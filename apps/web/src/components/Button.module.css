@@ -17,11 +17,21 @@
   line-height: 1.2;
   text-decoration: none;
   white-space: nowrap;
+  max-width: 100%;
   transition:
     transform var(--dur-fast) var(--ease-out),
     background-color var(--dur-fast),
     box-shadow var(--dur-fast);
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Em telas estreitas, rótulos longos quebram linha em vez de empurrar o layout para fora da tela. */
+@media (max-width: 420px) {
+  .button {
+    padding-block: var(--space-2);
+    white-space: normal;
+    text-align: center;
+  }
 }
 
 .button:hover:not(:disabled) {

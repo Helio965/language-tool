@@ -4,8 +4,13 @@ import { ApiError } from './errors';
 
 type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
+/** Cabeçalho com a conta que a interface exibe; a API recusa se o cookie for de outra conta. */
+export const SESSION_USER_HEADER = 'X-Session-User';
+
 /** Cliente da API REST. O token de sessão fica em cookie httpOnly, invisível ao JavaScript. */
 export function createHttpClient(baseUrl = '/api'): ApiClient {
+  let boundUserId: string | null = null;
+
   async function call<T>(method: Method, path: string, body?: unknown): Promise<T> {
     let response: Response;
     try {
@@ -17,6 +22,7 @@ export function createHttpClient(baseUrl = '/api'): ApiClient {
           ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
           // Cabeçalho exigido pela proteção CSRF da API.
           'X-Requested-With': 'english-ai',
+          ...(boundUserId ? { [SESSION_USER_HEADER]: boundUserId } : {}),
         },
         ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
       });
@@ -32,14 +38,28 @@ export function createHttpClient(baseUrl = '/api'): ApiClient {
     return data as T;
   }
 
+  const signedIn = (account: AccountState): AccountState => {
+    boundUserId = account.user.id;
+    return account;
+  };
+
   return {
     mode: 'http',
+    bindSession: (userId) => {
+      boundUserId = userId;
+    },
     getSession: async () => (await call<{ account: AccountState | null }>('GET', '/auth/session')).account,
-    register: (input) => call('POST', '/auth/register', input),
-    login: (input) => call('POST', '/auth/login', input),
-    logout: () => call('POST', '/auth/logout'),
+    register: async (input) => signedIn(await call<AccountState>('POST', '/auth/register', input)),
+    login: async (input) => signedIn(await call<AccountState>('POST', '/auth/login', input)),
+    logout: async () => {
+      await call('POST', '/auth/logout');
+      boundUserId = null;
+    },
     requestPasswordReset: async (email) => (await call<{ message: string }>('POST', '/auth/password-reset', { email })).message,
-    deleteAccount: (password) => call('DELETE', '/me', { password }),
+    deleteAccount: async (password) => {
+      await call('DELETE', '/me', { password });
+      boundUserId = null;
+    },
 
     saveProfile: (input) => call('PUT', '/me/profile', input),
     getPreferences: () => call('GET', '/me/preferences'),

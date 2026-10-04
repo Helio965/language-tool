@@ -1,4 +1,3 @@
-import { useQueryClient } from '@tanstack/react-query';
 import {
   Briefcase,
   Compass,
@@ -32,10 +31,10 @@ import {
 import { Button } from '../../components/Button';
 import { ChoiceGroup, Chip, Switch } from '../../components/Controls';
 import { FocusBar } from '../../components/FocusBar';
-import { InlineAlert } from '../../components/States';
 import { useToast } from '../../components/Overlay';
+import { ActionError } from '../../app/QueryErrorState';
+import { SignOutDialog } from '../../app/SignOutDialog';
 import { useAccount, useSession } from '../../app/session';
-import { errorMessage } from '../../services';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import styles from './OnboardingPage.module.css';
 
@@ -65,9 +64,9 @@ const STEPS = ['Objetivo', 'Experiência', 'Interesses'] as const;
 export function OnboardingPage({ mode = 'onboarding' }: { mode?: 'onboarding' | 'edit' }) {
   useDocumentTitle(mode === 'edit' ? 'Editar perfil de aprendizagem' : 'Configuração inicial');
   const account = useAccount();
-  const { api, refresh } = useSession();
-  const queryClient = useQueryClient();
+  const { api, refreshUserData } = useSession();
   const navigate = useNavigate();
+  const [confirmExit, setConfirmExit] = useState(false);
   const toast = useToast();
   const profile = account.profile;
   const [step, setStep] = useState(0);
@@ -77,7 +76,7 @@ export function OnboardingPage({ mode = 'onboarding' }: { mode?: 'onboarding' | 
   const [conversation, setConversation] = useState(profile.conversationInterest);
   const [professional, setProfessional] = useState(profile.professionalInterest);
   const [areas, setAreas] = useState<InterestArea[]>(profile.interestAreas);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [saving, setSaving] = useState(false);
 
   const canContinue = step === 0 ? goal !== null : step === 1 ? perceived !== null && experience !== null : true;
@@ -89,7 +88,7 @@ export function OnboardingPage({ mode = 'onboarding' }: { mode?: 'onboarding' | 
   }
 
   async function finish() {
-    if (!goal || !perceived || !experience) return;
+    if (!goal || !perceived || !experience || saving) return;
     setSaving(true);
     setError(null);
     const input: ProfileInput = {
@@ -102,16 +101,16 @@ export function OnboardingPage({ mode = 'onboarding' }: { mode?: 'onboarding' | 
     };
     try {
       await api.saveProfile(input);
-      await refresh();
-      await queryClient.invalidateQueries();
+      // Conta (etapa pendente, perfil) e dados que dependem do perfil (recomendações, assuntos).
+      await refreshUserData();
       if (mode === 'edit') {
         toast('Perfil de aprendizagem atualizado.');
         navigate('/perfil');
-      } else {
-        navigate('/nivelamento');
       }
+      // Primeiro acesso: com a conta atualizada (etapa = nivelamento), a guarda de rota leva ao
+      // nivelamento. Navegar aqui também criaria uma entrada duplicada no histórico.
     } catch (err) {
-      setError(errorMessage(err));
+      setError(err);
       setSaving(false);
     }
   }
@@ -123,8 +122,13 @@ export function OnboardingPage({ mode = 'onboarding' }: { mode?: 'onboarding' | 
       <div className={styles.inner}>
         <FocusBar
           icon={step === 0 ? 'close' : 'back'}
-          backLabel={step === 0 ? (mode === 'edit' ? 'Cancelar edição' : 'Sair') : 'Voltar ao passo anterior'}
-          onBack={() => (step === 0 ? navigate(mode === 'edit' ? '/perfil' : '/') : setStep(step - 1))}
+          backLabel={step === 0 ? (mode === 'edit' ? 'Cancelar edição' : 'Sair da conta') : 'Voltar ao passo anterior'}
+          onBack={() => {
+            if (step > 0) setStep(step - 1);
+            // Edição: cancelar volta ao perfil sem salvar. Primeiro acesso: não há outra tela antes, então sair é sair da conta.
+            else if (mode === 'edit') navigate('/perfil');
+            else setConfirmExit(true);
+          }}
           title={`Passo ${step + 1} de ${STEPS.length} · ${STEPS[step]}`}
           progress={(step + 1) / STEPS.length}
           progressLabel="Progresso da configuração"
@@ -223,7 +227,7 @@ export function OnboardingPage({ mode = 'onboarding' }: { mode?: 'onboarding' | 
             </>
           )}
 
-          {error && <InlineAlert>{error}</InlineAlert>}
+          <ActionError error={error} />
 
           <div className={styles.footer}>
             <Button
@@ -245,6 +249,11 @@ export function OnboardingPage({ mode = 'onboarding' }: { mode?: 'onboarding' | 
           </div>
         </main>
       </div>
+      <SignOutDialog
+        open={confirmExit}
+        onClose={() => setConfirmExit(false)}
+        description="Sua conta já está criada. Quando você entrar de novo, continua a configuração daqui."
+      />
     </div>
   );
 }

@@ -1,15 +1,36 @@
-import type { ReactNode } from 'react';
+import { Fragment, type ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router';
-import { LoadingState } from '../components/States';
-import { pathForStep, useSession } from './session';
+import { ErrorState, LoadingState } from '../components/States';
+import { pathForStep, safeReturnPath, useSession } from './session';
 
-/** Exige sessão. Sem sessão → login (guardando a rota de origem). */
+/**
+ * Exige sessão. Sem sessão, o destino depende de como ela terminou:
+ * - visitante ou sessão expirada → /entrar, guardando a página para voltar depois do login;
+ * - "Sair" intencional → /entrar, sem voltar à página anterior (e sem aviso de expiração);
+ * - conta excluída → página inicial.
+ */
 export function RequireAuth({ children }: { children: ReactNode }) {
-  const { account, loading } = useSession();
+  const { account, loading, checkFailed, endReason, refresh } = useSession();
   const location = useLocation();
   if (loading) return <LoadingState fullscreen label="Carregando sua conta…" />;
-  if (!account) return <Navigate to="/entrar" replace state={{ from: location.pathname }} />;
-  return children;
+  if (checkFailed) {
+    return (
+      <div className="session-check-failed">
+        <ErrorState
+          title="Não foi possível verificar sua conta"
+          message="Sem conexão com o servidor. Verifique sua internet e tente de novo."
+          onRetry={() => void refresh()}
+        />
+      </div>
+    );
+  }
+  if (!account) {
+    if (endReason === 'signed_out') return <Navigate to="/entrar" replace />;
+    if (endReason === 'deleted') return <Navigate to="/" replace />;
+    return <Navigate to="/entrar" replace state={{ from: `${location.pathname}${location.search}` }} />;
+  }
+  // Se a conta mudar (ex.: login com outra conta em outra aba), as telas privadas remontam do zero.
+  return <Fragment key={account.user.id}>{children}</Fragment>;
 }
 
 /**
@@ -27,10 +48,17 @@ export function RequireStep({ step, children }: { step: 'onboarding' | 'placemen
   return children;
 }
 
-/** Telas públicas (boas-vindas, login, cadastro): quem já entrou segue para a etapa pendente. */
+/**
+ * Telas públicas (boas-vindas, login, cadastro): quem já entrou segue para a etapa pendente
+ * — ou, depois do login, para a página que tentava abrir.
+ */
 export function PublicOnly({ children }: { children: ReactNode }) {
   const { account, loading } = useSession();
+  const location = useLocation();
   if (loading) return <LoadingState fullscreen label="Carregando…" />;
-  if (account) return <Navigate to={pathForStep(account.nextStep)} replace />;
+  if (account) {
+    const from = safeReturnPath((location.state as { from?: unknown } | null)?.from);
+    return <Navigate to={account.nextStep === 'ready' && from ? from : pathForStep(account.nextStep)} replace />;
+  }
   return children;
 }

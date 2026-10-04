@@ -6,6 +6,7 @@
 import {
   AppError,
   createAppServices,
+  type AccountState,
   createDocumentStore,
   createStaticCatalog,
   MockAIService,
@@ -81,10 +82,20 @@ export function createDemoClient(options: { aiDelayMs?: number; storage?: KeyVal
   const passwordHasher: PasswordHasher = globalThis.crypto?.subtle ? new Pbkdf2PasswordHasher(120_000) : new PrototypeOnlyHasher();
   const services: AppServices = createAppServices({ store, catalog, ai, passwordHasher, generateId });
 
+  /** Conta exibida pela interface (ver ApiClient.bindSession). */
+  let boundUserId: string | null = null;
+
   const currentUser = (): string => {
     const id = storage.getItem(SESSION_KEY);
-    if (!id) throw new AppError('UNAUTHENTICATED', 'Sem sessão.');
+    // Sem sessão, ou a sessão salva já é de outra conta (ex.: login em outra aba).
+    if (!id || id !== boundUserId) throw new AppError('UNAUTHENTICATED', 'Sem sessão.');
     return id;
+  };
+
+  const signIn = (account: AccountState): AccountState => {
+    storage.setItem(SESSION_KEY, account.user.id);
+    boundUserId = account.user.id;
+    return account;
   };
 
   /** Executa um caso de uso convertendo erros para o formato da interface. */
@@ -100,6 +111,9 @@ export function createDemoClient(options: { aiDelayMs?: number; storage?: KeyVal
 
   return {
     mode: 'demo',
+    bindSession: (userId) => {
+      boundUserId = userId;
+    },
 
     async getSession() {
       const id = storage.getItem(SESSION_KEY);
@@ -112,32 +126,24 @@ export function createDemoClient(options: { aiDelayMs?: number; storage?: KeyVal
         return null;
       }
     },
-    register: (input) =>
-      run(async () => {
-        const account = await services.auth.register(input);
-        storage.setItem(SESSION_KEY, account.user.id);
-        return account;
-      }),
-    login: (input) =>
-      run(async () => {
-        const account = await services.auth.login(input);
-        storage.setItem(SESSION_KEY, account.user.id);
-        return account;
-      }),
-    logout: async () => storage.removeItem(SESSION_KEY),
+    register: (input) => run(async () => signIn(await services.auth.register(input))),
+    login: (input) => run(async () => signIn(await services.auth.login(input))),
+    logout: async () => {
+      storage.removeItem(SESSION_KEY);
+      boundUserId = null;
+    },
     requestPasswordReset: async () => 'Se existir uma conta com este e-mail, enviaremos as instruções de recuperação.',
     deleteAccount: (password) =>
       withUser(async (userId) => {
         await services.auth.deleteAccount(userId, password);
         storage.removeItem(SESSION_KEY);
+        boundUserId = null;
       }),
     startDemo: () =>
       run(async () => {
         const existing = await store.users.findByEmail(DEMO_ACCOUNT.email);
         if (!existing) await seedDemoAccount({ store, catalog, ai, passwordHasher, generateId });
-        const account = await services.auth.login({ email: DEMO_ACCOUNT.email, password: DEMO_ACCOUNT.password });
-        storage.setItem(SESSION_KEY, account.user.id);
-        return account;
+        return signIn(await services.auth.login({ email: DEMO_ACCOUNT.email, password: DEMO_ACCOUNT.password }));
       }),
 
     saveProfile: (input) => withUser((id) => services.profile.saveProfile(id, input)),

@@ -5,8 +5,7 @@ import { AssistantAvatar } from '../../components/Brand';
 import { Button } from '../../components/Button';
 import { ChoiceGroup } from '../../components/Controls';
 import { CorrectionCard } from '../../components/CorrectionCard';
-import { InlineAlert } from '../../components/States';
-import { errorMessage } from '../../services';
+import { ActionError } from '../../app/QueryErrorState';
 import { cx } from '../../utils/cx';
 import styles from './ExerciseRunner.module.css';
 
@@ -65,7 +64,7 @@ function ExerciseCard({
 }) {
   const [answer, setAnswer] = useState('');
   const [feedback, setFeedback] = useState<ExerciseFeedback | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
   const [checking, setChecking] = useState(false);
   const isOpen = exercise.type === 'write';
 
@@ -77,7 +76,7 @@ function ExerciseCard({
     try {
       setFeedback(await onAnswer(exercise, answer.trim()));
     } catch (err) {
-      setError(errorMessage(err));
+      setError(err);
     } finally {
       setChecking(false);
     }
@@ -183,7 +182,7 @@ function ExerciseCard({
           </p>
         )}
 
-        {error && <InlineAlert>{error}</InlineAlert>}
+        <ActionError error={error} />
 
         {!feedback && (
           <div className={styles.actions}>
