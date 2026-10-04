@@ -1,0 +1,55 @@
+.page {
+  max-width: 760px;
+}
+
+.content {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.reason {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-m);
+  background: #fff8dc;
+  font-size: var(--text-small);
+}
+
+.resultHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+}
+
+.resultHead h1 {
+  font-size: clamp(1.8rem, 1.4rem + 1.4vw, 2.3rem);
+}
+
+.resultHead h1:focus {
+  outline: none;
+}
+
+.next {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+
+.next svg {
+  width: 18px;
+  height: 18px;
+}
+
+.actions {
+  display: grid;
+  gap: var(--space-3);
+}
+
+@media (min-width: 600px) {
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}

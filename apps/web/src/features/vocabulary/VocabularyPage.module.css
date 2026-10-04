@@ -1,0 +1,127 @@
+.counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin: calc(var(--space-2) * -1) 0 var(--space-5);
+  color: var(--ink-2);
+}
+
+.counts strong {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+}
+
+.toolbar {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+@media (min-width: 720px) {
+  .toolbar {
+    grid-template-columns: minmax(240px, 380px) 1fr;
+    align-items: end;
+  }
+}
+
+.searchIcon {
+  width: 20px;
+  height: 20px;
+  margin-right: var(--space-4);
+  color: var(--ink-3);
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 900px) {
+  .list {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'word meta'
+    'translation meta';
+  align-items: center;
+  gap: 0 var(--space-3);
+  width: 100%;
+  min-height: 64px;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  text-align: left;
+}
+
+.row:hover {
+  border-color: var(--line-input);
+}
+
+.word {
+  grid-area: word;
+  font-weight: 700;
+  font-size: 1.0625rem;
+}
+
+.translation {
+  grid-area: translation;
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+
+.rowMeta {
+  grid-area: meta;
+  display: flex;
+  gap: var(--space-1);
+}
+
+.none {
+  padding: var(--space-6) 0;
+  color: var(--ink-2);
+}
+
+.reviewButton {
+  margin-top: var(--space-5);
+}
+
+.suggestions {
+  margin-top: var(--space-10);
+}
+
+.details {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.detailTranslation {
+  font-family: var(--font-display);
+  font-variation-settings: 'SOFT' 100;
+  font-size: 1.5rem;
+}
+
+.detailMeta {
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+
+.example {
+  padding: var(--space-3) var(--space-4);
+  border-left: 4px solid var(--marker);
+  border-radius: 0 var(--radius-m) var(--radius-m) 0;
+  background: var(--paper);
+}

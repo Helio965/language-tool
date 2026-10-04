@@ -1,0 +1,231 @@
+.layout {
+  display: grid;
+  gap: var(--space-8);
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+    align-items: start;
+  }
+  .side {
+    position: sticky;
+    top: var(--space-8);
+  }
+}
+
+.trail {
+  display: grid;
+  gap: var(--space-8);
+  min-width: 0;
+}
+
+.group {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.groupHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.groupHead h2 {
+  font-size: 1.5rem;
+}
+
+.groupCount {
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink-3);
+}
+
+.groupNote {
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+
+.path {
+  position: relative;
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* linha pontilhada que liga as aulas, como num caderno */
+.path::before {
+  content: '';
+  position: absolute;
+  top: 22px;
+  bottom: 22px;
+  left: 21px;
+  border-left: 2px dashed var(--line-input);
+  opacity: 0.6;
+}
+
+.item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 2px solid var(--line-input);
+  border-radius: 50%;
+  background: var(--paper);
+  font-weight: 800;
+  color: var(--ink-2);
+}
+
+.dot svg {
+  width: 20px;
+  height: 20px;
+}
+
+.completed .dot {
+  border-color: var(--success);
+  background: var(--success);
+  color: #fff;
+}
+
+.recommended .dot {
+  border-color: var(--learn);
+  background: var(--learn);
+  color: #fff;
+  box-shadow: 0 0 0 6px var(--learn-soft);
+}
+
+.lessonCard {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 72px;
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    transform var(--dur-fast) var(--ease-out),
+    box-shadow var(--dur-fast),
+    border-color var(--dur-fast);
+}
+
+.lessonCard:hover {
+  transform: translateX(3px);
+  border-color: var(--line-input);
+  box-shadow: var(--shadow-2);
+}
+
+.recommended .lessonCard {
+  border: 2px solid var(--learn);
+  box-shadow: var(--shadow-2);
+}
+
+.lessonText {
+  display: grid;
+  gap: 2px;
+  flex: 1 1 220px;
+  min-width: 0;
+}
+
+.lessonMeta {
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+
+.lessonSummary {
+  margin-top: var(--space-1);
+  font-size: var(--text-small);
+}
+
+.lessonStatus:empty {
+  display: none;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-pill);
+  background: var(--learn);
+  color: #fff;
+  font-size: var(--text-small);
+  font-weight: 700;
+}
+
+.cta svg {
+  width: 16px;
+  height: 16px;
+}
+
+.side {
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+.levelRow {
+  margin: var(--space-2) 0 var(--space-4);
+}
+
+.sideText {
+  margin-top: var(--space-3);
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+
+.shortcut {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.shortcut:hover {
+  border-color: var(--line-input);
+}
+
+.shortcut > svg {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: var(--learn);
+}
+
+.shortcut > svg:last-child {
+  width: 18px;
+  height: 18px;
+  color: var(--ink-3);
+}
+
+.shortcut > span {
+  display: grid;
+  flex: 1;
+}
+
+.shortcut > span > span {
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}

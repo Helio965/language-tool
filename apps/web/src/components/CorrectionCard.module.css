@@ -1,0 +1,125 @@
+.card {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-4);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+
+.row {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.original {
+  color: var(--ink-2);
+}
+
+.suggestion {
+  font-weight: 700;
+  font-size: 1.0625rem;
+}
+
+.removed {
+  background: none;
+  color: var(--error);
+  text-decoration: underline wavy var(--error);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 4px;
+}
+
+.severity {
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 700;
+}
+
+.tip {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-m);
+  background: #fff4c4;
+  font-size: var(--text-small);
+}
+
+.tip svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  color: var(--almost);
+}
+
+/* Variante discreta do chat */
+.chat {
+  display: grid;
+  gap: 6px;
+  max-width: 100%;
+  padding: var(--space-3) var(--space-4);
+  border: 1.5px dashed #e6c86a;
+  border-radius: var(--radius-l);
+  background: #fffbea;
+  font-size: var(--text-small);
+  animation: slide var(--dur-base) var(--ease-out);
+}
+
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.chatRow {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  gap: var(--space-2);
+  align-items: baseline;
+}
+
+.chatLabel {
+  font-size: var(--text-caption);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.chat .suggestion {
+  font-size: var(--text-small);
+}
+
+.why {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 0 var(--space-2);
+  margin-left: calc(var(--space-2) * -1);
+  border: 0;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--talk-ink);
+  font-weight: 700;
+  font-size: var(--text-small);
+}
+
+.chevron {
+  width: 16px;
+  height: 16px;
+  transition: transform var(--dur-fast);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.chatExplanation {
+  display: grid;
+  gap: 4px;
+  color: var(--ink);
+}
