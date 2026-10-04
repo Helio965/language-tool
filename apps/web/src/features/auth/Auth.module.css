@@ -103,3 +103,88 @@
   font-size: var(--text-small);
   color: var(--ink-2);
 }
+
+/* Recuperação de senha */
+.sent {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.sentActions {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.simulated {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  border: 1px dashed var(--line-input);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+
+.simulated h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-body);
+  color: var(--ink);
+}
+
+.simulated h2 svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--learn);
+}
+
+.simulatedMail {
+  display: grid;
+  gap: var(--space-1);
+  justify-items: start;
+  margin-top: var(--space-2);
+  padding: var(--space-4);
+  border-radius: var(--radius-m);
+  background: var(--paper);
+  overflow-wrap: anywhere;
+}
+
+.simulatedMail span {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.simulatedMail a {
+  margin-top: var(--space-2);
+}
+
+/* Redefinição de senha */
+.resetState {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+  padding: var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-2);
+}
+
+.resetState > svg {
+  width: 32px;
+  height: 32px;
+  color: var(--almost);
+}
+
+.resetState h2 {
+  font-size: var(--text-h2);
+}
+
+.resetActions {
+  display: grid;
+  gap: var(--space-2);
+  width: 100%;
+}

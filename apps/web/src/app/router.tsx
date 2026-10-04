@@ -3,6 +3,7 @@ import { AppShell, type RouteHandle } from '../layouts/AppShell';
 import { ForgotPasswordPage } from '../features/auth/ForgotPasswordPage';
 import { LoginPage } from '../features/auth/LoginPage';
 import { RegisterPage } from '../features/auth/RegisterPage';
+import { ResetPasswordPage } from '../features/auth/ResetPasswordPage';
 import { WelcomePage } from '../features/auth/WelcomePage';
 import { ChatPage } from '../features/conversation/ChatPage';
 import { ConversationHubPage } from '../features/conversation/ConversationHubPage';
@@ -33,6 +34,8 @@ export const routes: RouteObject[] = [
   { path: '/entrar', element: <PublicOnly><LoginPage /></PublicOnly> },
   { path: '/cadastro', element: <PublicOnly><RegisterPage /></PublicOnly> },
   { path: '/recuperar-senha', element: <PublicOnly><ForgotPasswordPage /></PublicOnly> },
+  // Sem guarda: o link do e-mail precisa abrir mesmo com uma sessão ativa neste navegador.
+  { path: '/redefinir-senha/:token', element: <ResetPasswordPage /> },
   { path: '/termos-e-privacidade', element: <TermsPage /> },
   {
     path: '/configuracao',

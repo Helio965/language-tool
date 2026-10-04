@@ -5,6 +5,7 @@
  */
 import {
   AppError,
+  PASSWORD_RESET_REQUESTED_MESSAGE,
   createAppServices,
   type AccountState,
   createDocumentStore,
@@ -132,7 +133,33 @@ export function createDemoClient(options: { aiDelayMs?: number; storage?: KeyVal
       storage.removeItem(SESSION_KEY);
       boundUserId = null;
     },
-    requestPasswordReset: async () => 'Se existir uma conta com este e-mail, enviaremos as instruções de recuperação.',
+    /**
+     * A demonstração não envia e-mails: o pedido é registrado com as mesmas regras da API e a tela
+     * mostra, identificado como simulação, o e-mail que seria enviado.
+     */
+    requestPasswordReset: (email) =>
+      run(async () => {
+        const request = await services.passwordReset.requestReset(email);
+        return {
+          message: PASSWORD_RESET_REQUESTED_MESSAGE,
+          expiresInMinutes: services.passwordReset.ttlMinutes,
+          simulatedEmail: request
+            ? { to: request.user.email, subject: 'Redefinição de senha — English AI', resetPath: `/redefinir-senha/${request.token}` }
+            : null,
+        };
+      }),
+    checkPasswordResetToken: (token) => run(() => services.passwordReset.checkToken(token)),
+    resetPassword: (input) =>
+      run(async () => {
+        const { userId } = await services.passwordReset.resetPassword(input);
+        // Como na API: a sessão salva neste navegador, se for da mesma conta, deixa de valer.
+        const sessionEnded = storage.getItem(SESSION_KEY) === userId;
+        if (sessionEnded) {
+          storage.removeItem(SESSION_KEY);
+          boundUserId = null;
+        }
+        return { sessionEnded };
+      }),
     deleteAccount: (password) =>
       withUser(async (userId) => {
         await services.auth.deleteAccount(userId, password);
