@@ -4,6 +4,7 @@
 import { Router, type Response } from 'express';
 import { z } from 'zod';
 import { AppError, GOALS, INTEREST_AREAS, PRIOR_EXPERIENCES, type AccountState, type AppServices } from '@english-ai/core';
+import type { EmailService } from '../../email/emailService';
 import type { SessionTokens } from '../../security/sessionTokens';
 import { requireAuth, SESSION_COOKIE, userIdOf } from '../middleware/security';
 import type { RequestHandler } from 'express';
@@ -18,7 +19,6 @@ const registerSchema = z.object({
   acceptedTerms: z.boolean(),
 });
 const loginSchema = z.object({ email: text(320), password: text(256) });
-const resetSchema = z.object({ email: text(320) });
 const deleteSchema = z.object({ password: text(256) });
 const profileSchema = z.object({
   goal: z.enum(GOALS),
@@ -40,29 +40,37 @@ const preferencesSchema = z
   })
   .partial();
 
+export function sessionCookieOptions(secureCookies: boolean) {
+  return { httpOnly: true, sameSite: 'strict' as const, secure: secureCookies, path: '/api' };
+}
+
 export function authRoutes(deps: {
   services: AppServices;
   tokens: SessionTokens;
+  email: EmailService;
   secureCookies: boolean;
   authLimiter: RequestHandler;
 }): Router {
-  const { services, tokens, secureCookies, authLimiter } = deps;
+  const { services, tokens, email, secureCookies, authLimiter } = deps;
   const router = Router();
-  const cookieOptions = { httpOnly: true, sameSite: 'strict' as const, secure: secureCookies, path: '/api' };
+  const cookieOptions = sessionCookieOptions(secureCookies);
 
-  const startSession = (res: Response, account: AccountState) => {
-    res.cookie(SESSION_COOKIE, tokens.issue(account.user.id), { ...cookieOptions, maxAge: tokens.maxAgeMs });
+  const startSession = async (res: Response, account: AccountState) => {
+    const version = (await services.auth.sessionVersion(account.user.id)) ?? 0;
+    res.cookie(SESSION_COOKIE, tokens.issue(account.user.id, version), { ...cookieOptions, maxAge: tokens.maxAgeMs });
     return account;
   };
 
   router.post('/auth/register', authLimiter, async (req, res) => {
     const account = await services.auth.register(registerSchema.parse(req.body));
-    res.status(201).json(startSession(res, account));
+    // Secundário: se o envio falhar, a conta continua criada (o EmailService só registra o erro).
+    email.sendWelcome(account.user);
+    res.status(201).json(await startSession(res, account));
   });
 
   router.post('/auth/login', authLimiter, async (req, res) => {
     const account = await services.auth.login(loginSchema.parse(req.body));
-    res.json(startSession(res, account));
+    res.json(await startSession(res, account));
   });
 
   router.post('/auth/logout', (_req, res) => {
@@ -70,19 +78,14 @@ export function authRoutes(deps: {
     res.status(204).end();
   });
 
-  /**
-   * Recuperação de senha: resposta sempre igual (não revela se o e-mail existe).
-   * O MVP não possui serviço de e-mail configurado — ver docs/ARCHITECTURE.md §12.
-   */
-  router.post('/auth/password-reset', authLimiter, (req, res) => {
-    resetSchema.parse(req.body);
-    res.status(202).json({ message: 'Se existir uma conta com este e-mail, enviaremos as instruções de recuperação.' });
-  });
-
   /** Estado da sessão sem erro: 200 com a conta ou null (visitantes não geram 401 no console). */
   router.get('/auth/session', async (_req, res) => {
     const userId = res.locals.userId;
-    if (typeof userId !== 'string') return void res.json({ account: null });
+    if (typeof userId !== 'string') {
+      // Cookie de uma sessão encerrada (senha redefinida ou conta excluída): remove do navegador.
+      if (res.locals.staleSession) res.clearCookie(SESSION_COOKIE, cookieOptions);
+      return void res.json({ account: null });
+    }
     try {
       res.json({ account: await services.auth.getAccount(userId) });
     } catch (error) {

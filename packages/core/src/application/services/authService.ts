@@ -61,6 +61,12 @@ export function createAuthService(ctx: ServiceContext) {
       return accountState(ctx, await requireUser(ctx, userId));
     },
 
+    /** Versão atual das sessões da conta (null se a conta não existe mais). Ver passwordResetService. */
+    async sessionVersion(userId: string): Promise<number | null> {
+      const user = await ctx.store.users.findById(userId);
+      return user ? (user.sessionVersion ?? 0) : null;
+    },
+
     /** RF20: exclui conta e todos os dados associados após confirmar a senha. */
     async deleteAccount(userId: string, password: string): Promise<void> {
       const user = await requireUser(ctx, userId);

@@ -9,12 +9,20 @@ export const CSRF_VALUE = 'english-ai';
 /** Conta que a interface está exibindo (ver apps/web/src/services/httpClient.ts). */
 export const SESSION_USER_HEADER = 'x-session-user';
 
-/** Lê o cookie de sessão e, se válido, guarda o id do usuário em res.locals. */
-export function authenticate(tokens: SessionTokens) {
-  return (req: Request, res: Response, next: NextFunction) => {
+/**
+ * Lê o cookie de sessão e, se válido, guarda o id do usuário em res.locals.
+ * Além da assinatura e da validade, confere a versão da sessão da conta: depois de uma
+ * redefinição de senha (ou da exclusão da conta), tokens antigos deixam de valer em todos os aparelhos.
+ */
+export function authenticate(tokens: SessionTokens, sessionVersionOf: (userId: string) => Promise<number | null>) {
+  return async (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies?.[SESSION_COOKIE];
-    const userId = typeof token === 'string' ? tokens.verify(token) : null;
-    if (userId) res.locals.userId = userId;
+    const session = typeof token === 'string' ? tokens.read(token) : null;
+    if (session) {
+      const current = await sessionVersionOf(session.userId);
+      if (current !== null && current === session.sessionVersion) res.locals.userId = session.userId;
+      else res.locals.staleSession = true;
+    }
     next();
   };
 }
@@ -55,12 +63,14 @@ const limitHandler = (_req: Request, _res: Response, next: NextFunction) =>
 
 export function createRateLimiters({ disabled }: RateLimitOptions = {}) {
   const passthrough = (_req: Request, _res: Response, next: NextFunction) => next();
-  if (disabled) return { global: passthrough, auth: passthrough, ai: passthrough };
+  if (disabled) return { global: passthrough, auth: passthrough, passwordReset: passthrough, ai: passthrough };
   return {
     /** Limite geral por IP. */
     global: rateLimit({ windowMs: 15 * 60 * 1000, limit: 600, standardHeaders: 'draft-8', legacyHeaders: false, handler: limitHandler }),
     /** Tentativas de login/cadastro/recuperação por IP (proteção contra força bruta e enumeração). */
     auth: rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, standardHeaders: 'draft-8', legacyHeaders: false, handler: limitHandler }),
+    /** Pedidos de e-mail de recuperação por IP (evita usar o sistema para disparar e-mails em massa). */
+    passwordReset: rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: 'draft-8', legacyHeaders: false, handler: limitHandler }),
     /** Chamadas que podem acionar o modelo de IA, por usuário (controle de custo — Risco 1). */
     ai: rateLimit({
       windowMs: 60 * 1000,
