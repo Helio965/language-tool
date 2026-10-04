@@ -3,6 +3,7 @@ import type { AppDependencies } from './ports';
 import { createAuthService } from './services/authService';
 import { createConversationService } from './services/conversationService';
 import { createLearningService } from './services/learningService';
+import { createPasswordResetService } from './services/passwordResetService';
 import { createPlacementService } from './services/placementService';
 import { createProfileService } from './services/profileService';
 import { createProgressService } from './services/progressService';
@@ -18,6 +19,7 @@ export function createAppServices(deps: AppDependencies) {
   const conversation = createConversationService(ctx);
   return {
     auth: createAuthService(ctx),
+    passwordReset: createPasswordResetService(ctx),
     profile: createProfileService(ctx),
     placement: createPlacementService(ctx),
     learning,

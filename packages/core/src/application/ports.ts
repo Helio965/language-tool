@@ -9,6 +9,7 @@ import type {
   ExerciseAttempt,
   LearningProfile,
   Message,
+  PasswordResetToken,
   Preferences,
   Progress,
   Review,
@@ -21,6 +22,21 @@ export interface UserRepository {
   findById(id: string): Promise<UserRecord | null>;
   findByEmail(email: string): Promise<UserRecord | null>;
   create(user: UserRecord): Promise<void>;
+  /** Troca o hash da senha e invalida as sessões abertas (incrementa `sessionVersion`). */
+  updatePassword(userId: string, passwordHash: string): Promise<void>;
+}
+
+export interface PasswordResetRepository {
+  create(token: PasswordResetToken): Promise<void>;
+  findByTokenHash(tokenHash: string): Promise<PasswordResetToken | null>;
+  /** Pedido mais recente da conta (para limitar o reenvio de e-mails). */
+  latestForUser(userId: string): Promise<PasswordResetToken | null>;
+  /** Marca como usado só se ainda não foi usado; retorna false se outro pedido chegou antes (uso único). */
+  markUsed(id: string, usedAt: string): Promise<boolean>;
+  /** Remove todos os pedidos da conta (links anteriores deixam de funcionar). */
+  deleteForUser(userId: string): Promise<void>;
+  /** Limpeza periódica: remove pedidos vencidos antes da data informada. Retorna quantos removeu. */
+  deleteExpired(beforeIso: string): Promise<number>;
 }
 
 export interface ProfileRepository {
@@ -80,6 +96,7 @@ export interface DataStore {
   reviews: ReviewRepository;
   conversations: ConversationRepository;
   messages: MessageRepository;
+  passwordResets: PasswordResetRepository;
   /** Exclusão completa dos dados do usuário (RF20 / LGPD). */
   deleteUserData(userId: string): Promise<void>;
 }
@@ -100,4 +117,6 @@ export interface AppDependencies {
   timeZone?: string;
   conversationRetentionDays?: number;
   maxHistoryMessages?: number;
+  /** Validade do link de redefinição de senha, em minutos (padrão: 15). */
+  passwordResetTtlMinutes?: number;
 }

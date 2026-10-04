@@ -24,6 +24,25 @@ export interface User {
 /** Registro interno com credencial — nunca deve sair da camada de aplicação. */
 export interface UserRecord extends User {
   passwordHash: string;
+  /**
+   * Versão das sessões da conta. Sobe quando a senha é redefinida: sessões emitidas antes deixam de valer.
+   * Ausente em registros antigos (equivale a 0).
+   */
+  sessionVersion?: number;
+}
+
+/**
+ * Pedido de redefinição de senha. Guarda só o HASH do token enviado por e-mail:
+ * quem lê o banco não consegue usar o link.
+ */
+export interface PasswordResetToken {
+  id: string;
+  userId: string;
+  tokenHash: string;
+  createdAt: ISODate;
+  expiresAt: ISODate;
+  /** Preenchido quando o link é usado (uso único). */
+  usedAt: ISODate | null;
 }
 
 /** Perfil de aprendizagem: nível, objetivo, dificuldades e dados de personalização. */

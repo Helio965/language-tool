@@ -8,6 +8,7 @@ import type {
   ExerciseAttempt,
   LearningProfile,
   Message,
+  PasswordResetToken,
   Preferences,
   Progress,
   Review,
@@ -44,12 +45,14 @@ interface Collections {
   reviews: Review;
   conversations: Conversation;
   messages: Message;
+  passwordResets: PasswordResetToken;
 }
 
 type CollectionName = keyof Collections;
 
 const COLLECTIONS: CollectionName[] = [
   'users', 'profiles', 'preferences', 'progress', 'attempts', 'userVocabulary', 'reviews', 'conversations', 'messages',
+  'passwordResets',
 ];
 
 export function createDocumentStore(storage: KeyValueStorage, namespace = 'english-ai:v1'): DataStore {
@@ -94,6 +97,37 @@ export function createDocumentStore(storage: KeyValueStorage, namespace = 'engli
       findById: async (id) => one(read('users').find((user) => user.id === id)),
       findByEmail: async (email) => one(read('users').find((user) => user.email === email)),
       create: async (user) => upsert('users', user, (a, b) => a.id === b.id),
+      updatePassword: async (userId, passwordHash) =>
+        write(
+          'users',
+          read('users').map((user) =>
+            user.id === userId ? { ...user, passwordHash, sessionVersion: (user.sessionVersion ?? 0) + 1 } : user,
+          ),
+        ),
+    },
+    passwordResets: {
+      create: async (token) => write('passwordResets', [...read('passwordResets'), clone(token)]),
+      findByTokenHash: async (tokenHash) => one(read('passwordResets').find((token) => token.tokenHash === tokenHash)),
+      latestForUser: async (userId) =>
+        one(
+          read('passwordResets')
+            .filter((token) => token.userId === userId)
+            .sort((a, b) => b.createdAt.localeCompare(a.createdAt))[0],
+        ),
+      markUsed: async (id, usedAt) => {
+        const rows = read('passwordResets');
+        const target = rows.find((token) => token.id === id);
+        if (!target || target.usedAt) return false;
+        write('passwordResets', rows.map((token) => (token.id === id ? { ...token, usedAt } : token)));
+        return true;
+      },
+      deleteForUser: async (userId) => write('passwordResets', read('passwordResets').filter((token) => token.userId !== userId)),
+      deleteExpired: async (beforeIso) => {
+        const rows = read('passwordResets');
+        const kept = rows.filter((token) => token.expiresAt >= beforeIso);
+        if (kept.length !== rows.length) write('passwordResets', kept);
+        return rows.length - kept.length;
+      },
     },
     profiles: {
       get: async (userId) => one(read('profiles').find((profile) => profile.userId === userId)),

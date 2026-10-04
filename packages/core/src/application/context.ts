@@ -18,6 +18,7 @@ export interface ServiceContext {
   timeZone: string;
   retentionDays: number;
   maxHistory: number;
+  resetTtlMinutes: number;
 }
 
 export const DEFAULT_TIME_ZONE = 'America/Sao_Paulo';
@@ -33,6 +34,7 @@ export function createContext(deps: AppDependencies): ServiceContext {
     timeZone: deps.timeZone ?? DEFAULT_TIME_ZONE,
     retentionDays: deps.conversationRetentionDays ?? 90,
     maxHistory: deps.maxHistoryMessages ?? 12,
+    resetTtlMinutes: deps.passwordResetTtlMinutes ?? 15,
   };
 }
 
@@ -71,7 +73,7 @@ export function defaultPreferences(userId: string, now: Date): Preferences {
 }
 
 export function publicUser(record: UserRecord): User {
-  const { passwordHash: _hash, ...user } = record;
+  const { passwordHash: _hash, sessionVersion: _version, ...user } = record;
   return user;
 }
 
