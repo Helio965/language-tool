@@ -1,0 +1,122 @@
+.layout {
+  min-height: 100dvh;
+  display: grid;
+}
+
+.brandPanel {
+  display: none;
+}
+
+.main {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  padding: var(--space-6) var(--gutter) var(--space-12);
+  outline: none;
+}
+
+.mobileLogo {
+  width: 100%;
+  max-width: 440px;
+  margin-bottom: var(--space-8);
+}
+
+.mobileLogo a {
+  text-decoration: none;
+}
+
+.content {
+  width: 100%;
+  max-width: 440px;
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: minmax(380px, 0.9fr) 1.1fr;
+  }
+
+  .brandPanel {
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--space-10);
+    background-color: var(--ink);
+    background-image: radial-gradient(rgba(255, 253, 249, 0.09) 1px, transparent 1.2px);
+    background-size: 22px 22px;
+    color: var(--surface);
+  }
+
+  .main {
+    align-content: center;
+    padding: var(--space-12) var(--space-10);
+  }
+
+  .mobileLogo {
+    display: none;
+  }
+}
+
+.brandBody {
+  display: grid;
+  gap: var(--space-8);
+}
+
+.quote {
+  font-family: var(--font-display);
+  font-variation-settings: 'SOFT' 100;
+  font-size: 2.5rem;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.quoteAccent {
+  color: var(--marker);
+}
+
+.sample {
+  display: grid;
+  gap: var(--space-1);
+  max-width: 380px;
+  padding: var(--space-5);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  color: var(--ink);
+  transform: rotate(-1.5deg);
+  box-shadow: var(--shadow-pop);
+}
+
+.sampleLabel {
+  margin-top: var(--space-2);
+  font-size: var(--text-caption);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+}
+
+.sampleLabel:first-child {
+  margin-top: 0;
+}
+
+.sampleOriginal s {
+  color: var(--error);
+  text-decoration: underline wavy var(--error);
+}
+
+.sampleSuggestion {
+  font-weight: 700;
+}
+
+.sampleWhy {
+  margin-top: var(--space-2);
+  font-size: var(--text-small);
+  color: var(--ink-2);
+}
+
+.brandFoot {
+  font-size: var(--text-small);
+  color: rgba(255, 253, 249, 0.7);
+}

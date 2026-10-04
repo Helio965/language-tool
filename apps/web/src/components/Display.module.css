@@ -1,0 +1,309 @@
+/* Card */
+.card {
+  position: relative;
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+
+@media (min-width: 600px) {
+  .card {
+    padding: var(--space-6);
+  }
+}
+
+.card_flat {
+  box-shadow: none;
+  background: transparent;
+}
+
+.card_accent {
+  border-color: transparent;
+  background: var(--accent-soft);
+  box-shadow: none;
+}
+
+.card_learn {
+  border-color: transparent;
+  background: var(--learn-soft);
+  box-shadow: none;
+}
+
+.card_talk {
+  border-color: transparent;
+  background: var(--talk-soft);
+  box-shadow: none;
+}
+
+.card_ink {
+  border-color: transparent;
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.card_marker {
+  border-color: transparent;
+  background: #fff4c4;
+  box-shadow: none;
+}
+
+/* Progress bar */
+.progressWrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.progress {
+  position: relative;
+  flex: 1;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background: var(--paper-deep);
+}
+
+.progress_sm {
+  height: 6px;
+}
+
+.progress_md {
+  height: 10px;
+}
+
+.progressFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: inherit;
+  transition: width 600ms var(--ease-out);
+}
+
+.fill_accent {
+  background: var(--accent);
+}
+.fill_learn {
+  background: var(--learn);
+}
+.fill_talk {
+  background: var(--talk);
+}
+.fill_success {
+  background: var(--success);
+}
+.fill_ink {
+  background: var(--ink);
+}
+
+.progressValue {
+  min-width: 3ch;
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--ink-2);
+}
+
+/* Ring */
+.ring {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+
+.ring svg {
+  position: absolute;
+  inset: 0;
+}
+
+.ringValue {
+  transition: stroke-dashoffset 800ms var(--ease-out);
+}
+
+.ringLabel {
+  position: relative;
+  font-weight: 700;
+  font-size: var(--text-small);
+  text-align: center;
+  line-height: 1.1;
+}
+
+/* Stat tile */
+.stat {
+  display: grid;
+  gap: var(--space-1);
+  align-content: start;
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+}
+
+.statTop {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.statIcon {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-s);
+  background: var(--paper);
+  color: var(--ink-2);
+}
+
+.statIcon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.statLabel {
+  font-size: var(--text-small);
+  color: var(--ink-2);
+  font-weight: 700;
+}
+
+.statValue {
+  font-family: var(--font-display);
+  font-variation-settings: 'SOFT' 50;
+  font-size: 1.75rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.statHint {
+  font-size: var(--text-caption);
+  color: var(--ink-3);
+}
+
+/* Level badge */
+.levelBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 30px;
+  padding: 4px 12px 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--surface);
+  font-size: var(--text-small);
+  font-weight: 700;
+}
+
+.levelBars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 14px;
+}
+
+.levelBars i {
+  width: 3px;
+  border-radius: 2px;
+  background: rgba(255, 253, 249, 0.3);
+}
+
+.levelBars i:nth-child(1) {
+  height: 5px;
+}
+.levelBars i:nth-child(2) {
+  height: 8px;
+}
+.levelBars i:nth-child(3) {
+  height: 11px;
+}
+.levelBars i:nth-child(4) {
+  height: 14px;
+}
+
+.levelBars[data-level='beginner'] i:nth-child(-n + 1),
+.levelBars[data-level='basic'] i:nth-child(-n + 2),
+.levelBars[data-level='intermediate'] i:nth-child(-n + 3),
+.levelBars[data-level='advanced'] i:nth-child(-n + 4) {
+  background: var(--marker);
+}
+
+/* Mode badge */
+.modeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-caption);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.modeBadge svg {
+  width: 15px;
+  height: 15px;
+}
+
+.mode_learn {
+  background: var(--learn-soft);
+  color: var(--learn-ink);
+}
+
+.mode_talk {
+  background: var(--talk-soft);
+  color: var(--talk-ink);
+}
+
+/* Page header */
+.pageHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.pageHeaderText {
+  display: grid;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.pageHeaderText h1 {
+  font-size: var(--text-h1);
+}
+
+.pageHeaderText h1:focus {
+  outline: none;
+}
+
+.eyebrow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.subtitle {
+  max-width: 60ch;
+  color: var(--ink-2);
+}
+
+.pageActions {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.sectionTitle h2 {
+  font-size: 1.25rem;
+}
