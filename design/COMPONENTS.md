@@ -28,6 +28,7 @@ Convenções:
 | `to` | rota | renderiza um link com a mesma aparência (navegação ≠ ação) |
 
 Estados: padrão, hover (eleva 1px), pressionado, foco, desabilitado (50% de opacidade), carregando.
+Em telas de até 420px, rótulos longos quebram linha em vez de empurrar o layout para fora da tela.
 
 ## 2. Formulários
 
@@ -125,21 +126,29 @@ explicação; "Ver no outro idioma" quando há apoio bilíngue.
 | **LoadingState** | carregamento de tela ou ação longa, com texto | `role="status"`, `aria-live="polite"` |
 | **Skeleton** | listas/cartões carregando | decorativo |
 | **EmptyState** | sem dados, com explicação e ação | — |
-| **ErrorState** | falha ao carregar, com "Tentar de novo" | `role="alert"` |
+| **ErrorState** | falha ao carregar; `onRetry` ("Tentar de novo") só quando repetir pode resolver, e `actions` para outras saídas (ex.: voltar à lista) | `role="alert"` |
 | **InlineAlert** | mensagens dentro de formulários e fluxos | `error` → `role="alert"`; `info`/`success`/`almost` → `role="status"` |
+
+Componentes de erro com regra de produto (`apps/web/src/app/`):
+
+| Componente | Uso |
+| --- | --- |
+| **QueryErrorState** | erro ao carregar dados, com a ação certa por tipo: rede/servidor/IA/limite → "Tentar de novo"; não encontrado/sem acesso → "Voltar"; sessão → aviso neutro "Verificando sua sessão…" e "Entrar novamente" (nunca "Tentar de novo") |
+| **ActionError** | erro de uma ação (enviar, salvar, concluir); omite erros de sessão, que são avisados uma única vez no login |
+| **SignOutDialog** | confirmação "Sair da conta?" nas etapas obrigatórias do primeiro acesso (configuração inicial e nivelamento), com loading e erro |
 
 ## 7. Sobreposições — `Overlay.tsx`
 
 | Componente | Uso |
 | --- | --- |
-| **Dialog** | confirmação (encerrar conversa, apagar histórico, excluir conta) e detalhes da palavra; `<dialog>` nativo, Esc e clique fora fecham, foco preso no diálogo |
+| **Dialog** | confirmação (encerrar conversa, apagar histórico, excluir conta) e detalhes da palavra; `<dialog>` nativo, Esc, X e clique fora fecham, foco preso no diálogo; título com id único (`useId`) |
 | **Toast** (`useToast`) | confirmação curta ("Preferência salva."), some sozinho, `aria-live` |
 
 ## 8. Layout — `layouts/`
 
 | Componente | Função |
 | --- | --- |
-| **AppShell** | navegação principal responsiva (barra inferior / trilho / barra lateral), link "Pular para o conteúdo", foco no título a cada rota; esconde a navegação em rotas imersivas |
+| **AppShell** | navegação principal responsiva (barra inferior / trilho / barra lateral), link "Pular para o conteúdo", foco no título a cada rota; esconde a navegação em rotas imersivas; no modo demonstração, a barra lateral mostra o aviso "Modo demonstração — seus dados ficam salvos só neste navegador" |
 | **AuthLayout** | telas públicas com marca e coluna de apoio no desktop |
 | **FocusBar** (`components/FocusBar.tsx`) | barra das telas imersivas: voltar/sair, título, barra de progresso da etapa e ação à direita (ex.: "Encerrar") |
 

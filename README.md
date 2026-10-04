@@ -132,7 +132,7 @@ Documento completo: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Modelo de dado
 | Web | React 19, Vite, React Router, TanStack Query, CSS Modules, Lucide (ícones), fontes Fraunces e Atkinson Hyperlegible Next |
 | API | Express 5, `node:sqlite`, zod, helmet, express-rate-limit, JSON Web Token em cookie httpOnly, scrypt |
 | IA | SDK oficial da Anthropic (opcional), modo demonstração próprio |
-| Testes | Vitest, Testing Library, jsdom, Supertest |
+| Testes | Vitest, Testing Library, jsdom, Supertest, Playwright (ponta a ponta) |
 | Monorepo | npm workspaces |
 
 ## Estrutura de pastas
@@ -144,6 +144,7 @@ Documento completo: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Modelo de dado
 │   └── web/          aplicação web mobile first (protótipo navegável)
 ├── packages/
 │   └── core/         domínio, conteúdo, IA e casos de uso compartilhados
+├── e2e/              testes de ponta a ponta (Playwright) nos modos demonstração e http
 ├── docs/             arquitetura, IA, fluxos, escopo, UX, modelo de dados, rastreabilidade
 ├── design/           design system, componentes, telas, guia do Figma, capturas
 ├── .env.example      variáveis de ambiente (sem segredos)
@@ -203,7 +204,8 @@ Para a API servir também a interface, gere a web no modo http
 | `npm run dev:full` | API + web em modo http |
 | `npm run build` | typecheck e build de tudo |
 | `npm test` | testes de todos os pacotes |
-| `npm run typecheck` | verificação de tipos |
+| `npm run test:e2e` | testes de ponta a ponta no navegador (Playwright) |
+| `npm run typecheck` | verificação de tipos (pacotes e `e2e/`) |
 
 ## Variáveis de ambiente
 
@@ -259,6 +261,11 @@ Para outro provedor, implemente a interface `AIProvider` e registre-a em `apps/a
 ## Segurança e privacidade
 
 - Senhas com **scrypt** e salt; sessão em **cookie httpOnly, SameSite=Strict**; proteção CSRF por cabeçalho.
+  O token **nunca** fica no `localStorage` nem é legível pelo JavaScript da página.
+- Cada tela autenticada envia o id da conta que está exibindo (`X-Session-User`); se o cookie pertencer a outra
+  conta (login em outra aba), a API responde 401 em vez de misturar dados de duas pessoas.
+- Ao sair, expirar ou excluir a conta, o app cancela as requisições privadas, apaga da memória os dados da conta e
+  avisa as outras abas abertas. Detalhes em [docs/ARCHITECTURE.md §6.1](docs/ARCHITECTURE.md).
 - **helmet**, CORS restrito, **limite de tentativas** (login e IA), validação com **zod**, corpo limitado a 16 KB.
 - Cada recurso é verificado contra o dono (conversas de outra pessoa respondem 404).
 - Logs sem e-mail, senha, token ou conteúdo de mensagens.
@@ -274,9 +281,28 @@ npm test
 
 | Pacote | Testes | Cobertura principal |
 | --- | --- | --- |
-| `packages/core` | 147 | conteúdo, correção de exercícios, regras gramaticais, política de correção, nivelamento, progresso, revisão, privacidade, IA (mock, prompts, validação, fallback) e a jornada completa |
-| `apps/api` | 21 | cabeçalhos de segurança, CSRF, autenticação, rate limit, logs sem dados sensíveis, isolamento entre usuários, exclusão de dados, jornada pela API |
-| `apps/web` | 12 | cadastro, login, rotas protegidas, exercícios, cartão de correção e conversa |
+| `packages/core` | 148 | conteúdo, correção de exercícios, regras gramaticais, política de correção, nivelamento, progresso, revisão, privacidade, IA (mock, prompts, validação, fallback), armazenamento consistente entre abas e a jornada completa |
+| `apps/api` | 23 | cabeçalhos de segurança, CSRF, autenticação, conta exibida × cookie (`X-Session-User`), rate limit, logs sem dados sensíveis, isolamento entre usuários, exclusão de dados, jornada pela API, fallback da SPA |
+| `apps/web` | 29 | cadastro, login, rotas protegidas, exercícios, cartão de correção, conversa e 17 testes de regressão de sessão: sair da conta, sessão expirada, troca de conta sem vazamento, exclusão da conta, "Sair" na configuração e no nivelamento, recarregar, erro de rede, preferências salvas em sequência |
+
+### Ponta a ponta (Playwright)
+
+```bash
+npx playwright install chromium   # uma vez, se o Chromium do Playwright ainda não estiver instalado
+npm run test:e2e
+```
+
+11 testes no Chromium, em dois projetos que sobem os próprios servidores:
+
+- **demo** (Vite, dados no navegador): navegação pelas telas principais e saída da conta, seleção de texto,
+  sessão expirada com retorno à página, saída em outra aba, login incorreto/correto, ausência de rolagem
+  horizontal em 320px.
+- **http** (API + SQLite temporário + build da web): cadastro completo e cookie httpOnly sem token no
+  `localStorage`, nenhuma requisição privada depois de sair, troca de conta sem vazamento, sessão expirada
+  (cookie removido) e exclusão da conta.
+
+Os testes de jornada também conferem o console do navegador: qualquer erro faz o teste falhar (a única exceção
+aceita é a resposta 401 que revela uma sessão expirada ou um login recusado).
 
 ## Protótipo e design
 
@@ -312,6 +338,10 @@ npm test
 - Sem telas de administração de conteúdo.
 - SQLite atende ao MVP; para várias instâncias, trocar o adaptador de banco.
 - Testado no Chromium (celular, tablet e desktop emulados); outros navegadores e leitores de tela ainda não.
+- Sem auditoria automática de acessibilidade (axe) nem teste com leitor de tela real.
+- O JavaScript da web sai em um único arquivo (~208 KB com gzip); dividir por rota fica para a evolução.
+- Modo demonstração: o aviso "Sua sessão expirou" só aparece enquanto a página continua aberta; depois de
+  recarregar, a pessoa vai ao login sem o aviso.
 
 Lista completa: [docs/REQUIREMENTS-TRACEABILITY.md §9](docs/REQUIREMENTS-TRACEABILITY.md#9-lacunas-e-limitações-conhecidas-sem-esconder).
 

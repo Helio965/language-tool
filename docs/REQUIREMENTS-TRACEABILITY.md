@@ -7,7 +7,8 @@
 **Legenda:** ✅ atendido · 🟡 parcial (o que falta está descrito) · ⛔ fora do escopo do MVP / não feito
 
 Caminhos abreviados: `core` = `packages/core/src`, `api` = `apps/api/src`, `web` = `apps/web/src`.
-Testes: `core/test` = `packages/core/test`, `api/test` = `apps/api/test`, `web/test` = `apps/web/test`.
+Testes: `core/test` = `packages/core/test`, `api/test` = `apps/api/test`, `web/test` = `apps/web/test`,
+`e2e` = testes de ponta a ponta com Playwright (`e2e/demo.spec.ts`, `e2e/http.spec.ts`).
 
 ---
 
@@ -16,7 +17,7 @@ Testes: `core/test` = `packages/core/test`, `api/test` = `apps/api/test`, `web/t
 | ID | Requisito | Status | Implementação | Verificação |
 | --- | --- | --- | --- | --- |
 | RF01 | Cadastro de usuário | ✅ | `core/application/services/authService.ts`, `POST /api/auth/register`, tela `/cadastro` | `services.test` (autenticação), `api.test` (cookie httpOnly), `web/test/auth.test` |
-| RF02 | Autenticação segura | ✅ | scrypt + JWT em cookie httpOnly/SameSite=Strict, rate limit (`api/security`, `api/http`) | `api.test`, `security.test`, `auth.test` |
+| RF02 | Autenticação segura | ✅ | scrypt + JWT em cookie httpOnly/SameSite=Strict, rate limit (`api/security`, `api/http`); ciclo de vida da sessão no front-end (`web/app/session.tsx`, ver [ARCHITECTURE.md §6.1](./ARCHITECTURE.md)) | `api.test`, `security.test`, `auth.test`, `session.test`, `e2e` |
 | RF03 | Perfil do usuário | ✅ | `LearningProfile` (`core/domain/entities.ts`), `/configuracao`, `/perfil`, `/perfil/editar` | jornada em `services.test` e `api.test` |
 | RF04 | Definição de objetivo | ✅ | objetivos em `core/domain/profile.ts` (inclui os 5 exemplos da F1); etapa 1 da configuração | jornada |
 | RF05 | Nivelamento | ✅ | `core/domain/placement.ts` (3 etapas adaptativas, 12 perguntas), `/nivelamento` | `rules.test` (nivelamento), jornada |
@@ -34,22 +35,22 @@ Testes: `core/test` = `packages/core/test`, `api/test` = `apps/api/test`, `web/t
 | RF17 | Vocabulário estudado | ✅ | `UserVocabulary` com status e revisão espaçada; `/vocabulario` | jornada (`newWords`), `rules.test` (agendamento) |
 | RF18 | Revisão | ✅ | `core/domain/review.ts` (erros, nota baixa, espaçada, conversa, palavras); `/revisao` | `rules.test` (revisão), jornada |
 | RF19 | Configurações | 🟡 | `/preferencias`: idioma, intensidade, tamanho das respostas, tradução, meta diária, histórico, lembretes | `services.test`, `api.test`. **Falta:** os lembretes são salvos, mas não enviados (sem serviço de notificação no MVP) |
-| RF20 | Exclusão de dados | ✅ | `DELETE /api/me` com senha; `ON DELETE CASCADE`; apagar conversas | `services.test`, `api.test` |
+| RF20 | Exclusão de dados | ✅ | `DELETE /api/me` com senha; `ON DELETE CASCADE`; apagar conversas; depois da exclusão o app apaga os dados da memória e vira visitante | `services.test`, `api.test`, `session.test` (TESTE 7), `e2e` |
 
 ## 2. Requisitos não funcionais (F1 §10)
 
 | ID | Requisito | Status | Como foi atendido | Limitação |
 | --- | --- | --- | --- | --- |
 | RNF01 | Usabilidade, foco em celular | ✅ | mobile first, uma ação principal por tela, linguagem simples ([UX-SPECIFICATION.md](./UX-SPECIFICATION.md)) | sem teste com usuários reais (roteiro proposto em UX-SPEC §12) |
-| RNF02 | Responsividade | ✅ | 3 layouts (barra inferior, trilho, barra lateral); telas com 2 colunas no desktop | verificado em 390, 820 e 1440px (capturas em `design/screenshots`) |
-| RNF03 | Desempenho | 🟡 | estado "IA preparando resposta"; histórico limitado a 12 mensagens; esforço `low` e timeout de 20 s no provedor real; correção de exercícios fechados sem IA | sem medição de latência com provedor real nem teste de carga; JavaScript da web em um único pacote (~205 KB gzip, sem divisão por rota) |
-| RNF04 | Segurança | ✅ | scrypt, JWT em cookie httpOnly, CSRF por cabeçalho, helmet, CORS restrito, rate limit, zod, limite de 16 KB, checagem de dono (404), logs sem dados sensíveis, chaves só no `.env` do servidor | `api.test`, `security.test` |
+| RNF02 | Responsividade | ✅ | 3 layouts (barra inferior, trilho, barra lateral); telas com 2 colunas no desktop | verificado em 390, 820 e 1440px (capturas em `design/screenshots`); sem rolagem horizontal de 320 a 1920px, inclusive nas larguras equivalentes a zoom de 125%, 150% e 200% (verificação manual no Chromium) e em 320px nas telas principais (`e2e`) |
+| RNF03 | Desempenho | 🟡 | estado "IA preparando resposta"; histórico limitado a 12 mensagens; esforço `low` e timeout de 20 s no provedor real; correção de exercícios fechados sem IA | sem medição de latência com provedor real nem teste de carga; JavaScript da web em um único pacote (~208 KB gzip, sem divisão por rota) |
+| RNF04 | Segurança | ✅ | scrypt, JWT em cookie httpOnly (nunca no `localStorage`), CSRF por cabeçalho, helmet, CORS restrito, rate limit, zod, limite de 16 KB, checagem de dono (404), conta exibida × conta do cookie (`X-Session-User` → 401), cache privado por conta no front-end, logs sem dados sensíveis, chaves só no `.env` do servidor | `api.test`, `security.test`, `session.test`, `e2e` (cookie httpOnly/Strict, nenhuma requisição privada depois de sair) |
 | RNF05 | Privacidade / transparência | ✅ | página "Privacidade e dados", aceite dos termos, remoção de dados pessoais nas mensagens, contexto mínimo para a IA | texto informativo, não revisado juridicamente |
 | RNF06 | Escalabilidade | 🟡 | API sem estado de sessão (JWT), núcleo independente de banco (portas), provedor de IA substituível | SQLite é arquivo único: para várias instâncias é preciso trocar o adaptador (ex.: PostgreSQL) — ver ARCHITECTURE §10 |
 | RNF07 | Disponibilidade | ✅ | `FallbackAIService`: falha, timeout, recusa ou JSON inválido do provedor → modo demonstração | `ai.test` (fallback) |
-| RNF08 | Manutenibilidade | ✅ | monorepo com `core` (domínio e casos de uso sem framework), `api` e `web`; TypeScript estrito; 180 testes | — |
-| RNF09 | Acessibilidade | 🟡 | WCAG 2.1 AA como meta: contraste verificado, foco visível, rótulos, `aria-live`, `lang="en"`, movimento reduzido, link de pular navegação | sem auditoria automatizada (ex.: axe) nem teste com leitor de tela real |
-| RNF10 | Compatibilidade | 🟡 | HTML/CSS padrão, sem APIs experimentais no navegador; fallback de hash quando o Web Crypto não está disponível | testado apenas no Chromium (Playwright); Safari/Firefox e aparelhos reais não testados |
+| RNF08 | Manutenibilidade | ✅ | monorepo com `core` (domínio e casos de uso sem framework), `api` e `web`; TypeScript estrito; 200 testes unitários/integração + 11 de ponta a ponta | — |
+| RNF09 | Acessibilidade | 🟡 | WCAG 2.1 AA como meta: contraste verificado, foco visível, rótulos, `aria-live`, `lang="en"`, movimento reduzido, link de pular navegação, diálogos com título associado, campos sempre selecionáveis e editáveis, botões que quebram linha em telas estreitas | sem auditoria automatizada (ex.: axe) nem teste com leitor de tela real |
+| RNF10 | Compatibilidade | 🟡 | HTML/CSS padrão, sem APIs experimentais no navegador; fallback de hash quando o Web Crypto não está disponível; sincronização entre abas com `BroadcastChannel` quando disponível | testado apenas no Chromium (Playwright, inclusive a suíte `e2e`); Safari/Firefox e aparelhos reais não testados |
 
 ## 3. Regras de negócio (F1 §11)
 
@@ -127,7 +128,7 @@ F1-UC05→UC11 (todos ✅).
 | Especificação de telas | ✅ | [SCREEN-SPECIFICATIONS.md](../design/SCREEN-SPECIFICATIONS.md) |
 | Componentes | ✅ | [COMPONENTS.md](../design/COMPONENTS.md) |
 | `.env.example` sem segredos e `.gitignore` | ✅ | raiz do repositório |
-| Testes automatizados | ✅ | 147 (core) + 21 (API) + 12 (web) = 180 |
+| Testes automatizados | ✅ | 148 (core) + 23 (API) + 29 (web) = 200, mais 11 de ponta a ponta (Playwright, modos demonstração e http) |
 
 ## 8. Critérios de aceitação do MVP (F1 §24)
 
@@ -142,7 +143,7 @@ F1-UC05→UC11 (todos ✅).
 | Corrigir exercícios | ✅ | RF10 |
 | Registrar progresso | ✅ | RF15/RF16 |
 | Visualizar o progresso | ✅ | `/progresso` |
-| Funcionar em dispositivos móveis | ✅ | layout mobile first verificado em 390px (emulado) |
+| Funcionar em dispositivos móveis | ✅ | layout mobile first verificado em 390px (emulado) e sem rolagem horizontal a partir de 320px |
 | Autenticação e dados protegidos | ✅ | RNF04 |
 
 ## 9. Lacunas e limitações conhecidas (sem esconder)
@@ -159,3 +160,35 @@ F1-UC05→UC11 (todos ✅).
 | L8 | Acessibilidade e compatibilidade | verificações manuais e testes por papéis ARIA; só Chromium | axe + leitor de tela + Safari/Firefox/aparelhos reais |
 | L9 | Modo demonstração da IA | roteiros e 25 regras de erros comuns; não entende frases fora dos padrões | usar provedor real para conversa livre |
 | L10 | Política de privacidade | texto informativo do protótipo | revisão jurídica antes de uso real |
+| L11 | Aviso de sessão expirada | o motivo do fim da sessão fica na memória da página: depois de recarregar, a pessoa vai ao login **sem** o aviso "Sua sessão expirou" | guardar o motivo em `sessionStorage` se o aviso depois de recarregar for importante |
+| L12 | Tamanho do JavaScript | um único arquivo (~208 KB com gzip); o Vite avisa que passa de 500 KB sem compressão | dividir por rota com `React.lazy` |
+
+## 10. Testes de regressão da auditoria de sessão
+
+A auditoria de estabilidade (sair da conta, sessão expirada, troca de conta, cache privado) pediu, no mínimo, os
+testes abaixo. Todos rodam em `npm test` (`web/test`) ou em `npm run test:e2e`.
+
+| # | Cenário | Onde |
+| --- | --- | --- |
+| 1 | Demo → Alex → Perfil → Sair → visitante; rota protegida leva ao login | `session.test` (TESTE 1/2), `e2e` demo |
+| 2 | Depois de sair **não** aparece "Sua sessão expirou" | `session.test` (TESTE 1/2), `e2e` demo |
+| 3 | Sessão expirada de verdade → uma única transição para o login e retorno à página | `session.test` (TESTE 3), `e2e` demo e http |
+| 4 | UNAUTHENTICATED não oferece "Tentar de novo" | `session.test` (TESTE 4), `e2e` demo |
+| 5 | Alex → sair → nova conta → Perfil mostra a conta nova | `session.test` (TESTE 5) |
+| 6 | Conta A → sair → conta B sem nenhum cache de A | `session.test` (TESTE 6), `e2e` http |
+| 7 | Excluir conta → visitante → Voltar não revela dados | `session.test` (TESTE 7), `e2e` http |
+| 8 | Configuração inicial → Sair funciona | `session.test` (TESTE 8) |
+| 9 | Nivelamento → Sair funciona | `session.test` (TESTE 9) |
+| 10 | Cadastro completo | `session.test` (TESTE 10), `e2e` http |
+| 11 | Login correto | `auth.test` ("após entrar, volta para a página…"), `e2e` demo |
+| 12 | Login incorreto | `auth.test` ("mensagem genérica…"), `e2e` demo e http |
+| 13 | Recarregar rota protegida com sessão | `session.test` (TESTE 13), `e2e` http |
+| 14 | Recarregar sem sessão | `session.test` (TESTE 14) |
+| 15 | Erro de rede → "Tentar de novo" funciona | `session.test` (TESTE 15) |
+| 16 | Campos continuam permitindo selecionar texto | `e2e` demo ("seleção de texto") |
+| 17 | Texto estrutural não pode ser selecionado | `e2e` demo ("seleção de texto") |
+
+Os testes 16 e 17 ficam só no navegador real: o jsdom não aplica o CSS do app, então não mede `user-select`.
+Testes adicionais da mesma auditoria: saída em outra aba (`e2e` demo), conta exibida × cookie (`api.test`),
+armazenamento do modo demonstração consistente entre abas (`services.test`), autosave de preferências em sequência
+e clique duplo no nivelamento (`session.test`).

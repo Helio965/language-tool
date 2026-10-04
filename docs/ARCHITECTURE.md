@@ -80,6 +80,7 @@ A arquitetura segue a proposta conceitual dos documentos — **Aplicação → B
             │                regras gramaticais, prompts, modo demonstração, LLM + fallback
             ├── application/ casos de uso (UC01–UC12) e portas (interfaces) de persistência
             └── infrastructure/ armazenamento chave-valor e hash PBKDF2 (portáveis)
+e2e/                         testes ponta a ponta (Playwright) nos modos demo e http
 ```
 
 ## 4. Camadas
@@ -175,6 +176,63 @@ Principais rotas da API (todas sob `/api`):
 - **Recuperação de senha**: no MVP a rota responde sempre a mesma mensagem genérica e **não envia e-mail** (não há serviço de e-mail configurado). Ver §12.
 - **Modo demonstração**: contas ficam apenas no navegador, com senha em PBKDF2 (Web Crypto). É um protótipo — não é autenticação de produção.
 
+### 6.1 Sessão e cache no front-end
+
+Implementação em `apps/web/src/app/session.tsx`, `guards.tsx` e `queryKeys.ts`. Vale para os dois modos
+(demo e http), porque os dois clientes produzem os mesmos erros (`ApiError`).
+
+**Fonte da verdade.** A conta conectada fica na query `['session']` do TanStack Query (`AccountState` ou
+`null`). Essa query **nunca é removida do cache**: o `SessionProvider` a observa durante toda a vida do app.
+Remover a query (por exemplo com `queryClient.clear()`) destrói o objeto que o observer acompanha sem
+avisá-lo — a interface continuaria mostrando a conta antiga. Era a causa do bug "Sair da conta quebra o app".
+
+**Dados privados por conta.** Toda query de dados do usuário usa a chave `['user', userId, ...]`
+(`userKeys(userId)`). Dados de uma conta nunca podem aparecer para outra, porque as chaves são diferentes; e a
+limpeza é exata: um efeito no `SessionProvider` cancela e remove as queries de qualquer conta que não seja a
+atual (depois que as telas dela desmontaram) e limpa as mutations quando a conta muda.
+
+**Como a sessão termina.** `endSession(motivo)` cancela requisições privadas em andamento, muda a sessão para
+`null` e registra o motivo; as guardas de rota fazem o resto:
+
+```mermaid
+stateDiagram-v2
+  [*] --> Verificando: carregar o app
+  Verificando --> Visitante: sem sessão
+  Verificando --> Conectado: sessão válida
+  Verificando --> FalhaAoVerificar: sem conexão
+  FalhaAoVerificar --> Verificando: Tentar de novo
+  Visitante --> Conectado: login / cadastro / demonstração
+  Conectado --> Visitante: "Sair da conta" (signed_out) → /entrar
+  Conectado --> Visitante: sessão expirou (expired) → /entrar + aviso único + volta à página
+  Conectado --> Visitante: conta excluída (deleted) → página inicial
+  Conectado --> Conectado: outra conta entrou neste navegador → telas remontam com a nova conta
+```
+
+**UNAUTHENTICATED centralizado.** O `SessionProvider` entrega às telas um cliente envolvido (`guardApi`):
+qualquer chamada privada — query, mutation ou chamada direta — que receba `UNAUTHENTICATED` dispara **uma**
+revalidação da sessão. Se outra conta entrou, a identidade é trocada; senão a sessão termina como `expired`.
+Respostas atrasadas de uma conta anterior (inclusive depois de um logout intencional) são ignoradas, então
+"Sair" nunca vira "Sua sessão expirou". Queries não repetem erros de sessão (só erros de rede).
+
+**Abas e identidade esperada.** As abas se avisam por `BroadcastChannel` (login, logout, exclusão) e a sessão
+é revalidada quando a aba volta a ficar visível. Além disso, o cliente informa qual conta a tela está
+exibindo (`bindSession`): no modo http vai no cabeçalho `X-Session-User`, e a API responde 401 se o cookie
+for de outra conta; no modo demo, o cliente compara com a sessão salva. Assim, uma tela nunca recebe dados
+de outra conta, mesmo por instantes.
+
+**Guardas.** `RequireAuth` decide o destino pelo motivo (visitante/expirada → `/entrar` guardando a página;
+logout → `/entrar`; exclusão → `/`) e remonta as telas privadas se a conta mudar. `PublicOnly` leva quem
+acabou de entrar para a etapa pendente ou para a página que tentava abrir — sem navegação manual concorrente.
+`RequireStep` mantém a ordem configuração → nivelamento → app; nessas etapas, "Sair" significa sair da conta.
+
+**Erros semânticos.** `QueryErrorState` mostra a ação que faz sentido: "Tentar de novo" para rede, servidor,
+IA e limite de requisições; "Voltar" para não encontrado/sem acesso; e, para sessão, um aviso neutro enquanto a
+sessão é revalidada. `ActionError` omite erros de sessão (o aviso aparece uma vez, no login).
+
+**Modo demonstração com várias abas.** O armazenamento do modo demo (`createDocumentStore`) revalida cada
+leitura contra o `localStorage`; antes, cada aba trabalhava com uma cópia em memória e podia apagar o que a
+outra aba gravou.
+
 ## 7. Segurança
 
 | Ameaça / requisito | Medida |
@@ -182,6 +240,8 @@ Principais rotas da API (todas sob `/api`):
 | Credenciais vazadas | scrypt, nenhuma senha em log, `.env` no `.gitignore`, `.env.example` sem valores |
 | Chave de IA exposta | chave só no servidor (`ANTHROPIC_API_KEY`), nunca com prefixo `VITE_` |
 | Acesso a dados de outra pessoa | todo recurso é buscado com verificação de dono; resposta `404` igual para "não existe" e "não é seu" |
+| Dados de uma conta na tela de outra (troca de conta em outra aba) | cabeçalho `X-Session-User` validado em `requireAuth` (401 se o cookie for de outra conta); cache do front-end separado por conta (§6.1) |
+| Dados privados após logout ou exclusão | sessão encerrada com cancelamento das requisições privadas e remoção do cache da conta; telas privadas desmontadas pelas guardas (§6.1) |
 | Entrada maliciosa | zod nas rotas + validação de domínio + limites de tamanho (corpo 16 kB, mensagem 600 caracteres, resposta 400) |
 | Abuso / custo de IA | rate limit global, de autenticação e das rotas de IA; histórico enviado ao modelo limitado (`AI_MAX_HISTORY_MESSAGES`) |
 | Prompt injection | instruções de segurança no system prompt, mensagem do usuário sempre no papel `user`, saída do modelo validada e saneada |
@@ -216,6 +276,7 @@ Itens que dependem de decisão jurídica/organizacional (encarregado de dados, b
 
 ## 11. Tratamento de erros, logs e configuração
 
+- **Na interface**, cada código tem uma reação própria (ver §6.1, "Erros semânticos"): erros de sessão são tratados em um só lugar e nunca oferecem "Tentar de novo".
 - **Erros de domínio** (`AppError`) têm código estável (`VALIDATION`, `EMAIL_IN_USE`, `INVALID_CREDENTIALS`, `NOT_FOUND`, `RATE_LIMITED`, `AI_UNAVAILABLE`…). A API converte em status HTTP; o front-end converte em mensagens em português, sem termos técnicos.
 - Erros inesperados retornam `500 INTERNAL` com mensagem genérica; detalhes ficam só no log do servidor.
 - **Logs** estruturados em JSON (`logger.ts`): evento, rota, status, duração e id do usuário — sem senhas, tokens, e-mails ou conteúdo de mensagens.
@@ -233,6 +294,7 @@ Itens que dependem de decisão jurídica/organizacional (encarregado de dados, b
 | Correção determinística + IA explicativa | reduz o risco de respostas incorretas (Risco 2) |
 | Política de correção em código | garante RN04 independentemente do modelo |
 | Cookie httpOnly em vez de token no `localStorage` | reduz impacto de XSS |
+| Sessão como query permanente + dados privados em `['user', userId, ...]` | logout/expiração/troca de conta sem estados órfãos nem vazamento de cache (§6.1) |
 | Fuso `America/Sao_Paulo` para "dias de estudo" | público principal brasileiro (configurável) |
 
 ### Limitações atuais
