@@ -210,8 +210,8 @@ function Chat({ conversation }: { conversation: ConversationView }) {
             </form>
           )}
           <p className={styles.privacy}>
-            <ShieldCheck aria-hidden="true" /> Não compartilhe dados pessoais (documentos, telefone, senhas). Removemos os mais óbvios
-            automaticamente.
+            <ShieldCheck aria-hidden="true" /> {ASSISTANT_PERSONA.name} é uma IA e pode errar. Não compartilhe dados pessoais (documentos,
+            telefone, senhas) — removemos os mais óbvios automaticamente.
           </p>
         </section>
 
