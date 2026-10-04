@@ -40,7 +40,8 @@ export function passwordRoutes(deps: {
     res.status(202).json({ message: PASSWORD_RESET_REQUESTED_MESSAGE, expiresInMinutes: services.passwordReset.ttlMinutes });
   });
 
-  router.post('/auth/password-reset/verify', authLimiter, async (req, res) => {
+  // Consulta barata e sem efeito: fica só sob o limite geral (o token tem 256 bits, adivinhar é inviável).
+  router.post('/auth/password-reset/verify', async (req, res) => {
     res.json({ status: await services.passwordReset.checkToken(verifySchema.parse(req.body).token) });
   });
 
