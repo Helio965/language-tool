@@ -208,6 +208,25 @@ describe('API — jornada do MVP', () => {
     expect(vocabulary.counts.studied).toBeGreaterThan(0);
   });
 
+  it('não entrega dados de outra conta quando a interface espera a anterior (troca de conta em outra aba)', async () => {
+    const { app } = setup();
+    const agent = request.agent(app);
+    const alex = (await agent.post('/api/auth/register').set(CSRF).send(USER).expect(201)).body;
+    await agent.put('/api/me/profile').set(CSRF).send(PROFILE).expect(200);
+    const asAlex = { ...CSRF, 'X-Session-User': alex.user.id };
+    await agent.get('/api/me').set(asAlex).expect(200);
+
+    // Mesmo navegador (mesmo cookie): outra aba entra com a conta da Bia.
+    await agent.post('/api/auth/register').set(CSRF).send({ ...USER, name: 'Bia', email: 'bia@example.com' }).expect(201);
+    const denied = await agent.get('/api/me').set(asAlex).expect(401);
+    expect(denied.body.error.code).toBe('UNAUTHENTICATED');
+    // A interface revalida a sessão e descobre quem está conectado agora.
+    const session = await agent.get('/api/auth/session').set(asAlex).expect(200);
+    expect(session.body.account.user.email).toBe('bia@example.com');
+    // Sem o cabeçalho (ou com o id certo), a sessão funciona normalmente.
+    await agent.get('/api/me').set({ ...CSRF, 'X-Session-User': session.body.account.user.id }).expect(200);
+  });
+
   it('impede acesso a conversas de outro usuário e respeita a exclusão de dados (RF20)', async () => {
     const { app } = setup();
     const alex = await registeredAgent(app);

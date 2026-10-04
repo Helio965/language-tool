@@ -6,6 +6,8 @@ import type { SessionTokens } from '../../security/sessionTokens';
 export const SESSION_COOKIE = 'ea_session';
 export const CSRF_HEADER = 'x-requested-with';
 export const CSRF_VALUE = 'english-ai';
+/** Conta que a interface está exibindo (ver apps/web/src/services/httpClient.ts). */
+export const SESSION_USER_HEADER = 'x-session-user';
 
 /** Lê o cookie de sessão e, se válido, guarda o id do usuário em res.locals. */
 export function authenticate(tokens: SessionTokens) {
@@ -17,8 +19,13 @@ export function authenticate(tokens: SessionTokens) {
   };
 }
 
-export function requireAuth(_req: Request, res: Response, next: NextFunction) {
-  if (!res.locals.userId) return next(new AppError('UNAUTHENTICATED', 'Sessão inválida ou expirada.'));
+export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  const userId = res.locals.userId;
+  if (!userId) return next(new AppError('UNAUTHENTICATED', 'Sessão inválida ou expirada.'));
+  // Se a interface espera outra conta (o cookie mudou, ex.: login em outra aba), não devolve dados
+  // da conta atual para a tela da anterior: a interface revalida a sessão e se atualiza.
+  const expected = req.get(SESSION_USER_HEADER);
+  if (expected && expected !== userId) return next(new AppError('UNAUTHENTICATED', 'A sessão mudou.'));
   next();
 }
 
