@@ -38,3 +38,14 @@ Thumbs.db
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+# Python runtime and local state
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+instance/
+.coverage
+htmlcov/
+*.egg-info/
+*.db.backup-*
