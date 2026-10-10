@@ -1,0 +1,12 @@
+# Runtime and validation dependencies; requirements.txt pins resolved versions.
+Flask>=3.1,<4
+Flask-SQLAlchemy>=3.1,<4
+SQLAlchemy>=2.0,<2.1
+Flask-Migrate>=4,<5
+Flask-Login>=0.6,<1
+Flask-WTF>=1.2,<2
+Flask-Limiter>=4,<5
+python-dotenv>=1,<2
+anthropic>=0.75,<1
+pytest>=8,<10
+playwright>=1.56,<2

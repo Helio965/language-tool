@@ -1,0 +1,96 @@
+/*
+ * Tokens do design system — espelham design/DESIGN-SYSTEM.md.
+ * Mantenha os nomes sincronizados com as variáveis do Figma (design/FIGMA-GUIDE.md).
+ */
+:root {
+  /* Neutros: papel e tinta */
+  --paper: #f7f3ec;
+  --paper-deep: #efe8dc;
+  --surface: #fffdf9;
+  --line: #e4dccd;
+  --line-input: #8c8270;
+  --ink: #1a1f3a;
+  --ink-2: #464b66;
+  --ink-3: #62667d;
+
+  /* Modos */
+  --learn: #2f45c6;
+  --learn-ink: #24369f;
+  --learn-soft: #e6e9fb;
+  --talk: #c4441d;
+  --talk-ink: #a3381a;
+  --talk-soft: #fde7de;
+  --marker: #ffe27a;
+
+  /* Feedback pedagógico */
+  --success: #17784a;
+  --success-soft: #e1f3e8;
+  --almost: #8a4e00;
+  --almost-soft: #fdf0d8;
+  --error: #a8234a;
+  --error-soft: #fbe4ea;
+
+  /* Acento do modo atual (sobrescrito por [data-mode]) */
+  --accent: var(--learn);
+  --accent-ink: var(--learn-ink);
+  --accent-soft: var(--learn-soft);
+
+  /* Tipografia */
+  --font-display: 'Fraunces Variable', 'Iowan Old Style', Georgia, serif;
+  --font-text: 'Atkinson Hyperlegible Next Variable', 'Segoe UI', system-ui, sans-serif;
+  --text-display: clamp(2rem, 1.55rem + 1.9vw, 2.75rem);
+  --text-h1: clamp(1.625rem, 1.4rem + 0.9vw, 2rem);
+  --text-h2: clamp(1.3125rem, 1.2rem + 0.45vw, 1.5rem);
+  --text-h3: 1.125rem;
+  --text-body: 1rem;
+  --text-small: 0.875rem;
+  --text-caption: 0.78125rem;
+
+  /* Espaço (base 4px) */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Forma e profundidade */
+  --radius-s: 8px;
+  --radius-m: 12px;
+  --radius-l: 18px;
+  --radius-xl: 26px;
+  --radius-pill: 999px;
+  --shadow-1: 0 1px 2px rgba(26, 31, 58, 0.06), 0 1px 1px rgba(26, 31, 58, 0.04);
+  --shadow-2: 0 8px 24px -12px rgba(26, 31, 58, 0.22);
+  --shadow-pop: 0 18px 44px -16px rgba(26, 31, 58, 0.32);
+
+  /* Movimento */
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur-base: 220ms;
+  --dur-slow: 380ms;
+
+  /* Layout */
+  --touch: 44px;
+  --nav-bottom-height: 68px;
+  --sidebar-width: 248px;
+  --rail-width: 88px;
+  --content-max: 1120px;
+  --gutter: clamp(1rem, 0.6rem + 1.6vw, 2rem);
+}
+
+[data-mode='talk'] {
+  --accent: var(--talk);
+  --accent-ink: var(--talk-ink);
+  --accent-soft: var(--talk-soft);
+}
+
+[data-mode='learn'] {
+  --accent: var(--learn);
+  --accent-ink: var(--learn-ink);
+  --accent-soft: var(--learn-soft);
+}

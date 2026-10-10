@@ -1,5 +1,11 @@
 # Escopo do MVP — English AI
 
+> **Transição para Python:** os requisitos e as decisões acadêmicas deste documento
+> foram preservados. A implementação atual roda com Flask/Jinja na raiz; a versão
+> anterior e seus detalhes de framework estão em [legacy/MVP-SCOPE.md](legacy/MVP-SCOPE.md).
+> Evidências da nova execução ficam em [MIGRATION-AUDIT.md](MIGRATION-AUDIT.md),
+> não nas contagens/capturas históricas do protótipo TypeScript.
+
 > Projeto acadêmico — MVP em desenvolvimento.
 > Este documento registra a **análise dos materiais do projeto** e as decisões de escopo tomadas a partir deles. Ele não substitui os documentos originais: apenas os consolida.
 
@@ -66,7 +72,7 @@ Nenhum requisito foi substituído. Quando os documentos divergem, a decisão aba
 | D6 | F1 §15 lista "alfabeto e pronúncia", mas F1 §7 tira reconhecimento de voz/pronúncia do MVP. | A aula de alfabeto usa apenas **indicações escritas** de pronúncia. Nenhum recurso de áudio/voz é implementado. |
 | D7 | O ator **Administrador** existe (F1 §8, F2 §1), mas não há caso de uso de administração no MVP. | O usuário tem um campo `role` preparado; **não há telas de administração**. O conteúdo é versionado em código e sincronizado no banco (ver ARCHITECTURE.md). |
 | D8 | F1 RF14 fala em "modo de interação escolhido pelo usuário"; F2 UC12 fala em "intensidade das correções". | Preferência **intensidade das correções**: *Leve*, *Equilibrada* (padrão) e *Detalhada*. Regras em [IA-BEHAVIOR.md](./IA-BEHAVIOR.md). |
-| D9 | O nome da assistente de IA não está definido pela equipe. | Proposta: **Lumi**. O nome é uma **configuração** (`ASSISTANT_PERSONA.name` em `packages/core/src/ai/persona.ts`), não uma dependência estrutural. |
+| D9 | O nome da assistente de IA não está definido pela equipe. | Proposta: **Lumi**. O nome é uma **configuração** (`ASSISTANT_PERSONA` em `ai/personality.py`), não uma dependência estrutural. |
 | D10 | F2 UC01-A2 exige informar que a conta já existe (o que permite descobrir e-mails cadastrados). | O requisito é mantido. A mitigação é **limitação de tentativas** no endpoint; a recuperação de senha **não** revela se o e-mail existe. Registrado em ARCHITECTURE.md §Segurança. |
 | D11 | O fluxograma não mostra uma tela inicial; o prompt do projeto pede uma Página Inicial. | A Página Inicial ("Início") é o hub pós-nivelamento e responde à pergunta *"qual é a próxima coisa que devo fazer?"*. |
 
@@ -83,13 +89,13 @@ Nenhum requisito foi substituído. Quando os documentos divergem, a decisão aba
 
 | Tarefa | Como foi atendida |
 |--------|-------------------|
-| Criar os protótipos das telas no Figma | **Sem acesso ao Figma nesta entrega.** O protótipo foi especificado em `design/` (design system, componentes, telas) e implementado como protótipo navegável em `apps/web`. O guia `design/FIGMA-GUIDE.md` explica como reproduzi-lo no Figma. |
+| Criar os protótipos das telas no Figma | **Sem acesso ao Figma nesta entrega.** O protótipo foi especificado em `design/` (design system, componentes, telas) e implementado inicialmente em `apps/web` e agora em `templates/`/`static/` com backend Python. O guia `design/FIGMA-GUIDE.md` explica como reproduzi-lo no Figma. |
 | Desenhar login, cadastro e página inicial | Especificadas em `design/SCREEN-SPECIFICATIONS.md` e implementadas |
 | Desenhar os modos Aprender e Conversação | Especificados e implementados |
 | Definir o comportamento da IA em cada modo | `docs/IA-BEHAVIOR.md` §3–4 |
 | Documentar personalidade, correções e adaptação ao nível | `docs/IA-BEHAVIOR.md` §2, §5–7 |
 | Especificar como o usuário visualizará o progresso | `docs/UX-SPECIFICATION.md` §Progresso + tela de Progresso |
-| **Entregável:** protótipo navegável | `apps/web` (modo demonstração, sem backend obrigatório) |
+| **Entregável:** protótipo navegável | Flask/Jinja (`python app.py`); versão anterior em `apps/web` preservada |
 | **Entregável:** documento de comportamento da IA | `docs/IA-BEHAVIOR.md` |
 
 > A imagem também mostra, no topo, os entregáveis de outra frente: *diagrama de classes, DER e documento de arquitetura inicial*. Eles foram produzidos em `docs/DATABASE-MODEL.md` e `docs/ARCHITECTURE.md` para manter a implementação coerente.
@@ -115,7 +121,7 @@ A verificação detalhada de cada item está em [REQUIREMENTS-TRACEABILITY.md](.
 | Risco | Mitigação no MVP |
 |-------|------------------|
 | Custo da IA | Modo mock por padrão; limites de tamanho de mensagem e de histórico enviado ao modelo; rate limit nas rotas de IA |
-| Respostas incorretas | Correção de exercícios é **determinística** (gabarito); a IA explica, mas não decide sozinha se a resposta de um exercício está certa; aviso de limitações na interface |
-| Dependência externa | Interface `AIProvider` substituível e *fallback* para o mock em caso de falha |
-| Privacidade | Coleta mínima, histórico de conversa opcional, exclusão de dados, nenhuma informação pessoal enviada ao modelo além do primeiro nome |
+| Respostas incorretas | Exercícios fechados usam gabarito **determinístico**; produção livre usa requisitos locais e problemas de gramática/significado da avaliação por regras/IA. Trechos e formato são validados; aviso de limitações e revisão humana continuam necessários |
+| Dependência externa | Provedor substituível e erro seguro; demonstração explícita disponível. O fallback automático anterior foi substituído para não mascarar falha externa como sucesso |
+| Privacidade | Contexto da conta com primeiro nome e dados pedagógicos mínimos; histórico opcional, exclusão e saneamento de e-mail/telefone/CPF/cartão/senha declarada. Nomes e outros dados pessoais no texto livre podem escapar às regras; a pessoa é orientada a não compartilhá-los |
 | Escopo | Este documento e a lista de fora de escopo |
