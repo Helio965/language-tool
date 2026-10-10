@@ -1,0 +1,4417 @@
+{
+  "lessons": [
+    {
+      "id": "greetings",
+      "level": "beginner",
+      "order": 1,
+      "title": "Cumprimentos e apresentações",
+      "topic": "Greetings & introductions",
+      "summary": "Diga olá, apresente-se e pergunte o nome de alguém.",
+      "estimatedMinutes": 8,
+      "skillTags": [
+        "greetings"
+      ],
+      "objectives": [
+        "Cumprimentar em situações formais e informais",
+        "Dizer seu nome e perguntar o nome de alguém",
+        "Despedir-se de forma natural"
+      ],
+      "explanation": [
+        {
+          "pt": "\"Hello\" funciona em qualquer situação. \"Hi\" e \"Hey\" são mais informais — use com amigos e colegas.",
+          "en": "\"Hello\" works in any situation. \"Hi\" and \"Hey\" are more informal — use them with friends and colleagues."
+        },
+        {
+          "pt": "Para cumprimentar conforme o horário, use \"Good morning\" (manhã), \"Good afternoon\" (tarde) e \"Good evening\" (ao chegar, à noite). \"Good night\" é usado só para se despedir ou antes de dormir.",
+          "en": "Use \"Good morning\", \"Good afternoon\" and \"Good evening\" depending on the time of day. \"Good night\" is only for saying goodbye or before going to bed."
+        },
+        {
+          "pt": "Para se apresentar, diga \"My name is Ana\" ou \"I'm Ana\". Para perguntar, \"What's your name?\". Ao conhecer alguém, \"Nice to meet you!\".",
+          "en": "To introduce yourself, say \"My name is Ana\" or \"I'm Ana\". To ask, \"What's your name?\". When you meet someone, \"Nice to meet you!\"."
+        }
+      ],
+      "alternativeExplanations": [
+        {
+          "pt": "Pense assim: \"Hello\" é o \"Olá\" (serve sempre) e \"Hi\" é o \"Oi\" (mais casual). \"Good night\" é o \"boa noite\" de quem está indo embora — para chegar à noite, diga \"Good evening\".",
+          "en": "Think of it like this: \"Hello\" always works and \"Hi\" is casual. \"Good night\" is for leaving — when you arrive in the evening, say \"Good evening\"."
+        },
+        {
+          "pt": "Uma apresentação completa tem três partes: cumprimento + nome + frase simpática. Exemplo: \"Hi! I'm Leo. Nice to meet you!\"",
+          "en": "A complete introduction has three parts: greeting + name + a friendly phrase. Example: \"Hi! I'm Leo. Nice to meet you!\""
+        }
+      ],
+      "table": {
+        "caption": "Cumprimentos por situação",
+        "headers": [
+          "Inglês",
+          "Quando usar",
+          "Português"
+        ],
+        "rows": [
+          [
+            "Hello",
+            "Qualquer situação",
+            "Olá"
+          ],
+          [
+            "Hi / Hey",
+            "Informal",
+            "Oi"
+          ],
+          [
+            "Good morning",
+            "Até o meio-dia",
+            "Bom dia"
+          ],
+          [
+            "Good afternoon",
+            "À tarde",
+            "Boa tarde"
+          ],
+          [
+            "Good evening",
+            "Ao chegar, à noite",
+            "Boa noite"
+          ],
+          [
+            "Good night",
+            "Ao sair ou dormir",
+            "Boa noite"
+          ]
+        ]
+      },
+      "examples": [
+        {
+          "en": "Hi! My name is Ana.",
+          "pt": "Oi! Meu nome é Ana.",
+          "highlight": "My name is"
+        },
+        {
+          "en": "What's your name?",
+          "pt": "Qual é o seu nome?",
+          "highlight": "What's your name"
+        },
+        {
+          "en": "Nice to meet you!",
+          "pt": "Prazer em conhecer você!",
+          "highlight": "Nice to meet you"
+        },
+        {
+          "en": "See you tomorrow!",
+          "pt": "Até amanhã!",
+          "highlight": "See you"
+        }
+      ],
+      "extraExamples": [
+        {
+          "en": "Good morning, everyone!",
+          "pt": "Bom dia, pessoal!",
+          "highlight": "Good morning"
+        },
+        {
+          "en": "Hey! I'm Carlos. I'm new here.",
+          "pt": "Oi! Eu sou o Carlos. Sou novo aqui.",
+          "highlight": "I'm Carlos"
+        },
+        {
+          "en": "Good night! See you later.",
+          "pt": "Boa noite! Até mais.",
+          "highlight": "Good night"
+        }
+      ],
+      "vocabularyIds": [
+        "hello",
+        "good-morning",
+        "good-evening",
+        "nice-to-meet-you",
+        "see-you-later"
+      ],
+      "exercises": [
+        {
+          "id": "greetings-1",
+          "lessonId": "greetings",
+          "type": "multiple_choice",
+          "instruction": "Escolha o cumprimento adequado.",
+          "prompt": "Você chega a uma reunião às 9h da manhã. O que você diz?",
+          "options": [
+            "Good morning!",
+            "Good night!",
+            "Goodbye!",
+            "Good evening!"
+          ],
+          "acceptedAnswers": [
+            "Good morning!"
+          ],
+          "explanation": {
+            "pt": "\"Good morning\" é usado pela manhã, até por volta do meio-dia. \"Good night\" serve apenas para se despedir à noite.",
+            "en": "\"Good morning\" is used until about noon. \"Good night\" is only for saying goodbye at night."
+          },
+          "skillTag": "greetings"
+        },
+        {
+          "id": "greetings-2",
+          "lessonId": "greetings",
+          "type": "select_word",
+          "instruction": "Selecione a palavra que completa a frase.",
+          "prompt": "Hi! My ___ is Carlos.",
+          "options": [
+            "name",
+            "names",
+            "call",
+            "am"
+          ],
+          "acceptedAnswers": [
+            "name"
+          ],
+          "explanation": {
+            "pt": "A estrutura é \"My name is…\" (Meu nome é…). \"Name\" fica no singular porque é um nome só.",
+            "en": "The structure is \"My name is…\". \"Name\" is singular because it is one name.",
+            "tip": {
+              "pt": "Outra forma comum é \"I'm Carlos\".",
+              "en": "Another common way is \"I'm Carlos\"."
+            }
+          },
+          "skillTag": "greetings"
+        },
+        {
+          "id": "greetings-3",
+          "lessonId": "greetings",
+          "type": "fill_blank",
+          "instruction": "Complete a frase.",
+          "prompt": "Nice to ___ you!",
+          "acceptedAnswers": [
+            "meet"
+          ],
+          "hint": "Significa \"conhecer\". Começa com \"m\".",
+          "explanation": {
+            "pt": "\"Nice to meet you\" significa \"Prazer em conhecer você\". O verbo \"meet\" significa conhecer ou encontrar alguém.",
+            "en": "\"Nice to meet you\" is what we say when we meet someone for the first time."
+          },
+          "skillTag": "greetings"
+        },
+        {
+          "id": "greetings-4",
+          "lessonId": "greetings",
+          "type": "translate",
+          "instruction": "Traduza para o inglês.",
+          "prompt": "Qual é o seu nome?",
+          "acceptedAnswers": [
+            "What's your name?",
+            "What is your name?"
+          ],
+          "explanation": {
+            "pt": "A pergunta começa com \"What\" (qual/o que): \"What's your name?\". \"What's\" é a forma curta de \"What is\".",
+            "en": "The question starts with \"What\": \"What's your name?\". \"What's\" is the short form of \"What is\"."
+          },
+          "skillTag": "greetings"
+        },
+        {
+          "id": "greetings-5",
+          "lessonId": "greetings",
+          "type": "multiple_choice",
+          "instruction": "Escolha a melhor opção.",
+          "prompt": "Você está saindo de uma festa às 23h. O que você diz?",
+          "options": [
+            "Good night!",
+            "Good evening!",
+            "Good afternoon!",
+            "Good morning!"
+          ],
+          "acceptedAnswers": [
+            "Good night!"
+          ],
+          "explanation": {
+            "pt": "Ao se despedir à noite, usamos \"Good night\". \"Good evening\" é para quando você chega.",
+            "en": "When you leave at night, say \"Good night\". \"Good evening\" is for when you arrive."
+          },
+          "skillTag": "greetings"
+        }
+      ],
+      "practice": {
+        "opener": {
+          "en": "Let's practice! Hi, I'm {assistant}. What's your name?",
+          "pt": "Vamos praticar! Oi, eu sou {assistant}. Qual é o seu nome?"
+        },
+        "question": "What's your name?"
+      },
+      "takeaways": [
+        "\"Hello\" serve para qualquer situação; \"Hi\" é mais informal.",
+        "\"Good night\" é para despedidas — ao chegar à noite, use \"Good evening\".",
+        "Apresente-se com \"My name is…\" ou \"I'm…\"."
+      ]
+    },
+    {
+      "id": "alphabet",
+      "level": "beginner",
+      "order": 2,
+      "title": "O alfabeto e como soletrar",
+      "topic": "The alphabet & spelling",
+      "summary": "Reconheça as letras em inglês e soletre seu nome.",
+      "estimatedMinutes": 7,
+      "skillTags": [
+        "alphabet"
+      ],
+      "objectives": [
+        "Reconhecer os sons das vogais em inglês",
+        "Evitar as confusões mais comuns (E/I, G/J)",
+        "Soletrar seu nome e pedir que alguém soletre"
+      ],
+      "explanation": [
+        {
+          "pt": "As letras têm nomes diferentes do português. As vogais são as que mais confundem: A soa como \"êi\", E como \"í\", I como \"ái\", O como \"ôu\" e U como \"iú\".",
+          "en": "Letter names are different from Portuguese. Vowels are the trickiest: A sounds like \"ay\", E like \"ee\", I like \"eye\", O like \"oh\" and U like \"you\"."
+        },
+        {
+          "pt": "Pares que costumam confundir brasileiros: E (\"í\") e I (\"ái\"); G (\"djí\") e J (\"djêi\"). Vale a pena praticar esses quatro.",
+          "en": "Common confusions for Brazilian learners: E and I; G and J. Practice these four letters."
+        },
+        {
+          "pt": "Para pedir que alguém soletre: \"How do you spell that?\". Letras repetidas são ditas com \"double\": Anna = A, double N, A.",
+          "en": "To ask someone to spell a word: \"How do you spell that?\". Repeated letters use \"double\": Anna = A, double N, A."
+        }
+      ],
+      "alternativeExplanations": [
+        {
+          "pt": "Um truque: o nome da letra I em inglês soa como a palavra \"eye\" (olho), e o nome da letra E soa como o \"i\" do português.",
+          "en": "A trick: the letter I sounds like the word \"eye\", and the letter E sounds like the Portuguese \"i\"."
+        },
+        {
+          "pt": "Soletrar é útil em ligações, cadastros e e-mails. Pratique com o seu nome completo — é a palavra que você mais vai soletrar!",
+          "en": "Spelling is useful on the phone, in forms and e-mails. Practice with your full name — it is the word you will spell the most!"
+        }
+      ],
+      "table": {
+        "caption": "Pronúncia aproximada (apenas indicação escrita)",
+        "headers": [
+          "Letra",
+          "Soa como",
+          "Atenção"
+        ],
+        "rows": [
+          [
+            "A",
+            "êi",
+            "como em \"day\""
+          ],
+          [
+            "E",
+            "í",
+            "não é \"é\""
+          ],
+          [
+            "I",
+            "ái",
+            "como \"eye\""
+          ],
+          [
+            "O",
+            "ôu",
+            "como em \"go\""
+          ],
+          [
+            "U",
+            "iú",
+            "como \"you\""
+          ],
+          [
+            "G",
+            "djí",
+            "não confunda com J"
+          ],
+          [
+            "J",
+            "djêi",
+            "não confunda com G"
+          ],
+          [
+            "R",
+            "ár",
+            ""
+          ],
+          [
+            "Y",
+            "uái",
+            "como \"why\""
+          ]
+        ]
+      },
+      "examples": [
+        {
+          "en": "How do you spell your name?",
+          "pt": "Como se soletra o seu nome?",
+          "highlight": "spell"
+        },
+        {
+          "en": "It's M-A-R-I-A.",
+          "pt": "É M-A-R-I-A."
+        },
+        {
+          "en": "Anna — A, double N, A.",
+          "pt": "Anna — A, dois N, A.",
+          "highlight": "double N"
+        }
+      ],
+      "extraExamples": [
+        {
+          "en": "Can you spell that, please?",
+          "pt": "Você pode soletrar, por favor?",
+          "highlight": "spell"
+        },
+        {
+          "en": "My e-mail is ana at gmail dot com.",
+          "pt": "Meu e-mail é ana arroba gmail ponto com.",
+          "highlight": "at"
+        },
+        {
+          "en": "Is that with a G or a J?",
+          "pt": "É com G ou com J?"
+        }
+      ],
+      "vocabularyIds": [
+        "spell",
+        "letter"
+      ],
+      "exercises": [
+        {
+          "id": "alphabet-1",
+          "lessonId": "alphabet",
+          "type": "multiple_choice",
+          "instruction": "Escolha a resposta correta.",
+          "prompt": "Qual letra soa como \"ái\" em inglês?",
+          "options": [
+            "I",
+            "E",
+            "A",
+            "Y"
+          ],
+          "acceptedAnswers": [
+            "I"
+          ],
+          "explanation": {
+            "pt": "Em inglês, a letra I soa como \"ái\" (igual à palavra \"eye\"). A letra E é que soa como \"í\".",
+            "en": "The letter I sounds like \"eye\". The letter E sounds like \"ee\"."
+          },
+          "skillTag": "alphabet"
+        },
+        {
+          "id": "alphabet-2",
+          "lessonId": "alphabet",
+          "type": "multiple_choice",
+          "instruction": "Escolha a resposta correta.",
+          "prompt": "Qual letra soa como \"í\" em inglês?",
+          "options": [
+            "E",
+            "I",
+            "Y",
+            "A"
+          ],
+          "acceptedAnswers": [
+            "E"
+          ],
+          "explanation": {
+            "pt": "A letra E soa como \"í\". É o contrário do que muitos brasileiros esperam, por isso vale praticar!",
+            "en": "The letter E sounds like \"ee\". Many learners expect the opposite, so it is worth practicing!"
+          },
+          "skillTag": "alphabet"
+        },
+        {
+          "id": "alphabet-3",
+          "lessonId": "alphabet",
+          "type": "fill_blank",
+          "instruction": "Complete a pergunta.",
+          "prompt": "How do you ___ your name?",
+          "acceptedAnswers": [
+            "spell"
+          ],
+          "hint": "Verbo que significa \"soletrar\".",
+          "explanation": {
+            "pt": "\"Spell\" significa soletrar. A pergunta completa é \"How do you spell your name?\".",
+            "en": "\"Spell\" means to say the letters of a word in order."
+          },
+          "skillTag": "alphabet"
+        },
+        {
+          "id": "alphabet-4",
+          "lessonId": "alphabet",
+          "type": "select_word",
+          "instruction": "Selecione a palavra correta.",
+          "prompt": "My name is Anna, with ___ N.",
+          "options": [
+            "double",
+            "two",
+            "twice",
+            "pair"
+          ],
+          "acceptedAnswers": [
+            "double"
+          ],
+          "explanation": {
+            "pt": "Para letras repetidas, dizemos \"double\": A, double N, A.",
+            "en": "For repeated letters, we say \"double\": A, double N, A."
+          },
+          "skillTag": "alphabet"
+        },
+        {
+          "id": "alphabet-5",
+          "lessonId": "alphabet",
+          "type": "translate",
+          "instruction": "Traduza para o inglês.",
+          "prompt": "Como se soletra isso?",
+          "acceptedAnswers": [
+            "How do you spell that?",
+            "How do you spell it?",
+            "How do you spell this?",
+            "How is that spelled?"
+          ],
+          "explanation": {
+            "pt": "Usamos \"How do you spell…?\" para pedir que alguém soletre: \"How do you spell that?\".",
+            "en": "We use \"How do you spell…?\" to ask someone to spell a word."
+          },
+          "skillTag": "alphabet"
+        }
+      ],
+      "practice": {
+        "opener": {
+          "en": "Let's practice spelling! My name is {assistant}. How do you spell your name?",
+          "pt": "Vamos praticar a soletração! Meu nome é {assistant}. Como se soletra o seu nome?"
+        },
+        "question": "How do you spell your name?"
+      },
+      "takeaways": [
+        "E soa como \"í\" e I soa como \"ái\".",
+        "Use \"How do you spell…?\" para pedir a soletração.",
+        "Letras repetidas: \"double\" (double N, double L)."
+      ]
+    },
+    {
+      "id": "verb-to-be",
+      "level": "beginner",
+      "order": 3,
+      "title": "Verbo to be (ser e estar)",
+      "topic": "Verb to be",
+      "summary": "Use am, is e are para falar de você e dos outros.",
+      "estimatedMinutes": 10,
+      "skillTags": [
+        "to_be"
+      ],
+      "objectives": [
+        "Conjugar o verbo to be com todos os pronomes",
+        "Usar as formas curtas (I'm, she's, they're)",
+        "Fazer negativas e perguntas"
+      ],
+      "explanation": [
+        {
+          "pt": "O verbo \"to be\" significa ser ou estar. Ele muda conforme a pessoa: I am, you are, he/she/it is, we are, they are.",
+          "en": "The verb \"to be\" changes with the subject: I am, you are, he/she/it is, we are, they are."
+        },
+        {
+          "pt": "Na fala, as formas curtas são muito comuns: I'm, you're, he's, she's, it's, we're, they're.",
+          "en": "Short forms are very common in speech: I'm, you're, he's, she's, it's, we're, they're."
+        },
+        {
+          "pt": "Negativa: coloque \"not\" depois do verbo — I'm not tired, she isn't here. Pergunta: inverta a ordem — Are you ready? Is he your brother?",
+          "en": "Negative: add \"not\" after the verb — I'm not tired, she isn't here. Question: change the order — Are you ready? Is he your brother?"
+        },
+        {
+          "pt": "Em inglês, o sujeito é obrigatório. Em português dizemos \"Está feliz\", mas em inglês é \"He is happy\" ou \"She is happy\".",
+          "en": "In English, the subject is always required: \"He is happy\", never just \"Is happy\"."
+        }
+      ],
+      "alternativeExplanations": [
+        {
+          "pt": "Pense em três \"caixinhas\": \"am\" só combina com I; \"is\" combina com uma pessoa ou coisa (he, she, it, my mom, the car); \"are\" combina com you e com o plural (we, they, my friends).",
+          "en": "Think of three boxes: \"am\" only goes with I; \"is\" goes with one person or thing (he, she, it); \"are\" goes with you and plurals (we, they)."
+        },
+        {
+          "pt": "O mesmo verbo serve para \"ser\" e \"estar\": \"I am a teacher\" (sou professor) e \"I am tired\" (estou cansado). O contexto mostra o sentido.",
+          "en": "The same verb covers two Portuguese verbs, \"ser\" and \"estar\": \"I am a teacher\" and \"I am tired\". Context shows the meaning."
+        }
+      ],
+      "table": {
+        "caption": "Verbo to be no presente",
+        "headers": [
+          "Pronome",
+          "Forma completa",
+          "Forma curta",
+          "Português"
+        ],
+        "rows": [
+          [
+            "I",
+            "I am",
+            "I'm",
+            "eu sou/estou"
+          ],
+          [
+            "You",
+            "You are",
+            "You're",
+            "você é/está"
+          ],
+          [
+            "He",
+            "He is",
+            "He's",
+            "ele é/está"
+          ],
+          [
+            "She",
+            "She is",
+            "She's",
+            "ela é/está"
+          ],
+          [
+            "It",
+            "It is",
+            "It's",
+            "é/está (coisas, animais)"
+          ],
+          [
+            "We",
+            "We are",
+            "We're",
+            "nós somos/estamos"
+          ],
+          [
+            "They",
+            "They are",
+            "They're",
+            "eles/elas são/estão"
+          ]
+        ]
+      },
+      "examples": [
+        {
+          "en": "I'm a student.",
+          "pt": "Eu sou estudante.",
+          "highlight": "I'm"
+        },
+        {
+          "en": "She is my sister.",
+          "pt": "Ela é minha irmã.",
+          "highlight": "is"
+        },
+        {
+          "en": "We aren't tired.",
+          "pt": "Nós não estamos cansados.",
+          "highlight": "aren't"
+        },
+        {
+          "en": "Are you ready?",
+          "pt": "Você está pronto?",
+          "highlight": "Are you"
+        }
+      ],
+      "extraExamples": [
+        {
+          "en": "It's cold today.",
+          "pt": "Está frio hoje.",
+          "highlight": "It's"
+        },
+        {
+          "en": "They are from Recife.",
+          "pt": "Eles são de Recife.",
+          "highlight": "are"
+        },
+        {
+          "en": "Is he your teacher?",
+          "pt": "Ele é seu professor?",
+          "highlight": "Is he"
+        }
+      ],
+      "vocabularyIds": [
+        "student",
+        "teacher",
+        "happy",
+        "tired",
+        "friend"
+      ],
+      "exercises": [
+        {
+          "id": "to-be-1",
+          "lessonId": "verb-to-be",
+          "type": "select_word",
+          "instruction": "Selecione a forma correta do verbo to be.",
+          "prompt": "She ___ my sister.",
+          "options": [
+            "is",
+            "am",
+            "are",
+            "be"
+          ],
+          "acceptedAnswers": [
+            "is"
+          ],
+          "explanation": {
+            "pt": "Com he, she e it usamos \"is\": She is my sister.",
+            "en": "With he, she and it we use \"is\": She is my sister."
+          },
+          "skillTag": "to_be"
+        },
+        {
+          "id": "to-be-2",
+          "lessonId": "verb-to-be",
+          "type": "select_word",
+          "instruction": "Selecione a forma correta do verbo to be.",
+          "prompt": "We ___ from Brazil.",
+          "options": [
+            "are",
+            "is",
+            "am",
+            "be"
+          ],
+          "acceptedAnswers": [
+            "are"
+          ],
+          "explanation": {
+            "pt": "Com we, you e they usamos \"are\": We are from Brazil.",
+            "en": "With we, you and they we use \"are\": We are from Brazil."
+          },
+          "skillTag": "to_be"
+        },
+        {
+          "id": "to-be-3",
+          "lessonId": "verb-to-be",
+          "type": "fill_blank",
+          "instruction": "Complete com o verbo to be.",
+          "prompt": "I ___ a student.",
+          "acceptedAnswers": [
+            "am"
+          ],
+          "explanation": {
+            "pt": "Com \"I\", o verbo to be é sempre \"am\": I am a student (ou I'm a student).",
+            "en": "With \"I\", the verb to be is always \"am\": I am a student (or I'm a student)."
+          },
+          "skillTag": "to_be"
+        },
+        {
+          "id": "to-be-4",
+          "lessonId": "verb-to-be",
+          "type": "multiple_choice",
+          "instruction": "Escolha a forma negativa correta.",
+          "prompt": "They ___ tired.",
+          "options": [
+            "are not",
+            "not are",
+            "is not",
+            "don't"
+          ],
+          "acceptedAnswers": [
+            "are not"
+          ],
+          "explanation": {
+            "pt": "Na negativa, o \"not\" vem depois do verbo to be: They are not (aren't) tired. Não usamos \"don't\" com o verbo to be.",
+            "en": "In the negative, \"not\" comes after the verb to be: They are not (aren't) tired. We don't use \"don't\" with the verb to be."
+          },
+          "skillTag": "to_be"
+        },
+        {
+          "id": "to-be-5",
+          "lessonId": "verb-to-be",
+          "type": "translate",
+          "instruction": "Traduza para o inglês.",
+          "prompt": "Ele está feliz.",
+          "acceptedAnswers": [
+            "He is happy.",
+            "He's happy."
+          ],
+          "explanation": {
+            "pt": "\"Estar feliz\" usa o verbo to be: He is happy. Em português podemos omitir o sujeito, mas em inglês o \"he\" é obrigatório.",
+            "en": "\"To be happy\" uses the verb to be: He is happy. The subject \"he\" is required."
+          },
+          "skillTag": "to_be"
+        },
+        {
+          "id": "to-be-6",
+          "lessonId": "verb-to-be",
+          "type": "write",
+          "instruction": "Escreva uma frase se apresentando com o verbo to be (nome, idade, profissão ou cidade).",
+          "prompt": "Introduce yourself using \"I am\" or \"I'm\".",
+          "acceptedAnswers": [],
+          "requirements": [
+            {
+              "pattern": "\\b(i am|i'm)\\b",
+              "message": "Use \"I am\" ou \"I'm\" na sua frase."
+            }
+          ],
+          "minWords": 3,
+          "explanation": {
+            "pt": "Com \"I\" usamos sempre \"am\": I am Ana / I'm a designer / I'm from Salvador.",
+            "en": "With \"I\" we always use \"am\": I am Ana / I'm a designer / I'm from Salvador."
+          },
+          "skillTag": "to_be"
+        }
+      ],
+      "practice": {
+        "opener": {
+          "en": "Let's use the verb to be! I'm {assistant} and I'm your English assistant. Where are you from?",
+          "pt": "Vamos usar o verbo to be! Eu sou {assistant}, sua assistente de inglês. De onde você é?"
+        },
+        "question": "Where are you from?"
+      },
+      "takeaways": [
+        "I am · you/we/they are · he/she/it is.",
+        "Negativa: verbo + not (isn't, aren't, I'm not).",
+        "Pergunta: inverta a ordem (Are you…? Is she…?)."
+      ]
+    },
+    {
+      "id": "numbers-age",
+      "level": "beginner",
+      "order": 4,
+      "title": "Números e idade",
+      "topic": "Numbers & age",
+      "summary": "Conte, diga sua idade e pergunte a idade de alguém.",
+      "estimatedMinutes": 8,
+      "skillTags": [
+        "numbers",
+        "to_be"
+      ],
+      "objectives": [
+        "Diferenciar -teen (13–19) e -ty (20, 30, 40…)",
+        "Dizer a idade com o verbo to be",
+        "Perguntar \"How old are you?\""
+      ],
+      "explanation": [
+        {
+          "pt": "De 13 a 19 os números terminam em \"-teen\" (thirteen, fifteen). As dezenas terminam em \"-ty\" (thirty, fifty). Na fala, o \"-teen\" é mais forte e longo: fif-TEEN × FIF-ty.",
+          "en": "Numbers 13–19 end in \"-teen\" (thirteen, fifteen). Tens end in \"-ty\" (thirty, fifty). In speech, stress \"-teen\": fif-TEEN vs. FIF-ty."
+        },
+        {
+          "pt": "Para dizer a idade, usamos o verbo to be, e não \"have\": I am 25 years old (ou só I'm 25). \"I have 25 years\" é tradução literal do português e soa estranho em inglês.",
+          "en": "To say your age, use the verb to be, not \"have\": I am 25 years old (or just I'm 25)."
+        },
+        {
+          "pt": "Para perguntar a idade: \"How old are you?\". Sobre outra pessoa: \"How old is your brother?\".",
+          "en": "To ask about age: \"How old are you?\". About someone else: \"How old is your brother?\"."
+        }
+      ],
+      "alternativeExplanations": [
+        {
+          "pt": "Em inglês, a idade é algo que você \"é\", não algo que você \"tem\": I am 30 = \"eu sou 30 (anos de idade)\". Por isso usamos am/is/are.",
+          "en": "In English, your age is something you \"are\", not something you \"have\": I am 30."
+        },
+        {
+          "pt": "Para não confundir 15 e 50: \"fifteen\" tem dois sons fortes no final (fif-TEEN); \"fifty\" tem a força no começo (FIF-ty).",
+          "en": "To avoid mixing 15 and 50: \"fifteen\" is stressed at the end (fif-TEEN); \"fifty\" at the beginning (FIF-ty)."
+        }
+      ],
+      "table": {
+        "caption": "Números importantes",
+        "headers": [
+          "Número",
+          "Inglês",
+          "Número",
+          "Inglês"
+        ],
+        "rows": [
+          [
+            "1",
+            "one",
+            "13",
+            "thirteen"
+          ],
+          [
+            "2",
+            "two",
+            "15",
+            "fifteen"
+          ],
+          [
+            "3",
+            "three",
+            "20",
+            "twenty"
+          ],
+          [
+            "10",
+            "ten",
+            "30",
+            "thirty"
+          ],
+          [
+            "11",
+            "eleven",
+            "50",
+            "fifty"
+          ],
+          [
+            "12",
+            "twelve",
+            "100",
+            "one hundred"
+          ]
+        ]
+      },
+      "examples": [
+        {
+          "en": "I'm 25 years old.",
+          "pt": "Eu tenho 25 anos.",
+          "highlight": "I'm 25 years old"
+        },
+        {
+          "en": "How old are you?",
+          "pt": "Quantos anos você tem?",
+          "highlight": "How old"
+        },
+        {
+          "en": "My daughter is three.",
+          "pt": "Minha filha tem três anos.",
+          "highlight": "is three"
+        }
+      ],
+      "extraExamples": [
+        {
+          "en": "My grandmother is eighty years old.",
+          "pt": "Minha avó tem oitenta anos.",
+          "highlight": "is eighty years old"
+        },
+        {
+          "en": "How old is your dog?",
+          "pt": "Quantos anos tem o seu cachorro?",
+          "highlight": "How old is"
+        },
+        {
+          "en": "There are fifteen students in my class.",
+          "pt": "Há quinze alunos na minha turma.",
+          "highlight": "fifteen"
+        }
+      ],
+      "vocabularyIds": [
+        "fifteen",
+        "thirty",
+        "years-old",
+        "number"
+      ],
+      "exercises": [
+        {
+          "id": "numbers-1",
+          "lessonId": "numbers-age",
+          "type": "multiple_choice",
+          "instruction": "Escolha a resposta correta.",
+          "prompt": "Como se escreve 15 em inglês?",
+          "options": [
+            "fifteen",
+            "fifty",
+            "five",
+            "fiveteen"
+          ],
+          "acceptedAnswers": [
+            "fifteen"
+          ],
+          "explanation": {
+            "pt": "De 13 a 19 os números terminam em \"-teen\": thirteen, fourteen, fifteen… Já \"fifty\" é 50.",
+            "en": "Numbers from 13 to 19 end in \"-teen\". \"Fifty\" is 50."
+          },
+          "skillTag": "numbers"
+        },
+        {
+          "id": "numbers-2",
+          "lessonId": "numbers-age",
+          "type": "select_word",
+          "instruction": "Selecione a palavra correta.",
+          "prompt": "I ___ 25 years old.",
+          "options": [
+            "am",
+            "have",
+            "has",
+            "is"
+          ],
+          "acceptedAnswers": [
+            "am"
+          ],
+          "explanation": {
+            "pt": "A idade é expressa com o verbo to be: I am 25 years old. Em português dizemos \"tenho 25 anos\", mas em inglês não usamos \"have\" para idade.",
+            "en": "Age uses the verb to be: I am 25 years old. We don't use \"have\" for age in English.",
+            "tip": {
+              "pt": "Também é natural dizer apenas \"I'm 25\".",
+              "en": "It is also natural to say just \"I'm 25\"."
+            }
+          },
+          "skillTag": "to_be"
+        },
+        {
+          "id": "numbers-3",
+          "lessonId": "numbers-age",
+          "type": "fill_blank",
+          "instruction": "Complete a pergunta.",
+          "prompt": "How ___ are you? — I'm 30.",
+          "acceptedAnswers": [
+            "old"
+          ],
+          "explanation": {
+            "pt": "\"How old are you?\" é a pergunta sobre idade (ao pé da letra, \"quão velho você é?\").",
+            "en": "\"How old are you?\" is how we ask someone's age."
+          },
+          "skillTag": "numbers"
+        },
+        {
+          "id": "numbers-4",
+          "lessonId": "numbers-age",
+          "type": "translate",
+          "instruction": "Traduza para o inglês.",
+          "prompt": "Ela tem 20 anos.",
+          "acceptedAnswers": [
+            "She is 20 years old.",
+            "She's 20 years old.",
+            "She is twenty years old.",
+            "She's twenty years old.",
+            "She is 20.",
+            "She's 20.",
+            "She is twenty.",
+            "She's twenty."
+          ],
+          "explanation": {
+            "pt": "Para idade usamos o verbo to be: She is 20 years old (ou She's 20).",
+            "en": "Age uses the verb to be: She is 20 years old (or She's 20)."
+          },
+          "skillTag": "to_be"
+        },
+        {
+          "id": "numbers-5",
+          "lessonId": "numbers-age",
+          "type": "multiple_choice",
+          "instruction": "Escolha o número correto.",
+          "prompt": "Qual número é \"thirty\"?",
+          "options": [
+            "30",
+            "13",
+            "3",
+            "33"
+          ],
+          "acceptedAnswers": [
+            "30"
+          ],
+          "explanation": {
+            "pt": "\"Thirty\" termina em \"-ty\", então é uma dezena: 30. O 13 é \"thirteen\".",
+            "en": "\"Thirty\" ends in \"-ty\", so it is a ten: 30. 13 is \"thirteen\"."
+          },
+          "skillTag": "numbers"
+        }
+      ],
+      "practice": {
+        "opener": {
+          "en": "Let's talk about numbers! I'm {assistant}. How old are you?",
+          "pt": "Vamos falar de números! Eu sou {assistant}. Quantos anos você tem?"
+        },
+        "question": "How old are you?"
+      },
+      "takeaways": [
+        "13–19 terminam em \"-teen\"; dezenas terminam em \"-ty\".",
+        "Idade usa o verbo to be: I'm 25 (years old).",
+        "Pergunte com \"How old are you?\"."
+      ]
+    },
+    {
+      "id": "colors-objects",
+      "level": "beginner",
+      "order": 5,
+      "title": "Cores e objetos do dia a dia",
+      "topic": "Colors & everyday objects",
+      "summary": "Descreva objetos com cores e use \"a\" e \"an\".",
+      "estimatedMinutes": 8,
+      "skillTags": [
+        "vocabulary",
+        "articles"
+      ],
+      "objectives": [
+        "Nomear cores e objetos comuns",
+        "Colocar o adjetivo antes do substantivo",
+        "Escolher entre \"a\" e \"an\""
+      ],
+      "explanation": [
+        {
+          "pt": "Em inglês, o adjetivo (a cor) vem ANTES do substantivo: a red car (um carro vermelho), a blue bag (uma bolsa azul).",
+          "en": "In English, the adjective comes BEFORE the noun: a red car, a blue bag."
+        },
+        {
+          "pt": "Adjetivos não têm plural nem gênero: two red cars, a red bag. Nunca \"reds cars\".",
+          "en": "Adjectives have no plural form: two red cars, never \"reds cars\"."
+        },
+        {
+          "pt": "Usamos \"a\" antes de som de consoante (a book, a phone) e \"an\" antes de som de vogal (an apple, an umbrella).",
+          "en": "Use \"a\" before a consonant sound (a book) and \"an\" before a vowel sound (an apple, an umbrella)."
+        }
+      ],
+      "alternativeExplanations": [
+        {
+          "pt": "Pense na ordem \"como é + o que é\": red (como é) + car (o que é) = red car. É o inverso do português.",
+          "en": "Think \"what it looks like + what it is\": red + car = red car."
+        },
+        {
+          "pt": "\"An\" existe para facilitar a pronúncia: \"a apple\" fica difícil de falar, \"an apple\" flui melhor. O que importa é o SOM, não a letra.",
+          "en": "\"An\" makes pronunciation smoother: \"an apple\" flows better than \"a apple\". What matters is the SOUND, not the letter."
+        }
+      ],
+      "table": {
+        "caption": "Cores e objetos",
+        "headers": [
+          "Cor",
+          "Português",
+          "Objeto",
+          "Português"
+        ],
+        "rows": [
+          [
+            "red",
+            "vermelho",
+            "book",
+            "livro"
+          ],
+          [
+            "blue",
+            "azul",
+            "phone",
+            "celular"
+          ],
+          [
+            "green",
+            "verde",
+            "bag",
+            "bolsa/mochila"
+          ],
+          [
+            "yellow",
+            "amarelo",
+            "key",
+            "chave"
+          ],
+          [
+            "black",
+            "preto",
+            "chair",
+            "cadeira"
+          ],
+          [
+            "white",
+            "branco",
+            "umbrella",
+            "guarda-chuva"
+          ]
+        ]
+      },
+      "examples": [
+        {
+          "en": "I have a red car.",
+          "pt": "Eu tenho um carro vermelho.",
+          "highlight": "red car"
+        },
+        {
+          "en": "This is an orange umbrella.",
+          "pt": "Este é um guarda-chuva laranja.",
+          "highlight": "an orange"
+        },
+        {
+          "en": "My keys are on the white chair.",
+          "pt": "Minhas chaves estão na cadeira branca.",
+          "highlight": "white chair"
+        }
+      ],
+      "extraExamples": [
+        {
+          "en": "She has a black phone.",
+          "pt": "Ela tem um celular preto.",
+          "highlight": "black phone"
+        },
+        {
+          "en": "I need an eraser.",
+          "pt": "Eu preciso de uma borracha.",
+          "highlight": "an eraser"
+        },
+        {
+          "en": "Two green books are on the table.",
+          "pt": "Dois livros verdes estão na mesa.",
+          "highlight": "green books"
+        }
+      ],
+      "vocabularyIds": [
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "black",
+        "white",
+        "umbrella",
+        "phone",
+        "bag",
+        "key"
+      ],
+      "exercises": [
+        {
+          "id": "colors-1",
+          "lessonId": "colors-objects",
+          "type": "select_word",
+          "instruction": "Selecione o artigo correto.",
+          "prompt": "I have ___ umbrella.",
+          "options": [
+            "an",
+            "a",
+            "some"
+          ],
+          "acceptedAnswers": [
+            "an"
+          ],
+          "explanation": {
+            "pt": "\"Umbrella\" começa com som de vogal, então usamos \"an\": an umbrella.",
+            "en": "\"Umbrella\" starts with a vowel sound, so we use \"an\"."
+          },
+          "skillTag": "articles"
+        },
+        {
+          "id": "colors-2",
+          "lessonId": "colors-objects",
+          "type": "multiple_choice",
+          "instruction": "Escolha a tradução correta.",
+          "prompt": "Como se diz \"um carro vermelho\"?",
+          "options": [
+            "a red car",
+            "a car red",
+            "an red car",
+            "a reds car"
+          ],
+          "acceptedAnswers": [
+            "a red car"
+          ],
+          "explanation": {
+            "pt": "A cor (adjetivo) vem antes do objeto: a red car. E usamos \"a\" porque \"red\" começa com som de consoante.",
+            "en": "The color comes before the noun: a red car. We use \"a\" because \"red\" starts with a consonant sound."
+          },
+          "skillTag": "vocabulary"
+        },
+        {
+          "id": "colors-3",
+          "lessonId": "colors-objects",
+          "type": "multiple_choice",
+          "instruction": "Escolha o significado.",
+          "prompt": "O que significa \"yellow\"?",
+          "options": [
+            "amarelo",
+            "verde",
+            "vermelho",
+            "azul"
+          ],
+          "acceptedAnswers": [
+            "amarelo"
+          ],
+          "explanation": {
+            "pt": "\"Yellow\" é amarelo — a cor do sol e da banana.",
+            "en": "\"Yellow\" is the color of the sun and bananas."
+          },
+          "skillTag": "vocabulary"
+        },
+        {
+          "id": "colors-4",
+          "lessonId": "colors-objects",
+          "type": "translate",
+          "instruction": "Traduza para o inglês.",
+          "prompt": "Meu celular é preto.",
+          "acceptedAnswers": [
+            "My phone is black.",
+            "My cell phone is black.",
+            "My cellphone is black.",
+            "My mobile phone is black.",
+            "My mobile is black."
+          ],
+          "explanation": {
+            "pt": "\"Celular\" é \"phone\" (ou cell phone / mobile phone). A estrutura é: My phone + is + black.",
+            "en": "\"Celular\" is \"phone\" (or cell phone / mobile phone): My phone is black."
+          },
+          "skillTag": "vocabulary"
+        },
+        {
+          "id": "colors-5",
+          "lessonId": "colors-objects",
+          "type": "fill_blank",
+          "instruction": "Complete com a cor em inglês (verdes).",
+          "prompt": "She has two ___ bags.",
+          "acceptedAnswers": [
+            "green"
+          ],
+          "explanation": {
+            "pt": "Adjetivos não vão para o plural em inglês: two green bags (e não \"greens\").",
+            "en": "Adjectives have no plural: two green bags (not \"greens\")."
+          },
+          "skillTag": "vocabulary"
+        }
+      ],
+      "practice": {
+        "opener": {
+          "en": "Let's describe things! I'm {assistant}. What color is your phone?",
+          "pt": "Vamos descrever coisas! Eu sou {assistant}. Qual é a cor do seu celular?"
+        },
+        "question": "What color is your phone?"
+      },
+      "takeaways": [
+        "O adjetivo vem antes do substantivo: a blue bag.",
+        "Adjetivos não têm plural: two blue bags.",
+        "\"An\" antes de som de vogal: an umbrella."
+      ]
+    },
+    {
+      "id": "simple-present",
+      "level": "basic",
+      "order": 6,
+      "title": "Presente simples: rotina e hábitos",
+      "topic": "Simple Present",
+      "summary": "Fale da sua rotina e use o -s com he, she e it.",
+      "estimatedMinutes": 10,
+      "skillTags": [
+        "simple_present"
+      ],
+      "objectives": [
+        "Usar o presente simples para rotinas e fatos",
+        "Adicionar -s (ou -es) ao verbo com he, she e it",
+        "Posicionar always, usually, sometimes e never"
+      ],
+      "explanation": [
+        {
+          "pt": "Usamos o presente simples para rotinas, hábitos e fatos: I work every day. The sun rises in the east.",
+          "en": "We use the simple present for routines, habits and facts: I work every day. The sun rises in the east."
+        },
+        {
+          "pt": "Com he, she e it, normalmente adicionamos -s ao verbo: I work → she works; I live → he lives.",
+          "en": "With he, she and it, we usually add -s to the verb: I work → she works; I live → he lives."
+        },
+        {
+          "pt": "Alguns verbos mudam um pouco: go → goes, do → does, watch → watches, study → studies, have → has.",
+          "en": "Some verbs change a little: go → goes, do → does, watch → watches, study → studies, have → has."
+        },
+        {
+          "pt": "Palavras de frequência (always, usually, often, sometimes, never) costumam vir antes do verbo: I usually drink coffee.",
+          "en": "Frequency words (always, usually, often, sometimes, never) usually come before the verb: I usually drink coffee."
+        }
+      ],
+      "alternativeExplanations": [
+        {
+          "pt": "Pense no -s como uma \"etiqueta\" da terceira pessoa: quando o sujeito é UMA pessoa ou coisa que não é você nem eu (he, she, it, my mom, the dog), o verbo ganha -s.",
+          "en": "Think of -s as a \"label\" for the third person: when the subject is ONE person or thing that is not \"I\" or \"you\", the verb gets -s."
+        },
+        {
+          "pt": "Um teste rápido: troque o sujeito por \"he\" ou \"she\". Se der certo, o verbo leva -s. \"My boss (= he) works from home.\"",
+          "en": "A quick test: replace the subject with \"he\" or \"she\". If it works, the verb takes -s. \"My boss (= he) works from home.\""
+        }
+      ],
+      "table": {
+        "caption": "Presente simples",
+        "headers": [
+          "Sujeito",
+          "work",
+          "go",
+          "have",
+          "study"
+        ],
+        "rows": [
+          [
+            "I / You / We / They",
+            "work",
+            "go",
+            "have",
+            "study"
+          ],
+          [
+            "He / She / It",
+            "works",
+            "goes",
+            "has",
+            "studies"
+          ]
+        ]
+      },
+      "examples": [
+        {
+          "en": "She goes to school every day.",
+          "pt": "Ela vai à escola todos os dias.",
+          "highlight": "goes"
+        },
+        {
+          "en": "My father works from home.",
+          "pt": "Meu pai trabalha de casa.",
+          "highlight": "works"
+        },
+        {
+          "en": "I usually wake up at 7.",
+          "pt": "Eu geralmente acordo às 7.",
+          "highlight": "usually"
+        },
+        {
+          "en": "He watches TV at night.",
+          "pt": "Ele assiste TV à noite.",
+          "highlight": "watches"
+        }
+      ],
+      "extraExamples": [
+        {
+          "en": "Our class starts at 8 a.m.",
+          "pt": "Nossa aula começa às 8h.",
+          "highlight": "starts"
+        },
+        {
+          "en": "She never drinks coffee.",
+          "pt": "Ela nunca bebe café.",
+          "highlight": "never drinks"
+        },
+        {
+          "en": "My cat sleeps all day.",
+          "pt": "Meu gato dorme o dia todo.",
+          "highlight": "sleeps"
+        }
+      ],
+      "vocabularyIds": [
+        "every-day",
+        "usually",
+        "always",
+        "never",
+        "wake-up",
+        "breakfast",
+        "work"
+      ],
+      "exercises": [
+        {
+          "id": "present-1",
+          "lessonId": "simple-present",
+          "type": "select_word",
+          "instruction": "Selecione a forma correta do verbo.",
+          "prompt": "She ___ to school every day.",
+          "options": [
+            "goes",
+            "go",
+            "going",
+            "gos"
+          ],
+          "acceptedAnswers": [
+            "goes"
+          ],
+          "explanation": {
+            "pt": "Com he, she e it, normalmente adicionamos -s ao verbo no presente simples. \"Go\" vira \"goes\".",
+            "en": "With he, she and it, we usually add -s to the verb in the simple present. \"Go\" becomes \"goes\"."
+          },
+          "skillTag": "simple_present"
+        },
+        {
+          "id": "present-2",
+          "lessonId": "simple-present",
+          "type": "select_word",
+          "instruction": "Selecione a forma correta do verbo.",
+          "prompt": "My brother ___ in São Paulo.",
+          "options": [
+            "lives",
+            "live",
+            "living",
+            "is live"
+          ],
+          "acceptedAnswers": [
+            "lives"
+          ],
+          "explanation": {
+            "pt": "\"My brother\" equivale a \"he\", então o verbo recebe -s: lives.",
+            "en": "\"My brother\" is the same as \"he\", so the verb takes -s: lives."
+          },
+          "skillTag": "simple_present"
+        },
+        {
+          "id": "present-3",
+          "lessonId": "simple-present",
+          "type": "fill_blank",
+          "instruction": "Complete com o verbo \"have\" no presente simples.",
+          "prompt": "He ___ a new job.",
+          "acceptedAnswers": [
+            "has"
+          ],
+          "explanation": {
+            "pt": "\"Have\" é irregular com he, she e it: vira \"has\". He has a new job.",
+            "en": "\"Have\" is irregular with he, she and it: it becomes \"has\"."
+          },
+          "skillTag": "simple_present"
+        },
+        {
+          "id": "present-4",
+          "lessonId": "simple-present",
+          "type": "multiple_choice",
+          "instruction": "Escolha a frase correta.",
+          "prompt": "Qual frase está correta?",
+          "options": [
+            "I usually drink coffee in the morning.",
+            "I drink usually coffee in the morning.",
+            "Usually I drinks coffee in the morning.",
+            "I usually drinks coffee in the morning."
+          ],
+          "acceptedAnswers": [
+            "I usually drink coffee in the morning."
+          ],
+          "explanation": {
+            "pt": "Palavras de frequência (always, usually, never…) vêm antes do verbo principal. E com \"I\" o verbo não recebe -s.",
+            "en": "Frequency words come before the main verb. With \"I\", the verb does not take -s."
+          },
+          "skillTag": "simple_present"
+        },
+        {
+          "id": "present-5",
+          "lessonId": "simple-present",
+          "type": "write",
+          "instruction": "Escreva uma frase sobre a rotina de alguém usando he ou she.",
+          "prompt": "Write about someone's routine using \"he\" or \"she\".",
+          "acceptedAnswers": [],
+          "requirements": [
+            {
+              "pattern": "\\b(he|she)\\b",
+              "message": "Use \"he\" ou \"she\" na sua frase."
+            }
+          ],
+          "minWords": 4,
+          "explanation": {
+            "pt": "Com he, she e it, o verbo no presente simples recebe -s: She works, He goes, She studies.",
+            "en": "With he, she and it, the simple present verb takes -s: She works, He goes, She studies."
+          },
+          "skillTag": "simple_present"
+        },
+        {
+          "id": "present-6",
+          "lessonId": "simple-present",
+          "type": "translate",
+          "instruction": "Traduza para o inglês.",
+          "prompt": "Ela estuda inglês todos os dias.",
+          "acceptedAnswers": [
+            "She studies English every day."
+          ],
+          "explanation": {
+            "pt": "\"Study\" com she vira \"studies\" (o y vira -ies). \"Todos os dias\" é \"every day\" (duas palavras).",
+            "en": "\"Study\" with she becomes \"studies\". \"Every day\" is two words here.",
+            "tip": {
+              "pt": "\"Everyday\" (junto) é um adjetivo: everyday objects = objetos do dia a dia.",
+              "en": "\"Everyday\" (one word) is an adjective: everyday objects."
+            }
+          },
+          "skillTag": "simple_present"
+        }
+      ],
+      "practice": {
+        "opener": {
+          "en": "Let's talk about routines! I'm {assistant}. What time do you usually wake up?",
+          "pt": "Vamos falar de rotina! Eu sou {assistant}. Que horas você geralmente acorda?"
+        },
+        "question": "What time do you usually wake up?"
+      },
+      "takeaways": [
+        "Presente simples = rotinas, hábitos e fatos.",
+        "He/she/it + verbo com -s (goes, has, studies).",
+        "Frequência antes do verbo: I usually…"
+      ]
+    },
+    {
+      "id": "questions-negatives",
+      "level": "basic",
+      "order": 7,
+      "title": "Perguntas e negativas com do/does",
+      "topic": "Questions & negatives",
+      "summary": "Pergunte e negue no presente simples sem tropeçar no -s.",
+      "estimatedMinutes": 9,
+      "skillTags": [
+        "questions_negatives"
+      ],
+      "objectives": [
+        "Fazer perguntas com do e does",
+        "Negar com don't e doesn't",
+        "Dar respostas curtas (Yes, I do / No, she doesn't)"
+      ],
+      "explanation": [
+        {
+          "pt": "Para perguntar no presente simples, usamos \"do\" (I, you, we, they) ou \"does\" (he, she, it) antes do sujeito: Do you like pizza? Does she work here?",
+          "en": "To ask questions in the simple present, use \"do\" (I, you, we, they) or \"does\" (he, she, it) before the subject."
+        },
+        {
+          "pt": "Com \"does\", o verbo principal volta para a forma básica: Does he play? (e não \"Does he plays?\"). O -s já está no \"does\".",
+          "en": "With \"does\", the main verb goes back to its base form: Does he play? (not \"Does he plays?\")."
+        },
+        {
+          "pt": "Na negativa, use \"don't\" (do not) e \"doesn't\" (does not): I don't eat meat. She doesn't drive.",
+          "en": "For negatives, use \"don't\" and \"doesn't\": I don't eat meat. She doesn't drive."
+        },
+        {
+          "pt": "Atenção: o verbo to be não usa do/does. \"Are you tired?\" e \"She isn't here\".",
+          "en": "Remember: the verb to be does not use do/does. \"Are you tired?\" and \"She isn't here\"."
+        }
+      ],
+      "alternativeExplanations": [
+        {
+          "pt": "Imagine que o \"does\" \"rouba\" o -s do verbo: She works → Does she work? → She doesn't work. O -s só aparece uma vez.",
+          "en": "Imagine \"does\" \"steals\" the -s from the verb: She works → Does she work? → She doesn't work."
+        },
+        {
+          "pt": "Pergunta = Do/Does + sujeito + verbo básico. Negativa = sujeito + don't/doesn't + verbo básico. É sempre a mesma fórmula.",
+          "en": "Question = Do/Does + subject + base verb. Negative = subject + don't/doesn't + base verb."
+        }
+      ],
+      "table": {
+        "caption": "Afirmativa, negativa e pergunta",
+        "headers": [
+          "Afirmativa",
+          "Negativa",
+          "Pergunta"
+        ],
+        "rows": [
+          [
+            "I work",
+            "I don't work",
+            "Do I work?"
+          ],
+          [
+            "You like tea",
+            "You don't like tea",
+            "Do you like tea?"
+          ],
+          [
+            "She works",
+            "She doesn't work",
+            "Does she work?"
+          ],
+          [
+            "It rains",
+            "It doesn't rain",
+            "Does it rain?"
+          ]
+        ]
+      },
+      "examples": [
+        {
+          "en": "Do you speak Spanish?",
+          "pt": "Você fala espanhol?",
+          "highlight": "Do you"
+        },
+        {
+          "en": "He doesn't like coffee.",
+          "pt": "Ele não gosta de café.",
+          "highlight": "doesn't like"
+        },
+        {
+          "en": "Does your sister live here? — Yes, she does.",
+          "pt": "Sua irmã mora aqui? — Sim, mora.",
+          "highlight": "Does"
+        }
+      ],
+      "extraExamples": [
+        {
+          "en": "We don't work on Sundays.",
+          "pt": "Nós não trabalhamos aos domingos.",
+          "highlight": "don't work"
+        },
+        {
+          "en": "Does the store open at 9?",
+          "pt": "A loja abre às 9?",
+          "highlight": "Does the store open"
+        },
+        {
+          "en": "Do they have kids? — No, they don't.",
+          "pt": "Eles têm filhos? — Não, não têm.",
+          "highlight": "Do they have"
+        }
+      ],
+      "vocabularyIds": [
+        "speak",
+        "like",
+        "drive"
+      ],
+      "exercises": [
+        {
+          "id": "questions-1",
+          "lessonId": "questions-negatives",
+          "type": "select_word",
+          "instruction": "Selecione o auxiliar correto.",
+          "prompt": "___ she speak Spanish?",
+          "options": [
+            "Does",
+            "Do",
+            "Is",
+            "Are"
+          ],
+          "acceptedAnswers": [
+            "Does"
+          ],
+          "explanation": {
+            "pt": "Com he, she e it usamos \"does\" para perguntar: Does she speak Spanish?",
+            "en": "With he, she and it we use \"does\" in questions."
+          },
+          "skillTag": "questions_negatives"
+        },
+        {
+          "id": "questions-2",
+          "lessonId": "questions-negatives",
+          "type": "select_word",
+          "instruction": "Selecione a negativa correta.",
+          "prompt": "I ___ like horror movies.",
+          "options": [
+            "don't",
+            "doesn't",
+            "not",
+            "am not"
+          ],
+          "acceptedAnswers": [
+            "don't"
+          ],
+          "explanation": {
+            "pt": "Com \"I\" usamos \"don't\" na negativa: I don't like horror movies.",
+            "en": "With \"I\" we use \"don't\": I don't like horror movies."
+          },
+          "skillTag": "questions_negatives"
+        },
+        {
+          "id": "questions-3",
+          "lessonId": "questions-negatives",
+          "type": "multiple_choice",
+          "instruction": "Escolha a pergunta correta.",
+          "prompt": "Qual pergunta está correta?",
+          "options": [
+            "Does he play the guitar?",
+            "Does he plays the guitar?",
+            "Do he play the guitar?",
+            "He does play the guitar?"
+          ],
+          "acceptedAnswers": [
+            "Does he play the guitar?"
+          ],
+          "explanation": {
+            "pt": "Com \"does\", o verbo principal fica na forma básica: Does he play…? O -s já está no \"does\".",
+            "en": "With \"does\", the main verb stays in the base form: Does he play…?"
+          },
+          "skillTag": "questions_negatives"
+        },
+        {
+          "id": "questions-4",
+          "lessonId": "questions-negatives",
+          "type": "fill_blank",
+          "instruction": "Complete com a forma negativa (does not).",
+          "prompt": "My father ___ drink coffee.",
+          "acceptedAnswers": [
+            "doesn't",
+            "does not"
+          ],
+          "explanation": {
+            "pt": "\"My father\" equivale a \"he\", então a negativa é \"doesn't\": My father doesn't drink coffee.",
+            "en": "\"My father\" is \"he\", so the negative is \"doesn't\"."
+          },
+          "skillTag": "questions_negatives"
+        },
+        {
+          "id": "questions-5",
+          "lessonId": "questions-negatives",
+          "type": "translate",
+          "instruction": "Traduza para o inglês.",
+          "prompt": "Você mora aqui?",
+          "acceptedAnswers": [
+            "Do you live here?"
+          ],
+          "explanation": {
+            "pt": "Perguntas no presente simples começam com \"Do\" (para you): Do you live here?",
+            "en": "Simple present questions with \"you\" start with \"Do\"."
+          },
+          "skillTag": "questions_negatives"
+        },
+        {
+          "id": "questions-6",
+          "lessonId": "questions-negatives",
+          "type": "multiple_choice",
+          "instruction": "Escolha a resposta curta positiva.",
+          "prompt": "\"Do you like tea?\"",
+          "options": [
+            "Yes, I do.",
+            "Yes, I like.",
+            "Yes, I am.",
+            "Yes, I does."
+          ],
+          "acceptedAnswers": [
+            "Yes, I do."
+          ],
+          "explanation": {
+            "pt": "A resposta curta repete o auxiliar da pergunta: Do you…? → Yes, I do.",
+            "en": "Short answers repeat the auxiliary: Do you…? → Yes, I do."
+          },
+          "skillTag": "questions_negatives"
+        }
+      ],
+      "practice": {
+        "opener": {
+          "en": "Let's ask and answer questions! I'm {assistant}. Do you like coffee?",
+          "pt": "Vamos perguntar e responder! Eu sou {assistant}. Você gosta de café?"
+        },
+        "question": "Do you like coffee?"
+      },
+      "takeaways": [
+        "Do/Does + sujeito + verbo básico para perguntar.",
+        "Don't/Doesn't + verbo básico para negar.",
+        "O verbo to be não usa do/does."
+      ]
+    },
+    {
+      "id": "prepositions",
+      "level": "basic",
+      "order": 8,
+      "title": "Preposições de tempo e lugar: in, on, at",
+      "topic": "Prepositions: in, on, at",
+      "summary": "Saiba quando usar in, on e at com datas, horários e lugares.",
+      "estimatedMinutes": 9,
+      "skillTags": [
+        "prepositions"
+      ],
+      "objectives": [
+        "Usar in, on e at com tempo",
+        "Usar in, on e at com lugares",
+        "Evitar a tradução literal de \"em\""
+      ],
+      "explanation": [
+        {
+          "pt": "Tempo: \"in\" para meses, anos e partes do dia (in May, in 2025, in the morning); \"on\" para dias e datas (on Monday, on May 5th); \"at\" para horários (at 7 o'clock, at night).",
+          "en": "Time: \"in\" for months, years and parts of the day; \"on\" for days and dates; \"at\" for clock times and \"at night\"."
+        },
+        {
+          "pt": "Lugar: \"in\" para dentro de algo, cidades e países (in the box, in Brazil); \"on\" para superfícies (on the table); \"at\" para pontos específicos (at the bus stop, at work, at home).",
+          "en": "Place: \"in\" for inside something, cities and countries; \"on\" for surfaces; \"at\" for specific points (at the bus stop, at work, at home)."
+        },
+        {
+          "pt": "Dica: pense em uma pirâmide invertida — \"in\" é o mais amplo, \"on\" é intermediário e \"at\" é o mais específico.",
+          "en": "Tip: think of an upside-down pyramid — \"in\" is the widest, \"on\" is in the middle and \"at\" is the most specific."
+        }
+      ],
+      "alternativeExplanations": [
+        {
+          "pt": "Em português tudo vira \"em\", mas em inglês a pergunta é: é um período grande (in), um dia (on) ou um ponto exato (at)? Para lugares: dentro (in), em cima (on) ou um ponto no mapa (at).",
+          "en": "Ask yourself: is it a big period (in), a day (on) or an exact point (at)? For places: inside (in), on a surface (on) or a point on the map (at)."
+        },
+        {
+          "pt": "Memorize três expressões fixas que não seguem a lógica: at home, at work, at night.",
+          "en": "Memorize three fixed expressions: at home, at work, at night."
+        }
+      ],
+      "table": {
+        "caption": "in · on · at",
+        "headers": [
+          "",
+          "Tempo",
+          "Lugar"
+        ],
+        "rows": [
+          [
+            "in",
+            "in July, in 2020, in the morning",
+            "in Brazil, in the kitchen"
+          ],
+          [
+            "on",
+            "on Monday, on my birthday",
+            "on the table, on the wall"
+          ],
+          [
+            "at",
+            "at 8 p.m., at night",
+            "at home, at work, at the door"
+          ]
+        ]
+      },
+      "examples": [
+        {
+          "en": "The meeting is on Monday at 10.",
+          "pt": "A reunião é na segunda às 10.",
+          "highlight": "on Monday"
+        },
+        {
+          "en": "I was born in 1998.",
+          "pt": "Eu nasci em 1998.",
+          "highlight": "in 1998"
+        },
+        {
+          "en": "I'm at home now.",
+          "pt": "Estou em casa agora.",
+          "highlight": "at home"
+        }
+      ],
+      "extraExamples": [
+        {
+          "en": "There is a picture on the wall.",
+          "pt": "Há um quadro na parede.",
+          "highlight": "on the wall"
+        },
+        {
+          "en": "We have lunch at noon.",
+          "pt": "Nós almoçamos ao meio-dia.",
+          "highlight": "at noon"
+        },
+        {
+          "en": "She lives in Curitiba.",
+          "pt": "Ela mora em Curitiba.",
+          "highlight": "in Curitiba"
+        }
+      ],
+      "vocabularyIds": [
+        "weekend",
+        "morning",
+        "night",
+        "kitchen",
+        "table"
+      ],
+      "exercises": [
+        {
+          "id": "prepositions-1",
+          "lessonId": "prepositions",
+          "type": "select_word",
+          "instruction": "Selecione a preposição correta.",
+          "prompt": "The meeting is ___ Monday.",
+          "options": [
+            "on",
+            "in",
+            "at",
+            "to"
+          ],
+          "acceptedAnswers": [
+            "on"
+          ],
+          "explanation": {
+            "pt": "Para dias da semana usamos \"on\": on Monday, on Friday.",
+            "en": "We use \"on\" with days of the week."
+          },
+          "skillTag": "prepositions"
+        },
+        {
+          "id": "prepositions-2",
+          "lessonId": "prepositions",
+          "type": "select_word",
+          "instruction": "Selecione a preposição correta.",
+          "prompt": "I was born ___ 1998.",
+          "options": [
+            "in",
+            "on",
+            "at",
+            "to"
+          ],
+          "acceptedAnswers": [
+            "in"
+          ],
+          "explanation": {
+            "pt": "Para anos (e meses) usamos \"in\": in 1998, in May.",
+            "en": "We use \"in\" with years and months."
+          },
+          "skillTag": "prepositions"
+        },
+        {
+          "id": "prepositions-3",
+          "lessonId": "prepositions",
+          "type": "select_word",
+          "instruction": "Selecione a preposição correta.",
+          "prompt": "Let's meet ___ 7 p.m.",
+          "options": [
+            "at",
+            "in",
+            "on",
+            "to"
+          ],
+          "acceptedAnswers": [
+            "at"
+          ],
+          "explanation": {
+            "pt": "Para horários exatos usamos \"at\": at 7 p.m.",
+            "en": "We use \"at\" with clock times."
+          },
+          "skillTag": "prepositions"
+        },
+        {
+          "id": "prepositions-4",
+          "lessonId": "prepositions",
+          "type": "fill_blank",
+          "instruction": "Complete com a preposição correta.",
+          "prompt": "Your keys are ___ the table.",
+          "acceptedAnswers": [
+            "on"
+          ],
+          "explanation": {
+            "pt": "Para coisas sobre uma superfície usamos \"on\": on the table.",
+            "en": "We use \"on\" for things on a surface."
+          },
+          "skillTag": "prepositions"
+        },
+        {
+          "id": "prepositions-5",
+          "lessonId": "prepositions",
+          "type": "multiple_choice",
+          "instruction": "Escolha a frase correta.",
+          "prompt": "Qual frase está correta?",
+          "options": [
+            "I work at home on Fridays.",
+            "I work in home in Fridays.",
+            "I work at home in Fridays.",
+            "I work on home at Fridays."
+          ],
+          "acceptedAnswers": [
+            "I work at home on Fridays."
+          ],
+          "explanation": {
+            "pt": "\"At home\" é uma expressão fixa, e dias da semana usam \"on\": at home on Fridays.",
+            "en": "\"At home\" is a fixed expression, and days use \"on\"."
+          },
+          "skillTag": "prepositions"
+        },
+        {
+          "id": "prepositions-6",
+          "lessonId": "prepositions",
+          "type": "translate",
+          "instruction": "Traduza para o inglês.",
+          "prompt": "Eu estudo à noite.",
+          "acceptedAnswers": [
+            "I study at night."
+          ],
+          "explanation": {
+            "pt": "\"À noite\" é \"at night\" — uma das expressões fixas com \"at\".",
+            "en": "\"At night\" is a fixed expression.",
+            "tip": {
+              "pt": "Mas: in the morning, in the afternoon, in the evening.",
+              "en": "But: in the morning, in the afternoon, in the evening."
+            }
+          },
+          "skillTag": "prepositions"
+        }
+      ],
+      "practice": {
+        "opener": {
+          "en": "Let's practice in, on and at! I'm {assistant}. What do you usually do on weekends?",
+          "pt": "Vamos praticar in, on e at! Eu sou {assistant}. O que você costuma fazer nos fins de semana?"
+        },
+        "question": "What do you usually do on weekends?"
+      },
+      "takeaways": [
+        "in: meses, anos, partes do dia, cidades e países.",
+        "on: dias, datas e superfícies.",
+        "at: horários e pontos específicos (at home, at work, at night)."
+      ]
+    },
+    {
+      "id": "simple-past",
+      "level": "basic",
+      "order": 9,
+      "title": "Passado simples",
+      "topic": "Simple Past",
+      "summary": "Conte o que você fez ontem, com verbos regulares e irregulares.",
+      "estimatedMinutes": 11,
+      "skillTags": [
+        "simple_past"
+      ],
+      "objectives": [
+        "Formar o passado de verbos regulares (-ed)",
+        "Reconhecer verbos irregulares comuns",
+        "Fazer perguntas e negativas com did"
+      ],
+      "explanation": [
+        {
+          "pt": "Usamos o passado simples para ações que começaram e terminaram no passado: I visited my grandmother yesterday.",
+          "en": "We use the simple past for finished actions in the past: I visited my grandmother yesterday."
+        },
+        {
+          "pt": "Verbos regulares recebem -ed: work → worked, play → played, study → studied.",
+          "en": "Regular verbs take -ed: work → worked, play → played, study → studied."
+        },
+        {
+          "pt": "Muitos verbos comuns são irregulares e precisam ser memorizados: go → went, have → had, see → saw, eat → ate, buy → bought.",
+          "en": "Many common verbs are irregular: go → went, have → had, see → saw, eat → ate, buy → bought."
+        },
+        {
+          "pt": "Na negativa e na pergunta usamos \"did\", e o verbo volta para a forma básica: I didn't go. Did you see it?",
+          "en": "In negatives and questions we use \"did\" and the base verb: I didn't go. Did you see it?"
+        }
+      ],
+      "alternativeExplanations": [
+        {
+          "pt": "O passado aparece uma vez só na frase. Se o \"did\" já está lá, o verbo não precisa mudar: Did you go? (e não \"Did you went?\").",
+          "en": "The past appears only once in the sentence. If \"did\" is there, the verb stays the same: Did you go?"
+        },
+        {
+          "pt": "Comece pelos 10 irregulares mais usados: went, had, did, said, got, made, saw, came, took, ate. Eles aparecem em quase toda conversa sobre o passado.",
+          "en": "Start with the 10 most common irregular verbs: went, had, did, said, got, made, saw, came, took, ate."
+        }
+      ],
+      "table": {
+        "caption": "Verbos no passado",
+        "headers": [
+          "Base",
+          "Passado",
+          "Português"
+        ],
+        "rows": [
+          [
+            "work",
+            "worked",
+            "trabalhar"
+          ],
+          [
+            "study",
+            "studied",
+            "estudar"
+          ],
+          [
+            "go",
+            "went",
+            "ir"
+          ],
+          [
+            "have",
+            "had",
+            "ter"
+          ],
+          [
+            "see",
+            "saw",
+            "ver"
+          ],
+          [
+            "eat",
+            "ate",
+            "comer"
+          ],
+          [
+            "buy",
+            "bought",
+            "comprar"
+          ]
+        ]
+      },
+      "examples": [
+        {
+          "en": "I watched a movie last night.",
+          "pt": "Eu assisti a um filme ontem à noite.",
+          "highlight": "watched"
+        },
+        {
+          "en": "We went to the beach on Sunday.",
+          "pt": "Nós fomos à praia no domingo.",
+          "highlight": "went"
+        },
+        {
+          "en": "She didn't call me.",
+          "pt": "Ela não me ligou.",
+          "highlight": "didn't call"
+        },
+        {
+          "en": "Did you have lunch?",
+          "pt": "Você almoçou?",
+          "highlight": "Did you have"
+        }
+      ],
+      "extraExamples": [
+        {
+          "en": "They bought a new car last year.",
+          "pt": "Eles compraram um carro novo ano passado.",
+          "highlight": "bought"
+        },
+        {
+          "en": "I studied for three hours yesterday.",
+          "pt": "Eu estudei por três horas ontem.",
+          "highlight": "studied"
+        },
+        {
+          "en": "We didn't see the game.",
+          "pt": "Nós não vimos o jogo.",
+          "highlight": "didn't see"
+        }
+      ],
+      "vocabularyIds": [
+        "yesterday",
+        "last-weekend",
+        "visit",
+        "buy"
+      ],
+      "exercises": [
+        {
+          "id": "past-1",
+          "lessonId": "simple-past",
+          "type": "select_word",
+          "instruction": "Selecione o verbo no passado.",
+          "prompt": "Yesterday I ___ a great movie.",
+          "options": [
+            "saw",
+            "see",
+            "seen",
+            "sees"
+          ],
+          "acceptedAnswers": [
+            "saw"
+          ],
+          "explanation": {
+            "pt": "\"See\" é irregular: o passado é \"saw\". \"Seen\" é o particípio (usado em outros tempos verbais).",
+            "en": "\"See\" is irregular: the past is \"saw\". \"Seen\" is the past participle."
+          },
+          "skillTag": "simple_past"
+        },
+        {
+          "id": "past-2",
+          "lessonId": "simple-past",
+          "type": "fill_blank",
+          "instruction": "Complete com o verbo \"go\" no passado.",
+          "prompt": "We ___ to the beach last weekend.",
+          "acceptedAnswers": [
+            "went"
+          ],
+          "explanation": {
+            "pt": "\"Go\" é irregular: o passado é \"went\".",
+            "en": "\"Go\" is irregular: the past is \"went\"."
+          },
+          "skillTag": "simple_past"
+        },
+        {
+          "id": "past-3",
+          "lessonId": "simple-past",
+          "type": "multiple_choice",
+          "instruction": "Escolha a frase correta.",
+          "prompt": "Qual frase está correta?",
+          "options": [
+            "I didn't go to work yesterday.",
+            "I didn't went to work yesterday.",
+            "I don't went to work yesterday.",
+            "I not go to work yesterday."
+          ],
+          "acceptedAnswers": [
+            "I didn't go to work yesterday."
+          ],
+          "explanation": {
+            "pt": "Depois de \"didn't\", o verbo fica na forma básica (go), porque o \"did\" já indica o passado.",
+            "en": "After \"didn't\", use the base verb (go) — \"did\" already shows the past."
+          },
+          "skillTag": "simple_past"
+        },
+        {
+          "id": "past-4",
+          "lessonId": "simple-past",
+          "type": "select_word",
+          "instruction": "Selecione o auxiliar correto.",
+          "prompt": "___ you call your mom last night?",
+          "options": [
+            "Did",
+            "Do",
+            "Does",
+            "Were"
+          ],
+          "acceptedAnswers": [
+            "Did"
+          ],
+          "explanation": {
+            "pt": "Perguntas no passado simples usam \"did\": Did you call…?",
+            "en": "Simple past questions use \"did\"."
+          },
+          "skillTag": "simple_past"
+        },
+        {
+          "id": "past-5",
+          "lessonId": "simple-past",
+          "type": "translate",
+          "instruction": "Traduza para o inglês.",
+          "prompt": "Ela estudou muito ontem.",
+          "acceptedAnswers": [
+            "She studied a lot yesterday.",
+            "She studied hard yesterday.",
+            "Yesterday she studied a lot."
+          ],
+          "explanation": {
+            "pt": "\"Study\" no passado é \"studied\" (o y vira -ied). \"Muito\" pode ser \"a lot\" ou \"hard\".",
+            "en": "\"Study\" in the past is \"studied\". \"A lot\" or \"hard\" both work."
+          },
+          "skillTag": "simple_past"
+        },
+        {
+          "id": "past-6",
+          "lessonId": "simple-past",
+          "type": "write",
+          "instruction": "Escreva uma frase sobre o que você fez ontem.",
+          "prompt": "What did you do yesterday?",
+          "acceptedAnswers": [],
+          "requirements": [
+            {
+              "pattern": "\\b\\w+ed\\b|\\b(went|had|saw|ate|bought|made|took|came|got|did|was|were|met|read|wrote|spoke|drank|slept|left|felt|ran|swam|watched|played)\\b",
+              "message": "Use um verbo no passado (ex.: worked, went, had)."
+            }
+          ],
+          "minWords": 3,
+          "explanation": {
+            "pt": "No passado simples, use -ed nos verbos regulares (worked) e a forma irregular nos outros (went, had, saw).",
+            "en": "Use -ed for regular verbs (worked) and the irregular form for the others (went, had, saw)."
+          },
+          "skillTag": "simple_past"
+        }
+      ],
+      "practice": {
+        "opener": {
+          "en": "Let's talk about the past! I'm {assistant}. What did you do last weekend?",
+          "pt": "Vamos falar do passado! Eu sou {assistant}. O que você fez no último fim de semana?"
+        },
+        "question": "What did you do last weekend?"
+      },
+      "takeaways": [
+        "Regulares: -ed (worked, studied).",
+        "Irregulares comuns: went, had, saw, ate, bought.",
+        "Com did/didn't, o verbo volta à forma básica."
+      ]
+    },
+    {
+      "id": "future",
+      "level": "basic",
+      "order": 10,
+      "title": "Futuro com will e going to",
+      "topic": "Future: will & going to",
+      "summary": "Fale de planos, decisões e previsões.",
+      "estimatedMinutes": 9,
+      "skillTags": [
+        "future"
+      ],
+      "objectives": [
+        "Usar \"going to\" para planos",
+        "Usar \"will\" para decisões rápidas, promessas e previsões",
+        "Formar negativas (won't / not going to)"
+      ],
+      "explanation": [
+        {
+          "pt": "\"Going to\" é usado para planos e intenções já decididos: I'm going to travel in July.",
+          "en": "\"Going to\" is for plans and intentions you have already decided: I'm going to travel in July."
+        },
+        {
+          "pt": "\"Will\" é usado para decisões no momento da fala, promessas e previsões: I'll help you! It will rain tomorrow.",
+          "en": "\"Will\" is for decisions made while speaking, promises and predictions: I'll help you!"
+        },
+        {
+          "pt": "Estruturas: sujeito + will + verbo básico (She will call). Sujeito + am/is/are + going to + verbo básico (They are going to study).",
+          "en": "Structures: subject + will + base verb. Subject + am/is/are + going to + base verb."
+        }
+      ],
+      "alternativeExplanations": [
+        {
+          "pt": "\"Going to\" = já está na agenda. \"Will\" = acabei de decidir ou estou prometendo. \"Vou viajar em julho (já comprei a passagem)\" → going to. \"Eu atendo!\" (o telefone tocou agora) → I'll get it!",
+          "en": "\"Going to\" = it is already in your plans. \"Will\" = you just decided or you are promising."
+        },
+        {
+          "pt": "Depois de \"will\" nunca vem \"to\" nem -s: She will call (e não \"will to call\" ou \"will calls\").",
+          "en": "After \"will\", never use \"to\" or -s: She will call."
+        }
+      ],
+      "table": {
+        "caption": "will × going to",
+        "headers": [
+          "Uso",
+          "Exemplo"
+        ],
+        "rows": [
+          [
+            "Plano decidido",
+            "I'm going to visit my parents."
+          ],
+          [
+            "Decisão na hora",
+            "I'll have a coffee, please."
+          ],
+          [
+            "Promessa",
+            "I won't forget!"
+          ],
+          [
+            "Previsão com evidência",
+            "Look at the clouds! It's going to rain."
+          ]
+        ]
+      },
+      "examples": [
+        {
+          "en": "I'm going to start a new course next month.",
+          "pt": "Vou começar um curso novo no mês que vem.",
+          "highlight": "going to start"
+        },
+        {
+          "en": "I'll call you later.",
+          "pt": "Eu te ligo mais tarde.",
+          "highlight": "I'll call"
+        },
+        {
+          "en": "We won't be late.",
+          "pt": "Nós não vamos nos atrasar.",
+          "highlight": "won't"
+        }
+      ],
+      "extraExamples": [
+        {
+          "en": "She is going to buy a new laptop.",
+          "pt": "Ela vai comprar um notebook novo.",
+          "highlight": "is going to buy"
+        },
+        {
+          "en": "I think it will be a great day.",
+          "pt": "Acho que vai ser um ótimo dia.",
+          "highlight": "will be"
+        },
+        {
+          "en": "Are you going to watch the game?",
+          "pt": "Você vai assistir ao jogo?",
+          "highlight": "going to watch"
+        }
+      ],
+      "vocabularyIds": [
+        "tomorrow",
+        "next-week",
+        "plan",
+        "travel"
+      ],
+      "exercises": [
+        {
+          "id": "future-1",
+          "lessonId": "future",
+          "type": "select_word",
+          "instruction": "Selecione a forma correta.",
+          "prompt": "Look at those clouds! It ___ rain.",
+          "options": [
+            "is going to",
+            "going to",
+            "will to",
+            "is go to"
+          ],
+          "acceptedAnswers": [
+            "is going to"
+          ],
+          "explanation": {
+            "pt": "Para previsões com evidência (as nuvens), usamos \"going to\" com o verbo to be: It is going to rain.",
+            "en": "For predictions based on evidence, use \"be going to\": It is going to rain."
+          },
+          "skillTag": "future"
+        },
+        {
+          "id": "future-2",
+          "lessonId": "future",
+          "type": "select_word",
+          "instruction": "Selecione a forma correta.",
+          "prompt": "I'm tired. I think I ___ go to bed early.",
+          "options": [
+            "will",
+            "am",
+            "going",
+            "do"
+          ],
+          "acceptedAnswers": [
+            "will"
+          ],
+          "explanation": {
+            "pt": "Uma decisão tomada na hora usa \"will\": I think I will go to bed early.",
+            "en": "A decision made at the moment uses \"will\"."
+          },
+          "skillTag": "future"
+        },
+        {
+          "id": "future-3",
+          "lessonId": "future",
+          "type": "fill_blank",
+          "instruction": "Complete a frase.",
+          "prompt": "We are ___ to visit our friends next weekend.",
+          "acceptedAnswers": [
+            "going"
+          ],
+          "explanation": {
+            "pt": "A estrutura é \"be + going to + verbo\": We are going to visit…",
+            "en": "The structure is \"be + going to + verb\"."
+          },
+          "skillTag": "future"
+        },
+        {
+          "id": "future-4",
+          "lessonId": "future",
+          "type": "multiple_choice",
+          "instruction": "Escolha a frase correta.",
+          "prompt": "Qual frase está correta?",
+          "options": [
+            "She will call you later.",
+            "She will calls you later.",
+            "She wills call you later.",
+            "She will to call you later."
+          ],
+          "acceptedAnswers": [
+            "She will call you later."
+          ],
+          "explanation": {
+            "pt": "Depois de \"will\", o verbo fica na forma básica, sem -s e sem \"to\".",
+            "en": "After \"will\", use the base verb — no -s and no \"to\"."
+          },
+          "skillTag": "future"
+        },
+        {
+          "id": "future-5",
+          "lessonId": "future",
+          "type": "translate",
+          "instruction": "Traduza para o inglês.",
+          "prompt": "Eu vou viajar amanhã.",
+          "acceptedAnswers": [
+            "I'm going to travel tomorrow.",
+            "I am going to travel tomorrow.",
+            "I will travel tomorrow.",
+            "I'll travel tomorrow."
+          ],
+          "explanation": {
+            "pt": "Para um plano, \"going to\" é o mais natural: I'm going to travel tomorrow. \"I will travel\" também é aceito.",
+            "en": "For a plan, \"going to\" is most natural: I'm going to travel tomorrow."
+          },
+          "skillTag": "future"
+        }
+      ],
+      "practice": {
+        "opener": {
+          "en": "Let's talk about plans! I'm {assistant}. What are you going to do this weekend?",
+          "pt": "Vamos falar de planos! Eu sou {assistant}. O que você vai fazer neste fim de semana?"
+        },
+        "question": "What are you going to do this weekend?"
+      },
+      "takeaways": [
+        "Going to: planos já decididos.",
+        "Will: decisões na hora, promessas e previsões.",
+        "Depois de will: verbo básico (will call)."
+      ]
+    },
+    {
+      "id": "present-perfect",
+      "level": "intermediate",
+      "order": 11,
+      "title": "Present perfect: experiências",
+      "topic": "Present Perfect",
+      "summary": "Fale de experiências de vida e de situações que continuam até hoje.",
+      "estimatedMinutes": 12,
+      "skillTags": [
+        "present_perfect"
+      ],
+      "objectives": [
+        "Falar de experiências com \"Have you ever…?\"",
+        "Usar for e since",
+        "Escolher entre present perfect e simple past"
+      ],
+      "explanation": [
+        {
+          "pt": "O present perfect liga o passado ao presente. Usamos para experiências de vida (sem dizer quando) e para situações que começaram no passado e continuam agora. Estrutura: have/has + particípio.",
+          "en": "The present perfect connects the past with the present. We use it for life experiences (without saying when) and for situations that started in the past and continue now. Structure: have/has + past participle."
+        },
+        {
+          "pt": "Exemplos: Have you ever been to Japan? / I have never tried sushi. / She has lived here since 2019.",
+          "en": "Examples: Have you ever been to Japan? / I have never tried sushi. / She has lived here since 2019."
+        },
+        {
+          "pt": "Use \"for\" com períodos (for three years) e \"since\" com o ponto de partida (since 2019).",
+          "en": "Use \"for\" with a period of time (for three years) and \"since\" with a starting point (since 2019)."
+        },
+        {
+          "pt": "Se você disser QUANDO aconteceu (yesterday, last year, in 2019), use o simple past: I went to Japan in 2019.",
+          "en": "If you say WHEN it happened (yesterday, last year, in 2019), use the simple past: I went to Japan in 2019."
+        }
+      ],
+      "alternativeExplanations": [
+        {
+          "pt": "Pense no present perfect como uma \"ponte\": o que importa é o resultado ou a experiência AGORA, não o momento exato.",
+          "en": "Think of the present perfect as a bridge: what matters is the result or experience NOW, not the exact moment."
+        },
+        {
+          "pt": "Pergunta-chave: tem um tempo terminado na frase (ontem, em 2019)? Se sim → simple past. Se não, ou se ainda continua → present perfect.",
+          "en": "Key question: is there a finished time in the sentence (yesterday, in 2019)? If yes → simple past. If not, or if it continues → present perfect."
+        }
+      ],
+      "table": {
+        "caption": "for × since",
+        "headers": [
+          "for (período)",
+          "since (ponto de partida)"
+        ],
+        "rows": [
+          [
+            "for two years",
+            "since 2022"
+          ],
+          [
+            "for a long time",
+            "since I was a child"
+          ],
+          [
+            "for three months",
+            "since Monday"
+          ]
+        ]
+      },
+      "examples": [
+        {
+          "en": "Have you ever been to Canada?",
+          "pt": "Você já foi ao Canadá?",
+          "highlight": "Have you ever been"
+        },
+        {
+          "en": "I've worked here for five years.",
+          "pt": "Trabalho aqui há cinco anos.",
+          "highlight": "I've worked"
+        },
+        {
+          "en": "She has never seen snow.",
+          "pt": "Ela nunca viu neve.",
+          "highlight": "has never seen"
+        }
+      ],
+      "extraExamples": [
+        {
+          "en": "We've known each other since college.",
+          "pt": "Nós nos conhecemos desde a faculdade.",
+          "highlight": "We've known"
+        },
+        {
+          "en": "Has he finished the report yet?",
+          "pt": "Ele já terminou o relatório?",
+          "highlight": "Has he finished"
+        },
+        {
+          "en": "I've already had lunch, thanks.",
+          "pt": "Já almocei, obrigado.",
+          "highlight": "I've already had"
+        }
+      ],
+      "vocabularyIds": [
+        "ever",
+        "already",
+        "experience"
+      ],
+      "exercises": [
+        {
+          "id": "perfect-1",
+          "lessonId": "present-perfect",
+          "type": "select_word",
+          "instruction": "Select the correct form.",
+          "prompt": "I ___ here since 2019.",
+          "options": [
+            "have lived",
+            "lived",
+            "am living",
+            "live"
+          ],
+          "acceptedAnswers": [
+            "have lived"
+          ],
+          "explanation": {
+            "pt": "A situação começou em 2019 e continua até hoje, então usamos o present perfect: I have lived here since 2019.",
+            "en": "The situation started in 2019 and continues now, so we use the present perfect."
+          },
+          "skillTag": "present_perfect"
+        },
+        {
+          "id": "perfect-2",
+          "lessonId": "present-perfect",
+          "type": "select_word",
+          "instruction": "Select the correct word.",
+          "prompt": "She has worked here ___ five years.",
+          "options": [
+            "for",
+            "since",
+            "during",
+            "ago"
+          ],
+          "acceptedAnswers": [
+            "for"
+          ],
+          "explanation": {
+            "pt": "\"Five years\" é um período, então usamos \"for\".",
+            "en": "\"Five years\" is a period of time, so we use \"for\"."
+          },
+          "skillTag": "present_perfect"
+        },
+        {
+          "id": "perfect-3",
+          "lessonId": "present-perfect",
+          "type": "multiple_choice",
+          "instruction": "Choose the correct sentence.",
+          "prompt": "Which sentence is correct?",
+          "options": [
+            "I went to London last year.",
+            "I have gone to London last year.",
+            "I have been to London last year.",
+            "I go to London last year."
+          ],
+          "acceptedAnswers": [
+            "I went to London last year."
+          ],
+          "explanation": {
+            "pt": "\"Last year\" é um tempo terminado, então usamos o simple past: I went to London last year.",
+            "en": "\"Last year\" is a finished time, so we use the simple past."
+          },
+          "skillTag": "present_perfect"
+        },
+        {
+          "id": "perfect-4",
+          "lessonId": "present-perfect",
+          "type": "fill_blank",
+          "instruction": "Complete the question.",
+          "prompt": "___ you ever tried Indian food?",
+          "acceptedAnswers": [
+            "Have"
+          ],
+          "explanation": {
+            "pt": "Perguntas sobre experiências: Have + you + ever + particípio.",
+            "en": "Questions about experiences: Have + you + ever + past participle."
+          },
+          "skillTag": "present_perfect"
+        },
+        {
+          "id": "perfect-5",
+          "lessonId": "present-perfect",
+          "type": "write",
+          "instruction": "Escreva sobre uma experiência que você já teve (ou nunca teve).",
+          "prompt": "Write about an experience using \"I have…\" or \"I've never…\".",
+          "acceptedAnswers": [],
+          "requirements": [
+            {
+              "pattern": "\\b(i have|i've)\\b",
+              "message": "Use \"I have\" ou \"I've\" na sua frase."
+            }
+          ],
+          "minWords": 4,
+          "explanation": {
+            "pt": "Para experiências, use have + particípio sem dizer quando: I've visited Chile. I've never eaten sushi.",
+            "en": "For experiences, use have + past participle without saying when: I've visited Chile."
+          },
+          "skillTag": "present_perfect"
+        }
+      ],
+      "practice": {
+        "opener": {
+          "en": "Let's talk about experiences! I'm {assistant}. Have you ever traveled to another country?",
+          "pt": "Vamos falar de experiências! Eu sou {assistant}. Você já viajou para outro país?"
+        },
+        "question": "Have you ever traveled to another country?"
+      },
+      "takeaways": [
+        "have/has + particípio para experiências e situações que continuam.",
+        "for + período · since + ponto de partida.",
+        "Tempo terminado (yesterday, in 2019) → simple past."
+      ]
+    },
+    {
+      "id": "phrasal-verbs",
+      "level": "advanced",
+      "order": 12,
+      "title": "Phrasal verbs do dia a dia",
+      "topic": "Everyday phrasal verbs",
+      "summary": "Soe mais natural com verbos como figure out, run into e call off.",
+      "estimatedMinutes": 12,
+      "skillTags": [
+        "phrasal_verbs"
+      ],
+      "objectives": [
+        "Entender o significado de phrasal verbs comuns",
+        "Posicionar pronomes em phrasal verbs separáveis",
+        "Usar phrasal verbs em conversas"
+      ],
+      "explanation": [
+        {
+          "pt": "Phrasal verbs combinam um verbo com uma partícula (up, out, on, off…) e muitas vezes têm um sentido que não dá para deduzir: \"figure out\" = entender ou resolver.",
+          "en": "Phrasal verbs combine a verb with a particle (up, out, on, off…) and often have a meaning you can't guess from the parts: \"figure out\" means to understand or solve."
+        },
+        {
+          "pt": "Alguns são separáveis: \"turn off the lights\" ou \"turn the lights off\". Com pronomes, o pronome fica no meio: \"turn it off\" (nunca \"turn off it\").",
+          "en": "Some are separable: \"turn off the lights\" or \"turn the lights off\". With pronouns, the pronoun goes in the middle: \"turn it off\" (never \"turn off it\")."
+        },
+        {
+          "pt": "Eles deixam a fala mais natural: \"I ran into an old friend\" soa mais natural do que \"I met an old friend by chance\".",
+          "en": "They make your English sound more natural: \"I ran into an old friend\" sounds more natural than \"I met an old friend by chance\"."
+        }
+      ],
+      "alternativeExplanations": [
+        {
+          "pt": "Trate cada phrasal verb como uma palavra nova, com significado próprio. Aprenda sempre com um exemplo de contexto.",
+          "en": "Treat each phrasal verb as a new word with its own meaning. Always learn it with an example."
+        },
+        {
+          "pt": "A partícula às vezes dá uma pista: \"up\" costuma indicar completar algo (eat up, use up), \"off\" indica parar ou cancelar (turn off, call off).",
+          "en": "The particle sometimes gives a clue: \"up\" often means completion (eat up, use up); \"off\" means stopping or cancelling (turn off, call off)."
+        }
+      ],
+      "table": {
+        "caption": "Phrasal verbs comuns",
+        "headers": [
+          "Phrasal verb",
+          "Significado",
+          "Exemplo"
+        ],
+        "rows": [
+          [
+            "figure out",
+            "entender / resolver",
+            "I figured out the problem."
+          ],
+          [
+            "run into",
+            "encontrar por acaso",
+            "I ran into Ana yesterday."
+          ],
+          [
+            "call off",
+            "cancelar",
+            "They called off the meeting."
+          ],
+          [
+            "turn off",
+            "desligar",
+            "Turn it off, please."
+          ],
+          [
+            "look forward to",
+            "aguardar com expectativa",
+            "I'm looking forward to it."
+          ]
+        ]
+      },
+      "examples": [
+        {
+          "en": "I can't figure out this bug.",
+          "pt": "Não consigo entender esse bug.",
+          "highlight": "figure out"
+        },
+        {
+          "en": "I ran into my old boss at the mall.",
+          "pt": "Encontrei meu antigo chefe por acaso no shopping.",
+          "highlight": "ran into"
+        },
+        {
+          "en": "Could you turn it down a little?",
+          "pt": "Você poderia abaixar um pouco?",
+          "highlight": "turn it down"
+        }
+      ],
+      "extraExamples": [
+        {
+          "en": "Let's set up a meeting for Friday.",
+          "pt": "Vamos marcar uma reunião para sexta.",
+          "highlight": "set up"
+        },
+        {
+          "en": "She came up with a great idea.",
+          "pt": "Ela teve uma ótima ideia.",
+          "highlight": "came up with"
+        },
+        {
+          "en": "Don't give up — you're almost there!",
+          "pt": "Não desista — você está quase lá!",
+          "highlight": "give up"
+        }
+      ],
+      "vocabularyIds": [
+        "figure-out",
+        "run-into",
+        "call-off",
+        "turn-off"
+      ],
+      "exercises": [
+        {
+          "id": "phrasal-1",
+          "lessonId": "phrasal-verbs",
+          "type": "multiple_choice",
+          "instruction": "Choose the meaning.",
+          "prompt": "What does \"figure out\" mean?",
+          "options": [
+            "to understand or solve something",
+            "to draw a figure",
+            "to go outside",
+            "to cancel something"
+          ],
+          "acceptedAnswers": [
+            "to understand or solve something"
+          ],
+          "explanation": {
+            "pt": "\"Figure out\" significa entender ou resolver algo: I figured out the answer.",
+            "en": "\"Figure out\" means to understand or solve something."
+          },
+          "skillTag": "phrasal_verbs"
+        },
+        {
+          "id": "phrasal-2",
+          "lessonId": "phrasal-verbs",
+          "type": "select_word",
+          "instruction": "Select the correct word.",
+          "prompt": "The TV is too loud. Can you turn ___ down?",
+          "options": [
+            "it",
+            "on",
+            "out",
+            "up"
+          ],
+          "acceptedAnswers": [
+            "it"
+          ],
+          "explanation": {
+            "pt": "Com pronomes, o pronome fica entre o verbo e a partícula: turn it down.",
+            "en": "With pronouns, the pronoun goes between the verb and the particle: turn it down."
+          },
+          "skillTag": "phrasal_verbs"
+        },
+        {
+          "id": "phrasal-3",
+          "lessonId": "phrasal-verbs",
+          "type": "select_word",
+          "instruction": "Select the correct particle.",
+          "prompt": "I ran ___ my old teacher at the supermarket.",
+          "options": [
+            "into",
+            "in",
+            "onto",
+            "over"
+          ],
+          "acceptedAnswers": [
+            "into"
+          ],
+          "explanation": {
+            "pt": "\"Run into\" significa encontrar alguém por acaso.",
+            "en": "\"Run into\" means to meet someone by chance."
+          },
+          "skillTag": "phrasal_verbs"
+        },
+        {
+          "id": "phrasal-4",
+          "lessonId": "phrasal-verbs",
+          "type": "fill_blank",
+          "instruction": "Complete with the correct particle.",
+          "prompt": "We had to call ___ the meeting because the manager was sick.",
+          "acceptedAnswers": [
+            "off"
+          ],
+          "explanation": {
+            "pt": "\"Call off\" significa cancelar.",
+            "en": "\"Call off\" means to cancel."
+          },
+          "skillTag": "phrasal_verbs"
+        },
+        {
+          "id": "phrasal-5",
+          "lessonId": "phrasal-verbs",
+          "type": "write",
+          "instruction": "Use um phrasal verb em uma frase sobre a sua semana.",
+          "prompt": "Use a phrasal verb in a sentence about your week.",
+          "acceptedAnswers": [],
+          "requirements": [
+            {
+              "pattern": "\\b\\w+ (up|out|off|on|into|over|back|down|away)\\b",
+              "message": "Use um phrasal verb (ex.: figure out, turn off, run into)."
+            }
+          ],
+          "minWords": 5,
+          "explanation": {
+            "pt": "Phrasal verbs = verbo + partícula com significado próprio: I figured out…, We called off…, I ran into…",
+            "en": "Phrasal verbs = verb + particle with their own meaning: I figured out…, We called off…"
+          },
+          "skillTag": "phrasal_verbs"
+        }
+      ],
+      "practice": {
+        "opener": {
+          "en": "Let's put phrasal verbs to work! I'm {assistant}. What's something you've had to figure out recently?",
+          "pt": "Vamos usar phrasal verbs! Eu sou {assistant}. O que você teve que resolver (figure out) recentemente?"
+        },
+        "question": "What's something you've had to figure out recently?"
+      },
+      "takeaways": [
+        "Phrasal verb = verbo + partícula com sentido próprio.",
+        "Pronome no meio: turn it off.",
+        "Aprenda sempre com um exemplo de contexto."
+      ]
+    }
+  ],
+  "vocabulary": [
+    {
+      "id": "hello",
+      "word": "hello",
+      "translation": "olá",
+      "meaning": "a greeting you can use in any situation",
+      "partOfSpeech": "expression",
+      "level": "beginner",
+      "topic": "Greetings",
+      "examples": [
+        {
+          "en": "Hello! How are you?",
+          "pt": "Olá! Como vai?"
+        }
+      ]
+    },
+    {
+      "id": "good-morning",
+      "word": "good morning",
+      "translation": "bom dia",
+      "meaning": "a greeting used before noon",
+      "partOfSpeech": "expression",
+      "level": "beginner",
+      "topic": "Greetings",
+      "examples": [
+        {
+          "en": "Good morning, Ms. Silva!",
+          "pt": "Bom dia, Sra. Silva!"
+        }
+      ]
+    },
+    {
+      "id": "good-evening",
+      "word": "good evening",
+      "translation": "boa noite (ao chegar)",
+      "meaning": "a greeting used when you arrive in the evening",
+      "partOfSpeech": "expression",
+      "level": "beginner",
+      "topic": "Greetings",
+      "examples": [
+        {
+          "en": "Good evening, welcome to the show.",
+          "pt": "Boa noite, bem-vindos ao show."
+        }
+      ]
+    },
+    {
+      "id": "nice-to-meet-you",
+      "word": "nice to meet you",
+      "translation": "prazer em conhecer você",
+      "meaning": "what you say when you meet someone for the first time",
+      "partOfSpeech": "expression",
+      "level": "beginner",
+      "topic": "Greetings",
+      "examples": [
+        {
+          "en": "I'm Paulo. Nice to meet you!",
+          "pt": "Eu sou o Paulo. Prazer!"
+        }
+      ]
+    },
+    {
+      "id": "see-you-later",
+      "word": "see you later",
+      "translation": "até mais",
+      "meaning": "a friendly way to say goodbye",
+      "partOfSpeech": "expression",
+      "level": "beginner",
+      "topic": "Greetings",
+      "examples": [
+        {
+          "en": "Bye! See you later.",
+          "pt": "Tchau! Até mais."
+        }
+      ]
+    },
+    {
+      "id": "spell",
+      "word": "spell",
+      "translation": "soletrar",
+      "meaning": "to say the letters of a word in order",
+      "partOfSpeech": "verb",
+      "level": "beginner",
+      "topic": "Alphabet",
+      "examples": [
+        {
+          "en": "How do you spell your last name?",
+          "pt": "Como se soletra o seu sobrenome?"
+        }
+      ]
+    },
+    {
+      "id": "letter",
+      "word": "letter",
+      "translation": "letra; carta",
+      "meaning": "a symbol used in writing, like A or B",
+      "partOfSpeech": "noun",
+      "level": "beginner",
+      "topic": "Alphabet",
+      "examples": [
+        {
+          "en": "\"Z\" is the last letter of the alphabet.",
+          "pt": "\"Z\" é a última letra do alfabeto."
+        }
+      ]
+    },
+    {
+      "id": "student",
+      "word": "student",
+      "translation": "estudante",
+      "meaning": "a person who studies at a school or university",
+      "partOfSpeech": "noun",
+      "level": "beginner",
+      "topic": "People",
+      "examples": [
+        {
+          "en": "I'm a student at a public university.",
+          "pt": "Sou estudante de uma universidade pública."
+        }
+      ]
+    },
+    {
+      "id": "teacher",
+      "word": "teacher",
+      "translation": "professor(a)",
+      "meaning": "a person who teaches",
+      "partOfSpeech": "noun",
+      "level": "beginner",
+      "topic": "People",
+      "examples": [
+        {
+          "en": "My teacher is very patient.",
+          "pt": "Minha professora é muito paciente."
+        }
+      ]
+    },
+    {
+      "id": "friend",
+      "word": "friend",
+      "translation": "amigo(a)",
+      "meaning": "a person you know well and like",
+      "partOfSpeech": "noun",
+      "level": "beginner",
+      "topic": "People",
+      "examples": [
+        {
+          "en": "She is my best friend.",
+          "pt": "Ela é minha melhor amiga."
+        }
+      ]
+    },
+    {
+      "id": "happy",
+      "word": "happy",
+      "translation": "feliz",
+      "meaning": "feeling good and pleased",
+      "partOfSpeech": "adjective",
+      "level": "beginner",
+      "topic": "Feelings",
+      "examples": [
+        {
+          "en": "I'm happy to see you!",
+          "pt": "Estou feliz em ver você!"
+        }
+      ]
+    },
+    {
+      "id": "tired",
+      "word": "tired",
+      "translation": "cansado(a)",
+      "meaning": "needing rest or sleep",
+      "partOfSpeech": "adjective",
+      "level": "beginner",
+      "topic": "Feelings",
+      "examples": [
+        {
+          "en": "I'm tired after work.",
+          "pt": "Estou cansado depois do trabalho."
+        }
+      ]
+    },
+    {
+      "id": "number",
+      "word": "number",
+      "translation": "número",
+      "meaning": "a word or symbol for an amount, like 3 or seven",
+      "partOfSpeech": "noun",
+      "level": "beginner",
+      "topic": "Numbers",
+      "examples": [
+        {
+          "en": "What's your favorite number?",
+          "pt": "Qual é o seu número favorito?"
+        }
+      ]
+    },
+    {
+      "id": "fifteen",
+      "word": "fifteen",
+      "translation": "quinze",
+      "meaning": "the number 15",
+      "partOfSpeech": "number",
+      "level": "beginner",
+      "topic": "Numbers",
+      "examples": [
+        {
+          "en": "The bus comes in fifteen minutes.",
+          "pt": "O ônibus chega em quinze minutos."
+        }
+      ]
+    },
+    {
+      "id": "thirty",
+      "word": "thirty",
+      "translation": "trinta",
+      "meaning": "the number 30",
+      "partOfSpeech": "number",
+      "level": "beginner",
+      "topic": "Numbers",
+      "examples": [
+        {
+          "en": "My mother is thirty-eight.",
+          "pt": "Minha mãe tem trinta e oito anos."
+        }
+      ]
+    },
+    {
+      "id": "years-old",
+      "word": "years old",
+      "translation": "anos (de idade)",
+      "meaning": "used after a number to say someone's age",
+      "partOfSpeech": "expression",
+      "level": "beginner",
+      "topic": "Numbers",
+      "examples": [
+        {
+          "en": "I'm twenty-two years old.",
+          "pt": "Eu tenho vinte e dois anos."
+        }
+      ]
+    },
+    {
+      "id": "red",
+      "word": "red",
+      "translation": "vermelho",
+      "meaning": "the color of blood or strawberries",
+      "partOfSpeech": "adjective",
+      "level": "beginner",
+      "topic": "Colors",
+      "examples": [
+        {
+          "en": "I love your red shoes.",
+          "pt": "Adoro seus sapatos vermelhos."
+        }
+      ]
+    },
+    {
+      "id": "blue",
+      "word": "blue",
+      "translation": "azul",
+      "meaning": "the color of the sky on a clear day",
+      "partOfSpeech": "adjective",
+      "level": "beginner",
+      "topic": "Colors",
+      "examples": [
+        {
+          "en": "The sky is blue today.",
+          "pt": "O céu está azul hoje."
+        }
+      ]
+    },
+    {
+      "id": "green",
+      "word": "green",
+      "translation": "verde",
+      "meaning": "the color of grass and leaves",
+      "partOfSpeech": "adjective",
+      "level": "beginner",
+      "topic": "Colors",
+      "examples": [
+        {
+          "en": "He has a green bike.",
+          "pt": "Ele tem uma bicicleta verde."
+        }
+      ]
+    },
+    {
+      "id": "yellow",
+      "word": "yellow",
+      "translation": "amarelo",
+      "meaning": "the color of the sun and bananas",
+      "partOfSpeech": "adjective",
+      "level": "beginner",
+      "topic": "Colors",
+      "examples": [
+        {
+          "en": "Taxis in New York are yellow.",
+          "pt": "Os táxis de Nova York são amarelos."
+        }
+      ]
+    },
+    {
+      "id": "black",
+      "word": "black",
+      "translation": "preto",
+      "meaning": "the darkest color",
+      "partOfSpeech": "adjective",
+      "level": "beginner",
+      "topic": "Colors",
+      "examples": [
+        {
+          "en": "I drink black coffee.",
+          "pt": "Eu tomo café preto."
+        }
+      ]
+    },
+    {
+      "id": "white",
+      "word": "white",
+      "translation": "branco",
+      "meaning": "the color of snow and milk",
+      "partOfSpeech": "adjective",
+      "level": "beginner",
+      "topic": "Colors",
+      "examples": [
+        {
+          "en": "The walls are white.",
+          "pt": "As paredes são brancas."
+        }
+      ]
+    },
+    {
+      "id": "umbrella",
+      "word": "umbrella",
+      "translation": "guarda-chuva",
+      "meaning": "an object that protects you from the rain",
+      "partOfSpeech": "noun",
+      "level": "beginner",
+      "topic": "Objects",
+      "examples": [
+        {
+          "en": "Take an umbrella. It's raining!",
+          "pt": "Leve um guarda-chuva. Está chovendo!"
+        }
+      ]
+    },
+    {
+      "id": "phone",
+      "word": "phone",
+      "translation": "celular; telefone",
+      "meaning": "a device you use to call or text people",
+      "partOfSpeech": "noun",
+      "level": "beginner",
+      "topic": "Objects",
+      "examples": [
+        {
+          "en": "I can't find my phone.",
+          "pt": "Não consigo achar meu celular."
+        }
+      ]
+    },
+    {
+      "id": "bag",
+      "word": "bag",
+      "translation": "bolsa; mochila; sacola",
+      "meaning": "something you use to carry things",
+      "partOfSpeech": "noun",
+      "level": "beginner",
+      "topic": "Objects",
+      "examples": [
+        {
+          "en": "My bag is very heavy.",
+          "pt": "Minha mochila está muito pesada."
+        }
+      ]
+    },
+    {
+      "id": "key",
+      "word": "key",
+      "translation": "chave",
+      "meaning": "a small metal object that opens a lock",
+      "partOfSpeech": "noun",
+      "level": "beginner",
+      "topic": "Objects",
+      "examples": [
+        {
+          "en": "Where are my car keys?",
+          "pt": "Onde estão as chaves do meu carro?"
+        }
+      ]
+    },
+    {
+      "id": "every-day",
+      "word": "every day",
+      "translation": "todos os dias",
+      "meaning": "on each day, without exception",
+      "partOfSpeech": "expression",
+      "level": "basic",
+      "topic": "Routine",
+      "examples": [
+        {
+          "en": "I walk my dog every day.",
+          "pt": "Eu passeio com meu cachorro todos os dias."
+        }
+      ]
+    },
+    {
+      "id": "usually",
+      "word": "usually",
+      "translation": "geralmente",
+      "meaning": "in most cases; normally",
+      "partOfSpeech": "adverb",
+      "level": "basic",
+      "topic": "Routine",
+      "examples": [
+        {
+          "en": "I usually have lunch at noon.",
+          "pt": "Eu geralmente almoço ao meio-dia."
+        }
+      ]
+    },
+    {
+      "id": "always",
+      "word": "always",
+      "translation": "sempre",
+      "meaning": "every time; at all times",
+      "partOfSpeech": "adverb",
+      "level": "basic",
+      "topic": "Routine",
+      "examples": [
+        {
+          "en": "She always arrives early.",
+          "pt": "Ela sempre chega cedo."
+        }
+      ]
+    },
+    {
+      "id": "never",
+      "word": "never",
+      "translation": "nunca",
+      "meaning": "at no time",
+      "partOfSpeech": "adverb",
+      "level": "basic",
+      "topic": "Routine",
+      "examples": [
+        {
+          "en": "I never eat breakfast.",
+          "pt": "Eu nunca tomo café da manhã."
+        }
+      ]
+    },
+    {
+      "id": "wake-up",
+      "word": "wake up",
+      "translation": "acordar",
+      "meaning": "to stop sleeping",
+      "partOfSpeech": "verb",
+      "level": "basic",
+      "topic": "Routine",
+      "examples": [
+        {
+          "en": "I wake up at six on weekdays.",
+          "pt": "Eu acordo às seis nos dias de semana."
+        }
+      ]
+    },
+    {
+      "id": "breakfast",
+      "word": "breakfast",
+      "translation": "café da manhã",
+      "meaning": "the first meal of the day",
+      "partOfSpeech": "noun",
+      "level": "basic",
+      "topic": "Routine",
+      "examples": [
+        {
+          "en": "We have breakfast together.",
+          "pt": "Nós tomamos café da manhã juntos."
+        }
+      ]
+    },
+    {
+      "id": "work",
+      "word": "work",
+      "translation": "trabalhar; trabalho",
+      "meaning": "to do a job; the job you do",
+      "partOfSpeech": "verb",
+      "level": "basic",
+      "topic": "Routine",
+      "examples": [
+        {
+          "en": "He works in a hospital.",
+          "pt": "Ele trabalha em um hospital."
+        }
+      ]
+    },
+    {
+      "id": "speak",
+      "word": "speak",
+      "translation": "falar (um idioma)",
+      "meaning": "to use your voice to say words; to know a language",
+      "partOfSpeech": "verb",
+      "level": "basic",
+      "topic": "Communication",
+      "examples": [
+        {
+          "en": "Do you speak English?",
+          "pt": "Você fala inglês?"
+        }
+      ]
+    },
+    {
+      "id": "like",
+      "word": "like",
+      "translation": "gostar",
+      "meaning": "to enjoy something or think it is nice",
+      "partOfSpeech": "verb",
+      "level": "basic",
+      "topic": "Communication",
+      "examples": [
+        {
+          "en": "I don't like rainy days.",
+          "pt": "Eu não gosto de dias chuvosos."
+        }
+      ]
+    },
+    {
+      "id": "drive",
+      "word": "drive",
+      "translation": "dirigir",
+      "meaning": "to control a car or other vehicle",
+      "partOfSpeech": "verb",
+      "level": "basic",
+      "topic": "Transport",
+      "examples": [
+        {
+          "en": "She doesn't drive to work.",
+          "pt": "Ela não vai de carro para o trabalho."
+        }
+      ]
+    },
+    {
+      "id": "weekend",
+      "word": "weekend",
+      "translation": "fim de semana",
+      "meaning": "Saturday and Sunday",
+      "partOfSpeech": "noun",
+      "level": "basic",
+      "topic": "Time",
+      "examples": [
+        {
+          "en": "What are you doing this weekend?",
+          "pt": "O que você vai fazer neste fim de semana?"
+        }
+      ]
+    },
+    {
+      "id": "morning",
+      "word": "morning",
+      "translation": "manhã",
+      "meaning": "the early part of the day",
+      "partOfSpeech": "noun",
+      "level": "basic",
+      "topic": "Time",
+      "examples": [
+        {
+          "en": "I study in the morning.",
+          "pt": "Eu estudo de manhã."
+        }
+      ]
+    },
+    {
+      "id": "night",
+      "word": "night",
+      "translation": "noite",
+      "meaning": "the time when it is dark",
+      "partOfSpeech": "noun",
+      "level": "basic",
+      "topic": "Time",
+      "examples": [
+        {
+          "en": "I read at night.",
+          "pt": "Eu leio à noite."
+        }
+      ]
+    },
+    {
+      "id": "kitchen",
+      "word": "kitchen",
+      "translation": "cozinha",
+      "meaning": "the room where you cook",
+      "partOfSpeech": "noun",
+      "level": "basic",
+      "topic": "Home",
+      "examples": [
+        {
+          "en": "The kitchen is next to the living room.",
+          "pt": "A cozinha fica ao lado da sala."
+        }
+      ]
+    },
+    {
+      "id": "table",
+      "word": "table",
+      "translation": "mesa",
+      "meaning": "a piece of furniture with a flat top",
+      "partOfSpeech": "noun",
+      "level": "basic",
+      "topic": "Home",
+      "examples": [
+        {
+          "en": "Put the plates on the table.",
+          "pt": "Coloque os pratos na mesa."
+        }
+      ]
+    },
+    {
+      "id": "yesterday",
+      "word": "yesterday",
+      "translation": "ontem",
+      "meaning": "the day before today",
+      "partOfSpeech": "adverb",
+      "level": "basic",
+      "topic": "Time",
+      "examples": [
+        {
+          "en": "I saw her yesterday.",
+          "pt": "Eu a vi ontem."
+        }
+      ]
+    },
+    {
+      "id": "last-weekend",
+      "word": "last weekend",
+      "translation": "no último fim de semana",
+      "meaning": "the weekend before this one",
+      "partOfSpeech": "expression",
+      "level": "basic",
+      "topic": "Time",
+      "examples": [
+        {
+          "en": "We went to a concert last weekend.",
+          "pt": "Fomos a um show no último fim de semana."
+        }
+      ]
+    },
+    {
+      "id": "tomorrow",
+      "word": "tomorrow",
+      "translation": "amanhã",
+      "meaning": "the day after today",
+      "partOfSpeech": "adverb",
+      "level": "basic",
+      "topic": "Time",
+      "examples": [
+        {
+          "en": "I'll call you tomorrow.",
+          "pt": "Eu te ligo amanhã."
+        }
+      ]
+    },
+    {
+      "id": "next-week",
+      "word": "next week",
+      "translation": "semana que vem",
+      "meaning": "the week after this one",
+      "partOfSpeech": "expression",
+      "level": "basic",
+      "topic": "Time",
+      "examples": [
+        {
+          "en": "I'm going to start next week.",
+          "pt": "Vou começar semana que vem."
+        }
+      ]
+    },
+    {
+      "id": "visit",
+      "word": "visit",
+      "translation": "visitar",
+      "meaning": "to go and see a person or place",
+      "partOfSpeech": "verb",
+      "level": "basic",
+      "topic": "Activities",
+      "examples": [
+        {
+          "en": "We visited a museum.",
+          "pt": "Nós visitamos um museu."
+        }
+      ]
+    },
+    {
+      "id": "buy",
+      "word": "buy",
+      "translation": "comprar",
+      "meaning": "to get something by paying money",
+      "partOfSpeech": "verb",
+      "level": "basic",
+      "topic": "Activities",
+      "examples": [
+        {
+          "en": "I bought a new jacket.",
+          "pt": "Comprei uma jaqueta nova."
+        }
+      ]
+    },
+    {
+      "id": "plan",
+      "word": "plan",
+      "translation": "plano; planejar",
+      "meaning": "something you have decided to do",
+      "partOfSpeech": "noun",
+      "level": "basic",
+      "topic": "Activities",
+      "examples": [
+        {
+          "en": "Do you have any plans for Friday?",
+          "pt": "Você tem planos para sexta?"
+        }
+      ]
+    },
+    {
+      "id": "travel",
+      "word": "travel",
+      "translation": "viajar",
+      "meaning": "to go from one place to another, often far away",
+      "partOfSpeech": "verb",
+      "level": "basic",
+      "topic": "Travel",
+      "examples": [
+        {
+          "en": "I want to travel to Chile.",
+          "pt": "Quero viajar para o Chile."
+        }
+      ]
+    },
+    {
+      "id": "restaurant",
+      "word": "restaurant",
+      "translation": "restaurante",
+      "meaning": "a place where you buy and eat meals",
+      "partOfSpeech": "noun",
+      "level": "basic",
+      "topic": "Food",
+      "examples": [
+        {
+          "en": "Let's try that new restaurant.",
+          "pt": "Vamos experimentar aquele restaurante novo."
+        }
+      ]
+    },
+    {
+      "id": "delicious",
+      "word": "delicious",
+      "translation": "delicioso",
+      "meaning": "having a very good taste",
+      "partOfSpeech": "adjective",
+      "level": "basic",
+      "topic": "Food",
+      "examples": [
+        {
+          "en": "This cake is delicious!",
+          "pt": "Este bolo está delicioso!"
+        }
+      ]
+    },
+    {
+      "id": "order",
+      "word": "order",
+      "translation": "pedir (em restaurante)",
+      "meaning": "to ask for food or drinks in a restaurant",
+      "partOfSpeech": "verb",
+      "level": "basic",
+      "topic": "Food",
+      "examples": [
+        {
+          "en": "I'd like to order a salad, please.",
+          "pt": "Eu gostaria de pedir uma salada, por favor."
+        }
+      ]
+    },
+    {
+      "id": "airport",
+      "word": "airport",
+      "translation": "aeroporto",
+      "meaning": "a place where planes take off and land",
+      "partOfSpeech": "noun",
+      "level": "basic",
+      "topic": "Travel",
+      "examples": [
+        {
+          "en": "I need to be at the airport at 6.",
+          "pt": "Preciso estar no aeroporto às 6."
+        }
+      ]
+    },
+    {
+      "id": "ticket",
+      "word": "ticket",
+      "translation": "passagem; ingresso",
+      "meaning": "a piece of paper or code that lets you travel or enter",
+      "partOfSpeech": "noun",
+      "level": "basic",
+      "topic": "Travel",
+      "examples": [
+        {
+          "en": "I bought the tickets online.",
+          "pt": "Comprei as passagens pela internet."
+        }
+      ]
+    },
+    {
+      "id": "meeting",
+      "word": "meeting",
+      "translation": "reunião",
+      "meaning": "when people come together to discuss something",
+      "partOfSpeech": "noun",
+      "level": "intermediate",
+      "topic": "Work",
+      "examples": [
+        {
+          "en": "The meeting starts at 10.",
+          "pt": "A reunião começa às 10."
+        }
+      ]
+    },
+    {
+      "id": "deadline",
+      "word": "deadline",
+      "translation": "prazo",
+      "meaning": "the time by which something must be done",
+      "partOfSpeech": "noun",
+      "level": "intermediate",
+      "topic": "Work",
+      "examples": [
+        {
+          "en": "The deadline is next Friday.",
+          "pt": "O prazo é na próxima sexta."
+        }
+      ]
+    },
+    {
+      "id": "coworker",
+      "word": "coworker",
+      "translation": "colega de trabalho",
+      "meaning": "a person you work with",
+      "partOfSpeech": "noun",
+      "level": "intermediate",
+      "topic": "Work",
+      "examples": [
+        {
+          "en": "My coworkers are really helpful.",
+          "pt": "Meus colegas de trabalho são muito prestativos."
+        }
+      ]
+    },
+    {
+      "id": "laptop",
+      "word": "laptop",
+      "translation": "notebook",
+      "meaning": "a small computer you can carry",
+      "partOfSpeech": "noun",
+      "level": "basic",
+      "topic": "Technology",
+      "examples": [
+        {
+          "en": "My laptop battery is low.",
+          "pt": "A bateria do meu notebook está fraca."
+        }
+      ]
+    },
+    {
+      "id": "update",
+      "word": "update",
+      "translation": "atualização; atualizar",
+      "meaning": "a newer version of software, or to make it newer",
+      "partOfSpeech": "noun",
+      "level": "intermediate",
+      "topic": "Technology",
+      "examples": [
+        {
+          "en": "Install the update tonight.",
+          "pt": "Instale a atualização hoje à noite."
+        }
+      ]
+    },
+    {
+      "id": "developer",
+      "word": "developer",
+      "translation": "desenvolvedor(a)",
+      "meaning": "a person who creates software",
+      "partOfSpeech": "noun",
+      "level": "intermediate",
+      "topic": "Technology",
+      "examples": [
+        {
+          "en": "She works as a developer.",
+          "pt": "Ela trabalha como desenvolvedora."
+        }
+      ]
+    },
+    {
+      "id": "ever",
+      "word": "ever",
+      "translation": "alguma vez; já",
+      "meaning": "at any time (used in questions about experiences)",
+      "partOfSpeech": "adverb",
+      "level": "intermediate",
+      "topic": "Experiences",
+      "examples": [
+        {
+          "en": "Have you ever been to Peru?",
+          "pt": "Você já foi ao Peru?"
+        }
+      ]
+    },
+    {
+      "id": "already",
+      "word": "already",
+      "translation": "já",
+      "meaning": "before now or sooner than expected",
+      "partOfSpeech": "adverb",
+      "level": "intermediate",
+      "topic": "Experiences",
+      "examples": [
+        {
+          "en": "I've already finished.",
+          "pt": "Eu já terminei."
+        }
+      ]
+    },
+    {
+      "id": "experience",
+      "word": "experience",
+      "translation": "experiência",
+      "meaning": "something that happened to you",
+      "partOfSpeech": "noun",
+      "level": "intermediate",
+      "topic": "Experiences",
+      "examples": [
+        {
+          "en": "Living abroad was a great experience.",
+          "pt": "Morar fora foi uma ótima experiência."
+        }
+      ]
+    },
+    {
+      "id": "figure-out",
+      "word": "figure out",
+      "translation": "entender; resolver",
+      "meaning": "to understand or solve something",
+      "partOfSpeech": "verb",
+      "level": "advanced",
+      "topic": "Phrasal verbs",
+      "examples": [
+        {
+          "en": "I can't figure out how this works.",
+          "pt": "Não consigo entender como isso funciona."
+        }
+      ]
+    },
+    {
+      "id": "run-into",
+      "word": "run into",
+      "translation": "encontrar por acaso",
+      "meaning": "to meet someone by chance",
+      "partOfSpeech": "verb",
+      "level": "advanced",
+      "topic": "Phrasal verbs",
+      "examples": [
+        {
+          "en": "I ran into Marcos at the gym.",
+          "pt": "Encontrei o Marcos por acaso na academia."
+        }
+      ]
+    },
+    {
+      "id": "call-off",
+      "word": "call off",
+      "translation": "cancelar",
+      "meaning": "to cancel an event or plan",
+      "partOfSpeech": "verb",
+      "level": "advanced",
+      "topic": "Phrasal verbs",
+      "examples": [
+        {
+          "en": "They called off the trip.",
+          "pt": "Eles cancelaram a viagem."
+        }
+      ]
+    },
+    {
+      "id": "turn-off",
+      "word": "turn off",
+      "translation": "desligar",
+      "meaning": "to stop a machine or light from working",
+      "partOfSpeech": "verb",
+      "level": "advanced",
+      "topic": "Phrasal verbs",
+      "examples": [
+        {
+          "en": "Please turn off your phones.",
+          "pt": "Por favor, desliguem os celulares."
+        }
+      ]
+    }
+  ],
+  "placementQuestions": [
+    {
+      "id": "p1",
+      "stage": "beginner",
+      "instruction": "Complete a frase.",
+      "prompt": "Hello! My name ___ Ana.",
+      "options": [
+        "is",
+        "am",
+        "are",
+        "be"
+      ],
+      "answer": "is",
+      "skillTag": "to_be"
+    },
+    {
+      "id": "p2",
+      "stage": "beginner",
+      "instruction": "Escolha a tradução.",
+      "prompt": "O que significa \"blue\"?",
+      "options": [
+        "vermelho",
+        "azul",
+        "verde",
+        "amarelo"
+      ],
+      "answer": "azul",
+      "skillTag": "vocabulary"
+    },
+    {
+      "id": "p3",
+      "stage": "beginner",
+      "instruction": "Complete a frase.",
+      "prompt": "I ___ a student.",
+      "options": [
+        "am",
+        "is",
+        "are",
+        "have"
+      ],
+      "answer": "am",
+      "skillTag": "to_be"
+    },
+    {
+      "id": "p4",
+      "stage": "beginner",
+      "instruction": "Escolha a resposta correta.",
+      "prompt": "Como se diz 15 em inglês?",
+      "options": [
+        "fifty",
+        "fifteen",
+        "five",
+        "fourteen"
+      ],
+      "answer": "fifteen",
+      "skillTag": "numbers"
+    },
+    {
+      "id": "p5",
+      "stage": "basic",
+      "instruction": "Complete a frase.",
+      "prompt": "She ___ to work by bus.",
+      "options": [
+        "go",
+        "goes",
+        "going",
+        "is go"
+      ],
+      "answer": "goes",
+      "skillTag": "simple_present"
+    },
+    {
+      "id": "p6",
+      "stage": "basic",
+      "instruction": "Complete a pergunta.",
+      "prompt": "___ you like coffee?",
+      "options": [
+        "Do",
+        "Does",
+        "Are",
+        "Is"
+      ],
+      "answer": "Do",
+      "skillTag": "questions_negatives"
+    },
+    {
+      "id": "p7",
+      "stage": "basic",
+      "instruction": "Complete a frase.",
+      "prompt": "Yesterday I ___ a great movie.",
+      "options": [
+        "see",
+        "seen",
+        "saw",
+        "seeing"
+      ],
+      "answer": "saw",
+      "skillTag": "simple_past"
+    },
+    {
+      "id": "p8",
+      "stage": "basic",
+      "instruction": "Complete a frase.",
+      "prompt": "The meeting is ___ Monday.",
+      "options": [
+        "in",
+        "on",
+        "at",
+        "to"
+      ],
+      "answer": "on",
+      "skillTag": "prepositions"
+    },
+    {
+      "id": "p9",
+      "stage": "intermediate",
+      "instruction": "Complete the sentence.",
+      "prompt": "I ___ here since 2019.",
+      "options": [
+        "live",
+        "lived",
+        "have lived",
+        "am living"
+      ],
+      "answer": "have lived",
+      "skillTag": "present_perfect"
+    },
+    {
+      "id": "p10",
+      "stage": "intermediate",
+      "instruction": "Complete the sentence.",
+      "prompt": "If I ___ more time, I would travel more.",
+      "options": [
+        "have",
+        "had",
+        "will have",
+        "would have"
+      ],
+      "answer": "had",
+      "skillTag": "word_choice"
+    },
+    {
+      "id": "p11",
+      "stage": "intermediate",
+      "instruction": "Read and answer.",
+      "passage": "Marta used to work in a bank, but she was never really happy there. Two years ago, she quit her job and opened a small bakery. It is hard work, but she says she has never felt so alive.",
+      "prompt": "How does Marta feel about her new job?",
+      "options": [
+        "She finds it hard but very rewarding.",
+        "She wants to go back to the bank.",
+        "She thinks it is easy and boring.",
+        "She has not started it yet."
+      ],
+      "answer": "She finds it hard but very rewarding.",
+      "skillTag": "reading"
+    },
+    {
+      "id": "p12",
+      "stage": "intermediate",
+      "instruction": "Complete the sentence.",
+      "prompt": "I'm really looking forward to ___ you.",
+      "options": [
+        "meet",
+        "meeting",
+        "met",
+        "be meeting"
+      ],
+      "answer": "meeting",
+      "skillTag": "word_choice"
+    }
+  ],
+  "topics": [
+    {
+      "id": "free",
+      "title": "Conversa livre",
+      "titleEn": "Free talk",
+      "description": "Fale sobre o que quiser. A conversa segue o seu ritmo.",
+      "icon": "message-circle",
+      "areas": [
+        "everyday"
+      ],
+      "recommendedFrom": "beginner",
+      "questions": [
+        {
+          "id": "free-1",
+          "low": "How are you today?",
+          "high": "How's your day going so far?",
+          "lowPt": "Como você está hoje?"
+        },
+        {
+          "id": "free-2",
+          "low": "What do you like to do?",
+          "high": "What do you usually do to relax?",
+          "lowPt": "O que você gosta de fazer?"
+        },
+        {
+          "id": "free-3",
+          "low": "What is your favorite food?",
+          "high": "What's a dish you could eat every single day?",
+          "lowPt": "Qual é a sua comida favorita?",
+          "asks": [
+            "food"
+          ]
+        },
+        {
+          "id": "free-4",
+          "low": "Do you like music?",
+          "high": "What kind of music have you been listening to lately?",
+          "lowPt": "Você gosta de música?"
+        },
+        {
+          "id": "free-5",
+          "low": "Why do you study English?",
+          "high": "What would you like to do once your English is more fluent?",
+          "lowPt": "Por que você estuda inglês?"
+        }
+      ]
+    },
+    {
+      "id": "introductions",
+      "title": "Apresentações",
+      "titleEn": "Introductions",
+      "description": "Diga quem você é, de onde vem e o que faz.",
+      "icon": "hand",
+      "areas": [
+        "everyday"
+      ],
+      "recommendedFrom": "beginner",
+      "questions": [
+        {
+          "id": "intro-1",
+          "low": "Where are you from?",
+          "high": "Where are you from, and what do you like most about it?",
+          "lowPt": "De onde você é?",
+          "asks": [
+            "from",
+            "city"
+          ]
+        },
+        {
+          "id": "intro-2",
+          "low": "How old are you?",
+          "high": "How long have you lived there?",
+          "lowPt": "Quantos anos você tem?",
+          "asks": [
+            "age"
+          ]
+        },
+        {
+          "id": "intro-3",
+          "low": "What do you do? Are you a student?",
+          "high": "What do you do for a living, or what are you studying?",
+          "lowPt": "O que você faz? Você é estudante?",
+          "asks": [
+            "job"
+          ]
+        },
+        {
+          "id": "intro-4",
+          "low": "Do you have brothers or sisters?",
+          "high": "Tell me a bit about your family.",
+          "lowPt": "Você tem irmãos ou irmãs?"
+        },
+        {
+          "id": "intro-5",
+          "low": "What do you like to do on weekends?",
+          "high": "What does a perfect weekend look like for you?",
+          "lowPt": "O que você gosta de fazer nos fins de semana?"
+        }
+      ]
+    },
+    {
+      "id": "daily-routine",
+      "title": "Rotina",
+      "titleEn": "Daily routine",
+      "description": "Horários, hábitos e o seu dia a dia.",
+      "icon": "sun",
+      "areas": [
+        "everyday"
+      ],
+      "recommendedFrom": "beginner",
+      "questions": [
+        {
+          "id": "routine-1",
+          "low": "What time do you wake up?",
+          "high": "Are you a morning person or a night owl?",
+          "lowPt": "Que horas você acorda?"
+        },
+        {
+          "id": "routine-2",
+          "low": "What do you eat for breakfast?",
+          "high": "What does your morning routine look like?",
+          "lowPt": "O que você come no café da manhã?"
+        },
+        {
+          "id": "routine-3",
+          "low": "How do you go to work or school?",
+          "high": "How long does it take you to get to work or school?",
+          "lowPt": "Como você vai ao trabalho ou à escola?"
+        },
+        {
+          "id": "routine-4",
+          "low": "What do you do in the evening?",
+          "high": "How do you usually unwind after a long day?",
+          "lowPt": "O que você faz à noite?"
+        }
+      ]
+    },
+    {
+      "id": "food",
+      "title": "Comida e restaurantes",
+      "titleEn": "Food & restaurants",
+      "description": "Pratos favoritos, pedidos e receitas.",
+      "icon": "utensils",
+      "areas": [
+        "food",
+        "travel"
+      ],
+      "recommendedFrom": "beginner",
+      "questions": [
+        {
+          "id": "food-1",
+          "low": "What is your favorite food?",
+          "high": "What's your all-time favorite dish?",
+          "lowPt": "Qual é a sua comida favorita?",
+          "asks": [
+            "food"
+          ]
+        },
+        {
+          "id": "food-2",
+          "low": "Do you like to cook?",
+          "high": "Do you enjoy cooking, or do you prefer eating out?",
+          "lowPt": "Você gosta de cozinhar?"
+        },
+        {
+          "id": "food-3",
+          "low": "What do you usually order at a restaurant?",
+          "high": "What do you usually order when you go out to eat?",
+          "lowPt": "O que você geralmente pede em um restaurante?"
+        },
+        {
+          "id": "food-4",
+          "low": "Is there a food you don't like?",
+          "high": "Is there any food you just can't stand?",
+          "lowPt": "Tem alguma comida de que você não gosta?"
+        }
+      ]
+    },
+    {
+      "id": "travel",
+      "title": "Viagem",
+      "titleEn": "Travel",
+      "description": "Lugares, planos e situações de viagem.",
+      "icon": "plane",
+      "areas": [
+        "travel"
+      ],
+      "recommendedFrom": "basic",
+      "questions": [
+        {
+          "id": "travel-1",
+          "low": "Do you like to travel?",
+          "high": "What's the best trip you've ever taken?",
+          "lowPt": "Você gosta de viajar?"
+        },
+        {
+          "id": "travel-2",
+          "low": "Where do you want to go?",
+          "high": "If you could go anywhere next year, where would you go?",
+          "lowPt": "Para onde você quer ir?"
+        },
+        {
+          "id": "travel-3",
+          "low": "Do you like the beach or the mountains?",
+          "high": "Do you prefer relaxing trips or adventurous ones?",
+          "lowPt": "Você prefere praia ou montanha?"
+        },
+        {
+          "id": "travel-4",
+          "low": "What do you pack in your bag?",
+          "high": "What's something you always forget to pack?",
+          "lowPt": "O que você leva na mala?"
+        }
+      ]
+    },
+    {
+      "id": "work",
+      "title": "Trabalho e carreira",
+      "titleEn": "Work & career",
+      "description": "Seu trabalho, reuniões e objetivos profissionais.",
+      "icon": "briefcase",
+      "areas": [
+        "business"
+      ],
+      "recommendedFrom": "basic",
+      "questions": [
+        {
+          "id": "work-1",
+          "low": "What is your job?",
+          "high": "What do you do, and what do you enjoy most about it?",
+          "lowPt": "Qual é o seu trabalho?",
+          "asks": [
+            "job"
+          ]
+        },
+        {
+          "id": "work-2",
+          "low": "Do you like your job?",
+          "high": "What's the most challenging part of your job?",
+          "lowPt": "Você gosta do seu trabalho?"
+        },
+        {
+          "id": "work-3",
+          "low": "Do you work from home?",
+          "high": "Do you prefer working from home or at the office? Why?",
+          "lowPt": "Você trabalha de casa?"
+        },
+        {
+          "id": "work-4",
+          "low": "What is your dream job?",
+          "high": "Where do you see your career in five years?",
+          "lowPt": "Qual é o trabalho dos seus sonhos?"
+        }
+      ]
+    },
+    {
+      "id": "technology",
+      "title": "Tecnologia",
+      "titleEn": "Technology",
+      "description": "Apps, programação e o mundo digital.",
+      "icon": "cpu",
+      "areas": [
+        "technology"
+      ],
+      "recommendedFrom": "basic",
+      "questions": [
+        {
+          "id": "tech-1",
+          "low": "What apps do you use every day?",
+          "high": "Which apps could you not live without?",
+          "lowPt": "Quais aplicativos você usa todos os dias?"
+        },
+        {
+          "id": "tech-2",
+          "low": "Do you like technology?",
+          "high": "What new technology are you most curious about?",
+          "lowPt": "Você gosta de tecnologia?"
+        },
+        {
+          "id": "tech-3",
+          "low": "Do you work with computers?",
+          "high": "How does technology show up in your work or studies?",
+          "lowPt": "Você trabalha com computadores?"
+        },
+        {
+          "id": "tech-4",
+          "low": "Do you use AI tools?",
+          "high": "How do you think AI will change the way people learn?",
+          "lowPt": "Você usa ferramentas de IA?"
+        }
+      ]
+    },
+    {
+      "id": "hobbies",
+      "title": "Hobbies e lazer",
+      "titleEn": "Hobbies & free time",
+      "description": "Filmes, séries, esportes e passatempos.",
+      "icon": "music",
+      "areas": [
+        "entertainment",
+        "sports"
+      ],
+      "recommendedFrom": "beginner",
+      "questions": [
+        {
+          "id": "hobbies-1",
+          "low": "What do you do in your free time?",
+          "high": "What do you love doing in your free time?",
+          "lowPt": "O que você faz no seu tempo livre?"
+        },
+        {
+          "id": "hobbies-2",
+          "low": "Do you like movies or series?",
+          "high": "What's a series you'd recommend to a friend?",
+          "lowPt": "Você gosta de filmes ou séries?"
+        },
+        {
+          "id": "hobbies-3",
+          "low": "Do you play any sports?",
+          "high": "Is there a sport or activity you'd like to try?",
+          "lowPt": "Você pratica algum esporte?"
+        },
+        {
+          "id": "hobbies-4",
+          "low": "Do you read books?",
+          "high": "What's the last book or podcast you really enjoyed?",
+          "lowPt": "Você lê livros?"
+        }
+      ]
+    }
+  ]
+}
