@@ -1,4 +1,5 @@
 """Shared validation, clock and learner context for business services."""
+
 from datetime import datetime, timezone
 from uuid import uuid4
 
@@ -25,7 +26,11 @@ def now():
 
 
 def iso(value):
-    return value.astimezone(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+    return (
+        value.astimezone(timezone.utc)
+        .isoformat(timespec="milliseconds")
+        .replace("+00:00", "Z")
+    )
 
 
 def now_iso():
@@ -45,6 +50,7 @@ def body():
 
 def require_user(user_id):
     from models import User
+
     user = db.session.get(User, user_id)
     if user is None:
         raise AppError("UNAUTHENTICATED", "Entre na sua conta para continuar.", 401)
@@ -53,11 +59,16 @@ def require_user(user_id):
 
 def learner_bundle(user_id):
     from models import LearningProfile, Preferences
+    from services.perfil import ensure_account_defaults
+
     user = require_user(user_id)
+    ensure_account_defaults(user_id)
     profile = db.session.get(LearningProfile, user_id)
     preferences = db.session.get(Preferences, user_id)
     if profile is None or preferences is None:
-        raise AppError("INCOMPLETE_ACCOUNT", "Não foi possível carregar o perfil da conta.", 409)
+        raise AppError(
+            "INCOMPLETE_ACCOUNT", "Não foi possível carregar o perfil da conta.", 409
+        )
     level = profile.estimated_level or "beginner"
     language = preferences.explanation_language
     if language == "auto":
@@ -70,7 +81,14 @@ def learner_bundle(user_id):
         "explanationLanguage": language,
         "correctionIntensity": preferences.correction_intensity,
         "replyLength": preferences.reply_length,
-        "showTranslations": bool(preferences.show_translations and level in {"beginner", "basic"}),
+        "showTranslations": bool(
+            preferences.show_translations and level in {"beginner", "basic"}
+        ),
         "difficulties": profile.difficulties or [],
     }
-    return {"user": user, "profile": profile, "preferences": preferences, "learner": learner}
+    return {
+        "user": user,
+        "profile": profile,
+        "preferences": preferences,
+        "learner": learner,
+    }

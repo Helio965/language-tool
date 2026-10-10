@@ -1,4 +1,5 @@
 """Flask application factory and Python-only development entry point."""
+
 from pathlib import Path
 from urllib.parse import urlencode
 
@@ -37,6 +38,7 @@ def create_app(config=None):
     csrf.init_app(app)
     limiter.init_app(app)
     from models import User
+
     migrate.init_app(app, db, directory=str(ROOT / "migrations"))
 
     @login_manager.user_loader
@@ -61,8 +63,12 @@ def create_app(config=None):
         if request.path in {"/api/auth/register", "/api/auth/login"}:
             return
         expected = request.headers.get("X-Session-User")
-        if expected and (not current_user.is_authenticated or expected != current_user.id):
-            raise AppError("UNAUTHENTICATED", "A conta desta página mudou. Entre novamente.", 401)
+        if expected and (
+            not current_user.is_authenticated or expected != current_user.id
+        ):
+            raise AppError(
+                "UNAUTHENTICATED", "A conta desta página mudou. Entre novamente.", 401
+            )
 
     @app.get("/api/csrf")
     def csrf_token():
@@ -72,23 +78,39 @@ def create_app(config=None):
     def health():
         db.session.execute(text("SELECT 1"))
         ai = app.extensions["english_ai"]
-        metadata = ai.metadata() if callable(getattr(ai, "metadata", None)) else {"provider": app.config["AI_PROVIDER"]}
-        return jsonify(status="ok", aiProvider=metadata.get("provider", app.config["AI_PROVIDER"]), ai=metadata)
+        metadata = (
+            ai.metadata()
+            if callable(getattr(ai, "metadata", None))
+            else {"provider": app.config["AI_PROVIDER"]}
+        )
+        return jsonify(
+            status="ok",
+            aiProvider=metadata.get("provider", app.config["AI_PROVIDER"]),
+            ai=metadata,
+        )
 
     @app.errorhandler(AppError)
     def domain_error(error):
         db.session.rollback()
-        return jsonify(error={"code": error.code, "message": error.message, "fields": error.fields}), error.status
+        return jsonify(
+            error={"code": error.code, "message": error.message, "fields": error.fields}
+        ), error.status
 
     @app.errorhandler(CSRFError)
     def invalid_csrf(_error):
-        return jsonify(error={"code": "CSRF", "message": "Atualize a página e tente novamente."}), 400
+        return jsonify(
+            error={"code": "CSRF", "message": "Atualize a página e tente novamente."}
+        ), 400
 
     @app.errorhandler(HTTPException)
     def http_error(error):
         if request.path.startswith("/api/"):
-            return jsonify(error={"code": str(error.code), "message": "Requisição não permitida."}), error.code
-        return render_template("error.html", status=error.code, message="Esta página não está disponível."), error.code
+            return jsonify(
+                error={"code": str(error.code), "message": "Requisição não permitida."}
+            ), error.code
+        return render_template(
+            "error.html", status=error.code, message="Esta página não está disponível."
+        ), error.code
 
     @app.errorhandler(Exception)
     def unexpected(error):
@@ -96,41 +118,62 @@ def create_app(config=None):
         # Log only the exception class: database/provider errors can contain private data.
         app.logger.error("request.failed type=%s", type(error).__name__)
         if request.path.startswith("/api/"):
-            return jsonify(error={"code": "INTERNAL", "message": "Não foi possível concluir. Tente novamente."}), 500
-        return render_template("error.html", status=500, message="Não foi possível concluir. Tente novamente."), 500
+            return jsonify(
+                error={
+                    "code": "INTERNAL",
+                    "message": "Não foi possível concluir. Tente novamente.",
+                }
+            ), 500
+        return render_template(
+            "error.html",
+            status=500,
+            message="Não foi possível concluir. Tente novamente.",
+        ), 500
 
     @app.after_request
     def headers(response):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "same-origin"
-        response.headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
-        if request.path.startswith("/api/") or current_user.is_authenticated or request.path in {"/entrar", "/cadastro", "/recuperar-senha"}:
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
+        )
+        if (
+            request.path.startswith("/api/")
+            or session.get("_user_id")
+            or request.path in {"/entrar", "/cadastro", "/recuperar-senha"}
+            or request.path.startswith("/redefinir-senha/")
+        ):
             response.headers["Cache-Control"] = "no-store"
         return response
 
     from ai.provider import create_ai_service
     from services.email import init_email
+
     app.extensions["english_ai"] = create_ai_service(app.config)
     init_email(app)
     from blueprints.auth import bp as auth_bp
     from blueprints.aprendizagem import bp as learning_bp
     from blueprints.conversacao import bp as conversation_bp
     from blueprints.pages import bp as pages_bp
+
     for bp in [auth_bp, learning_bp, conversation_bp, pages_bp]:
         app.register_blueprint(bp)
     from models.migration import initialize_database, register_migration_cli
+
     register_migration_cli(app)
     if app.config.get("AUTO_INIT_DB"):
         with app.app_context():
             initialize_database(app)
             from database.seed import seed_content
+
             seed_content()
 
     @app.cli.command("seed")
     def seed():
-        """Synchronize the original educational corpus without deleting user data."""
+        """Add missing corpus entries without overwriting existing records."""
         from database.seed import seed_content
+
         seed_content()
         click.echo("Conteúdo pedagógico sincronizado.")
 
@@ -138,8 +181,12 @@ def create_app(config=None):
     def purge():
         """Apply conversation retention and remove expired password reset tokens."""
         from services.conversacao import purge_expired
+        from services.autenticacao import purge_expired_resets
+
         count = purge_expired()
+        reset_count = purge_expired_resets()
         click.echo(f"Conversas expiradas processadas: {count}")
+        click.echo(f"Tokens de recuperação expirados removidos: {reset_count}")
 
     return app
 
