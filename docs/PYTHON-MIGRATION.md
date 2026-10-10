@@ -20,7 +20,7 @@ comando npm; o legado tem dependências e comandos próprios.
 | `apps/api/src/config/env.ts` | `config.py` com ambientes e validação |
 | `apps/api/src/db`, repositório SQLite | `extensions.py`, `models/`, `database/`, `migrations/` |
 | `core/application/services/*` | `services/` — regras, validação e transações |
-| `core/content/*` | catálogo preservado em `database/` / `services/` |
+| `core/content/*` | catálogo preservado em `content/catalog.json` / `content/catalog.py` |
 | `core/ai/*`, `api/ai/*` | `ai/` — provedor, prompts, política e demonstração |
 | `apps/api/src/http/routes/*` | `blueprints/` — rotas por contexto |
 | `apps/web/src/features`, layouts, componentes | `templates/` com Jinja e macros |
@@ -44,8 +44,13 @@ O banco original contém **14 tabelas**: `users`, `password_reset_tokens`,
 O modelo preserva nomes/PK/FK e dados existentes. Campos adicionais suportam
 passagens de aprendizagem, idempotência, resultados persistidos e identificação
 da origem da resposta de IA. Alembic versiona essa evolução. Senhas scrypt do
-Node devem ser verificáveis no Python sem pedir troca global; hashes PBKDF2
-compatíveis são tratados explicitamente. Senhas não são exportadas em texto.
+Node devem ser verificáveis no Python sem pedir troca global; o demo PBKDF2 do navegador fica fora da importação SQLite, sem alegar suporte
+a essa migração automática. Senhas não são exportadas em texto.
+
+Contas antigas sem a linha individual de perfil/preferências recebem os padrões
+ausentes ao entrar, preservando valores já existentes e seguindo para a etapa
+pendente. Isso acrescenta relações faltantes; não altera o identificador/hash da
+conta. Mensagens antigas com a mesma data mantêm sua ordem de inserção SQLite.
 
 Antes de migrar banco existente:
 
@@ -57,6 +62,12 @@ Antes de migrar banco existente:
 5. Aplique a migração na cópia com o comando documentado no README.
 6. Compare colunas originais, hashes, PK/FK e contagens. Novas colunas têm valores
    próprios; não devem alterar o conteúdo antigo. Verifique login com hash legado.
+   O seed acrescenta somente IDs/associações ausentes e não sobrescreve linhas
+   existentes. Se o banco contém conteúdo personalizado, esse cache é preservado;
+   o catálogo de `content/` continua sendo a fonte pedagógica em execução. A
+   migração não implementa um editor nem execução de conteúdo personalizado.
+   Em um catálogo incompleto, registre separadamente as inserções esperadas e
+   compare o hash das linhas originais pelo conjunto de PKs anterior.
 7. Somente use a cópia migrada após testes. Preserve o original e o manifesto.
 
 Não se deve copiar só o arquivo `.db` enquanto um servidor mantém WAL aberto.
@@ -77,7 +88,15 @@ Alembic e colunas presentes antes de retomar. Uma falha não autoriza reiniciali
 o banco. Use o backup preservado se o arquivo não puder ser recuperado. Dados
 gravados depois da migração precisam de exportação/reconciliação antes do retorno;
 restaurar backup antigo perde essas gravações, portanto a reversão operacional
-exige essa conferência. Downgrade destrutivo não é o procedimento padrão.
+exige essa conferência. As revisões recusam downgrade destrutivo; a recuperação é importar o backup
+original validado para um destino novo. Campos aditivos já aplicados são
+reconhecidos ao retomar `db upgrade`; confira o estado antes de repetir.
+
+As revisões finais são `0001_legacy_schema` (criação/adoção),
+`0002_integrity_metadata` (passagens/resultados/metadata) e
+`0003_conversation_idempotency` (recuperação de envio do chat após perda da
+resposta HTTP). A terceira revisão acrescenta campos/índice à tabela de
+mensagens, sem tabela nova nem mudança das colunas originais.
 
 ## Limites de compatibilidade e revisão
 
@@ -90,4 +109,6 @@ exige essa conferência. Downgrade destrutivo não é o procedimento padrão.
 - Anthropic e SMTP só têm verificação real quando suas credenciais estiverem
   configuradas e a chamada/entrega tiverem sido executadas.
 - Branch e commits devem ser publicados com Pull Request; merge da `main`
-  depende de autorização. URL e commits serão registrados após sua criação.
+  depende de autorização. As etapas/commits realizados estão no
+  [relatório de auditoria](MIGRATION-AUDIT.md); a URL do PR será registrada
+  após sua criação.

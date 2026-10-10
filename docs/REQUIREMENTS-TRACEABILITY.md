@@ -1,249 +1,212 @@
-# Rastreabilidade de requisitos — English AI
+# Rastreabilidade — English AI em Python
 
-> Auditoria final do MVP: cada requisito dos materiais do projeto, onde está implementado, como foi verificado
-> e o que ficou parcial ou fora do escopo. Fontes: Análise de requisitos (F1), Especificação de Casos de Uso (F2),
-> fluxograma (F3) e tarefas da Pessoa 2 (F4) — ver [MVP-SCOPE.md](./MVP-SCOPE.md).
+Os identificadores e a numeração acadêmica foram preservados. Fontes disponíveis:
+consolidação da Análise (F1), Especificação de Casos de Uso (F2), fluxograma (F3)
+e tarefas Pessoa 2 (F4) em [MVP-SCOPE.md](MVP-SCOPE.md). Os DOCX/PDF originais
+não foram reenviados nesta tarefa. [A rastreabilidade anterior está preservada](legacy/REQUIREMENTS-TRACEABILITY.md).
 
-**Legenda:** ✅ atendido · 🟡 parcial (o que falta está descrito) · ⛔ fora do escopo do MVP / não feito
+**Legenda:** implementado = caminho de código existente, com validação registrada
+no relatório; parcial = falta explícita; fora do MVP = decisão acadêmica mantida.
+Existência de código não substitui evidência de execução. A versão e os resultados
+executados estão em [MIGRATION-AUDIT.md](MIGRATION-AUDIT.md). Credenciais externas,
+Windows, aparelhos reais e plataformas não executadas mantêm limites próprios.
 
-Caminhos abreviados: `core` = `packages/core/src`, `api` = `apps/api/src`, `web` = `apps/web/src`.
-Testes: `core/test` = `packages/core/test`, `api/test` = `apps/api/test`, `web/test` = `apps/web/test`,
-`e2e` = testes de ponta a ponta com Playwright (`e2e/demo.spec.ts`, `e2e/http.spec.ts`).
+## Requisitos funcionais (RF01–RF20)
 
----
-
-## 1. Requisitos funcionais (F1 §9)
-
-| ID | Requisito | Status | Implementação | Verificação |
-| --- | --- | --- | --- | --- |
-| RF01 | Cadastro de usuário | ✅ | `core/application/services/authService.ts`, `POST /api/auth/register`, tela `/cadastro`; e-mail de boas-vindas em segundo plano (`api/email`) | `services.test` (autenticação), `api.test` (cookie httpOnly), `web/test/auth.test`, `api/passwordReset.test` (boas-vindas, falha de SMTP não desfaz a conta) |
-| RF02 | Autenticação segura | ✅ | scrypt + JWT com versão da sessão em cookie httpOnly/SameSite=Strict, rate limit (`api/security`, `api/http`); recuperação de senha com token de uso único guardado como hash ([EMAIL-AND-AUTH.md](./EMAIL-AND-AUTH.md)); ciclo de vida da sessão no front-end (`web/app/session.tsx`, ver [ARCHITECTURE.md §6.1](./ARCHITECTURE.md)) | `api.test`, `security.test`, `auth.test`, `session.test`, `e2e`; recuperação de senha e encerramento de sessões: `core/passwordReset.test`, `api/passwordReset.test`, `web/passwordReset.test`, `e2e` |
-| RF03 | Perfil do usuário | ✅ | `LearningProfile` (`core/domain/entities.ts`), `/configuracao`, `/perfil`, `/perfil/editar` | jornada em `services.test` e `api.test` |
-| RF04 | Definição de objetivo | ✅ | objetivos em `core/domain/profile.ts` (inclui os 5 exemplos da F1); etapa 1 da configuração | jornada |
-| RF05 | Nivelamento | ✅ | `core/domain/placement.ts` (3 etapas adaptativas, 12 perguntas), `/nivelamento` | `rules.test` (nivelamento), jornada |
-| RF06 | Modo Aprender | ✅ | trilha `/aprender`, aula `/aprender/aula/:id` | jornada, capturas `mobile-07`/`desktop-03` |
-| RF07 | Conteúdo de gramática | ✅ | 12 aulas próprias (5 Iniciante, 5 Básico, 1 Intermediário, 1 Avançado) em `core/content/lessons` | `content.test` |
-| RF08 | Vocabulário por nível | ✅ | 67 palavras com nível, tradução, significado, classe e exemplos (`core/content/vocabulary.ts`) | `content.test` |
-| RF09 | Exercícios | ✅ | 65 exercícios de 5 tipos (múltipla escolha, lacuna, seleção, tradução, escrita livre) | `content.test` (consistência de cada exercício), `exerciseRunner.test` |
-| RF10 | Correção | ✅ | gabarito determinístico (`core/domain/grading.ts`) + regras/IA para escrita livre | `rules.test`, jornada |
-| RF11 | Explicação dos erros adequada ao nível | ✅ | `buildCorrection` + `levelPolicy.ts` (idioma e detalhe por nível) | `grammar.test` (formato e idioma) |
-| RF12 | Conversação com a IA | ✅ | `conversationService.ts`, `MockAIService`/`LLMAIService`, `/conversar/:id` | `ai.test`, `services.test`, `conversation.test` |
-| RF13 | Personalidade da IA | ✅ | `core/ai/persona.ts` (Lumi) + camada base do prompt | `ai.test` (prompt e honestidade sobre ser IA) |
-| RF14 | Correção durante conversação conforme o modo escolhido | ✅ | `core/ai/correctionPolicy.ts` (Leve/Equilibrada/Detalhada) | `grammar.test` (política), `services.test` |
-| RF15 | Histórico respeitando privacidade | ✅ | tentativas, progresso e conversas; preferência "Salvar histórico"; retenção de 90 dias | `services.test` (RN07, retenção) |
-| RF16 | Progresso | ✅ | `core/domain/progress.ts`, `/progresso`, resumo no Início | `rules.test` (progresso), jornada |
-| RF17 | Vocabulário estudado | ✅ | `UserVocabulary` com status e revisão espaçada; `/vocabulario` | jornada (`newWords`), `rules.test` (agendamento) |
-| RF18 | Revisão | ✅ | `core/domain/review.ts` (erros, nota baixa, espaçada, conversa, palavras); `/revisao` | `rules.test` (revisão), jornada |
-| RF19 | Configurações | 🟡 | `/preferencias`: idioma, intensidade, tamanho das respostas, tradução, meta diária, histórico, lembretes | `services.test`, `api.test`. **Falta:** os lembretes são salvos, mas não enviados (sem serviço de notificação no MVP) |
-| RF20 | Exclusão de dados | ✅ | `DELETE /api/me` com senha; `ON DELETE CASCADE`; apagar conversas; depois da exclusão o app apaga os dados da memória e vira visitante | `services.test`, `api.test`, `session.test` (TESTE 7), `e2e` |
-
-## 2. Requisitos não funcionais (F1 §10)
-
-| ID | Requisito | Status | Como foi atendido | Limitação |
-| --- | --- | --- | --- | --- |
-| RNF01 | Usabilidade, foco em celular | ✅ | mobile first, uma ação principal por tela, linguagem simples ([UX-SPECIFICATION.md](./UX-SPECIFICATION.md)) | sem teste com usuários reais (roteiro proposto em UX-SPEC §12) |
-| RNF02 | Responsividade | ✅ | 3 layouts (barra inferior, trilho, barra lateral); telas com 2 colunas no desktop | verificado em 390, 820 e 1440px (capturas em `design/screenshots`); sem rolagem horizontal de 320 a 1920px, inclusive nas larguras equivalentes a zoom de 125%, 150% e 200% (verificação manual no Chromium) e em 320px nas telas principais (`e2e`) |
-| RNF03 | Desempenho | 🟡 | estado "IA preparando resposta"; histórico limitado a 12 mensagens; esforço `low` e timeout de 20 s no provedor real; correção de exercícios fechados sem IA | sem medição de latência com provedor real nem teste de carga; JavaScript da web em um único pacote (~219 KB gzip, sem divisão por rota) |
-| RNF04 | Segurança | ✅ | scrypt, JWT em cookie httpOnly (nunca no `localStorage`), CSRF por cabeçalho, helmet, CORS restrito, rate limit, zod, limite de 16 KB, checagem de dono (404), conta exibida × conta do cookie (`X-Session-User` → 401), cache privado por conta no front-end, token de redefinição de senha só como hash (validade curta, uso único), versão da sessão (troca de senha encerra as sessões), links de e-mail só com `APP_PUBLIC_URL`, credenciais SMTP só no servidor, logs sem dados sensíveis, chaves só no `.env` do servidor | `api.test`, `security.test`, `session.test`, `e2e` (cookie httpOnly/Strict, nenhuma requisição privada depois de sair) |
-| RNF05 | Privacidade / transparência | ✅ | página "Privacidade e dados", aceite dos termos, remoção de dados pessoais nas mensagens, contexto mínimo para a IA | texto informativo, não revisado juridicamente |
-| RNF06 | Escalabilidade | 🟡 | API sem estado de sessão (JWT), núcleo independente de banco (portas), provedor de IA substituível | SQLite é arquivo único: para várias instâncias é preciso trocar o adaptador (ex.: PostgreSQL) — ver ARCHITECTURE §10 |
-| RNF07 | Disponibilidade | ✅ | `FallbackAIService`: falha, timeout, recusa ou JSON inválido do provedor → modo demonstração | `ai.test` (fallback) |
-| RNF08 | Manutenibilidade | ✅ | monorepo com `core` (domínio e casos de uso sem framework), `api` e `web`; TypeScript estrito; 276 testes unitários/integração + 16 de ponta a ponta | — |
-| RNF09 | Acessibilidade | 🟡 | WCAG 2.1 AA como meta: contraste verificado, foco visível, rótulos, `aria-live`, `lang="en"`, movimento reduzido, link de pular navegação, diálogos com título associado, campos sempre selecionáveis e editáveis, botões que quebram linha em telas estreitas | sem auditoria automatizada (ex.: axe) nem teste com leitor de tela real |
-| RNF10 | Compatibilidade | 🟡 | HTML/CSS padrão, sem APIs experimentais no navegador; fallback de hash quando o Web Crypto não está disponível; sincronização entre abas com `BroadcastChannel` quando disponível | testado apenas no Chromium (Playwright, inclusive a suíte `e2e`); Safari/Firefox e aparelhos reais não testados |
-
-## 3. Regras de negócio (F1 §11)
-
-| ID | Regra | Status | Onde |
+| ID | Requisito original | Implementação Python | Verificação / limite |
 | --- | --- | --- | --- |
-| RN01 | Dois modos: Aprender e Conversar | ✅ | navegação, cores e comportamentos distintos; `modeLayer` do prompt; IA-BEHAVIOR §3–4 |
-| RN02 | Progressão de dificuldade | ✅ | aulas ordenadas por nível (`content.test`: "segue uma progressão de dificuldade") |
-| RN03 | Adequação ao nível | ✅ | trilha e assuntos marcam conteúdo acima do nível; `levelPolicy.ts` |
-| RN04 | Não interromper constantemente na conversa | ✅ | `correctionPolicy.ts` (intervalo mínimo, correções guardadas para o resumo), recast, cartão recolhido |
-| RN05 | Explicações conforme o nível | ✅ | idioma e detalhe por nível; "Ver no outro idioma" |
-| RN06 | Personalização por perfil e desempenho | ✅ | próxima aula, revisões por erro, assuntos recomendados pelos interesses, dificuldades no prompt |
-| RN07 | Controle sobre dados e conversas | ✅ | salvar histórico (sim/não), apagar conversas, excluir conta, retenção automática |
-| RN08 | Conteúdo próprio | ✅ | todo o conteúdo pedagógico foi escrito para o projeto (`core/content`); fontes com licença OFL |
+| RF01 | Cadastro | `services/autenticacao.py`, `blueprints/auth.py`, `templates/auth` | Cadastro, duplicação, campos/senha/aceite; boas-vindas local |
+| RF02 | Autenticação segura | scrypt compatível, Flask-Login, versão sessão, CSRF/limites; recuperação uso único | Login, logout, expiração, sessão antiga, CSRF, token/TTL/reuso |
+| RF03 | Perfil | `models/usuario.py`, `services/perfil.py`, `templates/perfil` | Persistir/editar perfil e retomar etapa pendente |
+| RF04 | Objetivo | perfil com básicos/conversação/trabalho/viagem/tecnologia | Objetivo/interesses informam recomendações |
+| RF05 | Nivelamento | `services/nivelamento.py`, `content/catalog.json`, `templates/aprender/placement.html` | Três etapas, 12 questões, resultado estimado, pular/refazer |
+| RF06 | Modo Aprender | `services/aprendizagem.py`, `templates/aprender` | Iniciar/retomar aula e navegar seus passos |
+| RF07 | Gramática | 12 aulas preservadas em `content/` | Consistência, ordem, conteúdo PT/EN |
+| RF08 | Vocabulário por nível | 67 palavras preservadas; `services/vocabulario.py` | Tradução/exemplos/nível e consulta |
+| RF09 | Exercícios | 65 atividades de aula em cinco tipos | Entradas inválidas, gabaritos e produção livre distinta |
+| RF10 | Correção | `services/exercicios.py`, `ai/correction.py` | Fechados determinísticos; feedback, reenvio/idempotência |
+| RF11 | Explicação adequada ao nível | `ai/personality.py`, `ai/correction.py`, explicação PT/EN catálogo | Idioma/detalhe e formato Sua frase/Forma recomendada/Explicação |
+| RF12 | Conversação | `services/conversacao.py`, `ai/provider.py`, `ai/conversation.py`, templates/chat | Turnos/contexto e persistência; integração real depende de chave |
+| RF13 | Personalidade da IA | `ai/personality.py` e prompts | Lumi preservada, paciente, educativa e transparente |
+| RF14 | Correção durante conversa conforme preferência | política Python leve/equilibrada/detalhada | Exibir/adiar correções, naturalidade, resumo |
+| RF15 | Histórico privado | conversas salvas/temporárias, retenção, exclusão | Desligar histórico, encerrar, expirar e apagar conteúdo |
+| RF16 | Progresso | `services/progresso.py`, tentativas/passagens e `models/progresso.py` | Resultado calculado no servidor e recarga do banco |
+| RF17 | Vocabulário estudado | `services/vocabulario.py`, `user_vocabulary` | Aula registra palavras; status e revisão espaçada |
+| RF18 | Revisão | `services/revisao.py`, `models/progresso.py`, templates/review | Motivo, atividades permitidas, nota do servidor, intervalo |
+| RF19 | Preferências | `services/perfil.py`, `templates/configuracoes/preferences.html` | **Parcial:** escolhas salvas, lembretes sem envio |
+| RF20 | Exclusão de dados | DELETE conta com senha, cascatas, apagar conversas | Dono, senha, conta/tokens/conversas/tentativas removidos |
 
-## 4. Casos de uso (F2 — numeração canônica)
+## Requisitos não funcionais (RNF01–RNF10)
 
-| UC | Caso de uso | Status | Tela | Fluxos alternativos | Verificação |
-| --- | --- | --- | --- | --- | --- |
-| UC01 | Criar conta | ✅ | `/cadastro` → `/configuracao` | A1 dados inválidos ✅ · A2 conta existente com opção de login ✅ | `services.test`, `api.test`, `auth.test` |
-| UC02 | Fazer login | ✅ | `/entrar` → Início ou etapa pendente | A1 credenciais inválidas (mensagem genérica) ✅ · esqueci a senha (link por e-mail, `/redefinir-senha/:token`) ✅ | `api.test`, `auth.test`, `passwordReset.test` (core, API, web), `e2e` |
-| UC03 | Configurar perfil | ✅ | `/configuracao`, `/perfil/editar` | — | jornada |
-| UC04 | Realizar nivelamento | ✅ | `/nivelamento`, `/perfil/nivelamento` | resultado como estimativa ✅ · pular ✅ | `rules.test`, jornada |
-| UC05 | Iniciar aula | ✅ | `/aprender/aula/:id` (explicação, "Explicar de outro jeito", exemplos) | — | `ai.test`, jornada |
-| UC06 | Realizar exercício | ✅ | `ExerciseRunner` | erro ao verificar → tentar de novo ✅ | `exerciseRunner.test`, jornada |
-| UC07 | Consultar correção | ✅ | `CorrectionCard` (Sua frase / Forma recomendada / Explicação) | — | `grammar.test` (exemplo "She go to school"), `correctionCard.test` |
-| UC08 | Revisar conteúdo | ✅ | `/revisao`, `/revisao/:id` | — | `rules.test`, jornada |
-| UC09 | Conversar com IA | ✅ | `/conversar`, `/conversar/:id` | Naturalidade > correção ✅ · "You said / More natural" ✅ | `ai.test`, `services.test`, `conversation.test` |
-| UC10 | Consultar vocabulário | 🟡 | `/vocabulario` (tradução, exemplos, classe, nível, revisão) | — | jornada. **Falta:** pronúncia (campo `phonetic` preparado, sem áudio — fora do escopo) |
-| UC11 | Consultar progresso | ✅ | `/progresso` + atalho no Perfil (F1-UC05) | — | `rules.test`, jornada |
-| UC12 | Configurar preferências | 🟡 | `/preferencias` | — | `services.test`, `api.test`. **Falta:** envio de notificações |
-
-Mapeamento dos UCs da Análise (F1 §18): F1-UC01→UC01, F1-UC02→UC04, F1-UC03→UC05/UC06, F1-UC04→UC09,
-F1-UC05→UC11 (todos ✅).
-
-## 5. Fluxograma (F3)
-
-| Elemento | Status | Onde |
-| --- | --- | --- |
-| Novo usuário → Criar conta | ✅ | `/cadastro` |
-| Usuário existente → Login | ✅ | `/entrar` |
-| Perfil existente → Configurar perfil | ✅ | `/perfil` → `/perfil/editar` |
-| Nivelamento | ✅ | `/nivelamento` (após a configuração inicial — decisão D2 do MVP-SCOPE) |
-| Aprender → Aula → Exercício | ✅ | `/aprender` → aula → exercícios |
-| Conversar → Chat IA → Correção | ✅ | `/conversar` → chat → correções e resumo |
-| Progresso (convergência) | ✅ | resumo da aula e da conversa levam ao progresso |
-| Revisão | ✅ | `/revisao` |
-
-## 6. Tarefas da Pessoa 2 — Experiência do usuário e IA (F4)
-
-| Tarefa | Status | Evidência |
-| --- | --- | --- |
-| Criar os protótipos das telas no Figma | ⛔ | **Não feito: sem acesso ao Figma neste ambiente.** Substituído por protótipo navegável em código + [FIGMA-GUIDE.md](../design/FIGMA-GUIDE.md) com variáveis, componentes e fluxos para a equipe montar o arquivo |
-| Desenhar login, cadastro e página inicial | ✅ | telas implementadas; [SCREEN-SPECIFICATIONS.md](../design/SCREEN-SPECIFICATIONS.md) §1–7; capturas |
-| Desenhar os modos Aprender e Conversação | ✅ | telas implementadas; SCREEN-SPECIFICATIONS §8–12 |
-| Definir o comportamento da IA em cada modo | ✅ | [IA-BEHAVIOR.md](./IA-BEHAVIOR.md) §3–4 + código (`correctionPolicy`, `prompts`) |
-| Documentar personalidade, correções e adaptação ao nível | ✅ | IA-BEHAVIOR §2, §5, §6 |
-| Especificar como o usuário visualizará o progresso | ✅ | [UX-SPECIFICATION.md §7](./UX-SPECIFICATION.md#7-visualização-do-progresso) + tela `/progresso` |
-| **Entregável:** protótipo navegável | ✅ | `apps/web` em modo demonstração (`npm run dev`) |
-| **Entregável:** documento de comportamento da IA | ✅ | `docs/IA-BEHAVIOR.md` (+ `docs/AI-PROMPT-STRATEGY.md`) |
-
-## 7. Entregáveis do projeto
-
-| Entregável | Status | Arquivo |
-| --- | --- | --- |
-| README | ✅ | [README.md](../README.md) |
-| Arquitetura | ✅ | [ARCHITECTURE.md](./ARCHITECTURE.md) |
-| Comportamento da IA | ✅ | [IA-BEHAVIOR.md](./IA-BEHAVIOR.md) |
-| Estratégia de prompts | ✅ | [AI-PROMPT-STRATEGY.md](./AI-PROMPT-STRATEGY.md) |
-| Fluxos de usuário | ✅ | [USER-FLOWS.md](./USER-FLOWS.md) |
-| Escopo do MVP | ✅ | [MVP-SCOPE.md](./MVP-SCOPE.md) |
-| Especificação de UX | ✅ | [UX-SPECIFICATION.md](./UX-SPECIFICATION.md) |
-| Modelo de dados (DER e diagrama de classes) | ✅ | [DATABASE-MODEL.md](./DATABASE-MODEL.md) |
-| Design system | ✅ | [DESIGN-SYSTEM.md](../design/DESIGN-SYSTEM.md) |
-| Guia do Figma | ✅ | [FIGMA-GUIDE.md](../design/FIGMA-GUIDE.md) (sem arquivo Figma — ver §6) |
-| Especificação de telas | ✅ | [SCREEN-SPECIFICATIONS.md](../design/SCREEN-SPECIFICATIONS.md) |
-| Componentes | ✅ | [COMPONENTS.md](../design/COMPONENTS.md) |
-| Autenticação e e-mail | ✅ | [EMAIL-AND-AUTH.md](./EMAIL-AND-AUTH.md) |
-| Página pública | ✅ | `/` (`apps/web/src/features/landing`), ver [UX-SPECIFICATION.md §3.1](./UX-SPECIFICATION.md) |
-| `.env.example` sem segredos e `.gitignore` | ✅ | raiz do repositório |
-| Testes automatizados | ✅ | 163 (core) + 60 (API) + 53 (web) = 276, mais 16 de ponta a ponta (Playwright, modos demonstração e http) |
-
-## 8. Critérios de aceitação do MVP (F1 §24)
-
-| Critério | Status | Evidência |
-| --- | --- | --- |
-| Criar conta | ✅ | UC01 |
-| Realizar o nivelamento | ✅ | UC04 |
-| Acessar o Modo Aprender | ✅ | UC05 |
-| Acessar o Modo Conversação | ✅ | UC09 |
-| Conversar com a IA | ✅ | modo demonstração; provedor real implementado (ver §9) |
-| Explicar conceitos básicos | ✅ | aulas + "Explicar de outro jeito" |
-| Corrigir exercícios | ✅ | RF10 |
-| Registrar progresso | ✅ | RF15/RF16 |
-| Visualizar o progresso | ✅ | `/progresso` |
-| Funcionar em dispositivos móveis | ✅ | layout mobile first verificado em 390px (emulado) e sem rolagem horizontal a partir de 320px |
-| Autenticação e dados protegidos | ✅ | RNF04 |
-
-## 9. Lacunas e limitações conhecidas (sem esconder)
-
-| # | Item | Situação | Próximo passo sugerido |
+| ID | Requisito | Implementação / evidência | Limitação expressa |
 | --- | --- | --- | --- |
-| L1 | Protótipo no Figma | não criado (sem acesso) | seguir FIGMA-GUIDE.md e adicionar o link ao README |
-| L2 | Provedor real de IA | implementado (`AnthropicProvider`) e coberto por testes com provedor simulado, **mas não executado contra a API real** neste ambiente (sem chave) | configurar `ANTHROPIC_API_KEY` e validar com o roteiro de AI-PROMPT-STRATEGY §8 |
-| L3 | Recuperação de senha e e-mails | **implementados** (link por e-mail com token guardado como hash, 15 min, uso único; boas-vindas). O envio por SMTP foi testado com o transporte do nodemailer em memória e com a caixa de saída local, **não contra um servidor SMTP real** neste ambiente. Sem confirmação de e-mail no cadastro e sem fila de envio | configurar SMTP (`SMTP_HOST`, `MAIL_FROM`, `APP_PUBLIC_URL`) e validar a entrega; fila com nova tentativa; confirmação de e-mail |
-| L4 | Lembretes de estudo | preferência salva, **sem envio** | notificações push ou e-mail |
-| L5 | Pronúncia, voz e áudio | fora do escopo do MVP (F1 §7) | campo `phonetic` já previsto |
-| L6 | Administração de conteúdo | sem telas (ator Administrador preparado com `role`) | CMS ou painel administrativo |
-| L7 | Escala horizontal | SQLite em arquivo único | adaptador PostgreSQL implementando as mesmas portas |
-| L8 | Acessibilidade e compatibilidade | verificações manuais e testes por papéis ARIA; só Chromium | axe + leitor de tela + Safari/Firefox/aparelhos reais |
-| L9 | Modo demonstração da IA | roteiros e 25 regras de erros comuns; não entende frases fora dos padrões | usar provedor real para conversa livre |
-| L10 | Política de privacidade | texto informativo do protótipo | revisão jurídica antes de uso real |
-| L11 | Aviso de sessão expirada | o motivo do fim da sessão fica na memória da página: depois de recarregar, a pessoa vai ao login **sem** o aviso "Sua sessão expirou" | guardar o motivo em `sessionStorage` se o aviso depois de recarregar for importante |
-| L12 | Tamanho do JavaScript | um único arquivo (~219 KB com gzip, 712 KB sem compressão); o Vite avisa que passa de 500 KB | dividir por rota com `React.lazy` (a página pública e as telas autenticadas são boas fronteiras) |
-| L13 | Revogação de sessão no logout | sair remove o cookie, mas o token continua válido no servidor até vencer (72 h) ou até a senha mudar | lista de revogação ou versão da sessão também no logout |
+| RNF01 | Usabilidade e foco mobile | Jinja/macros, texto simples, um fluxo por contexto | Sem teste com usuários reais |
+| RNF02 | Responsividade | Identidade/CSS mobile-first, navegação adaptada | Somente larguras/navegador executados podem ser declarados verificados |
+| RNF03 | Desempenho | HTML sem bundle React, conteúdo local, histórico/timeout limitados | Sem teste de carga ou latência do provedor real |
+| RNF04 | Segurança | Hash, sessão/versionamento, CSRF global, dono, limites, CSP/escape, token hash | Não equivale a auditoria externa; limites em memória por instância |
+| RNF05 | Privacidade/transparência | Consentimento, página dados, saneamento, histórico opcional, exclusão | Texto informativo sem revisão jurídica |
+| RNF06 | Escalabilidade | ORM e dependências substituíveis, ambientes configuráveis | SQLite validado localmente; PostgreSQL/distribuição futura |
+| RNF07 | Disponibilidade | Tratamento falha/timeout/JSON inválido com erro seguro; modo demo explícito | Sem fallback automático; erro externo preserva rascunho, sem SLA do provedor |
+| RNF08 | Manutenibilidade | Factory, Blueprints, serviços, modelos, testes pytest, docs | Resultados/quantidades registrados depois de executar |
+| RNF09 | Acessibilidade | Semântica, rótulos, foco, mensagens de estado, movimento reduzido | Sem auditoria formal completa ou leitor de tela real |
+| RNF10 | Compatibilidade | HTML/CSS/JS padrão; Python 3.12 | Windows documentado; navegador/OS não executado não é validado |
 
-## 10. Testes de regressão da auditoria de sessão
+## Regras de negócio (RN01–RN08)
 
-A auditoria de estabilidade (sair da conta, sessão expirada, troca de conta, cache privado) pediu, no mínimo, os
-testes abaixo. Todos rodam em `npm test` (`web/test`) ou em `npm run test:e2e`.
-
-| # | Cenário | Onde |
+| ID | Regra | Implementação |
 | --- | --- | --- |
-| 1 | Demo → Alex → Perfil → Sair → visitante; rota protegida leva ao login | `session.test` (TESTE 1/2), `e2e` demo |
-| 2 | Depois de sair **não** aparece "Sua sessão expirou" | `session.test` (TESTE 1/2), `e2e` demo |
-| 3 | Sessão expirada de verdade → uma única transição para o login e retorno à página | `session.test` (TESTE 3), `e2e` demo e http |
-| 4 | UNAUTHENTICATED não oferece "Tentar de novo" | `session.test` (TESTE 4), `e2e` demo |
-| 5 | Alex → sair → nova conta → Perfil mostra a conta nova | `session.test` (TESTE 5) |
-| 6 | Conta A → sair → conta B sem nenhum cache de A | `session.test` (TESTE 6), `e2e` http |
-| 7 | Excluir conta → visitante → Voltar não revela dados | `session.test` (TESTE 7), `e2e` http |
-| 8 | Configuração inicial → Sair funciona | `session.test` (TESTE 8) |
-| 9 | Nivelamento → Sair funciona | `session.test` (TESTE 9) |
-| 10 | Cadastro completo | `session.test` (TESTE 10), `e2e` http |
-| 11 | Login correto | `auth.test` ("após entrar, volta para a página…"), `e2e` demo |
-| 12 | Login incorreto | `auth.test` ("mensagem genérica…"), `e2e` demo e http |
-| 13 | Recarregar rota protegida com sessão | `session.test` (TESTE 13), `e2e` http |
-| 14 | Recarregar sem sessão | `session.test` (TESTE 14) |
-| 15 | Erro de rede → "Tentar de novo" funciona | `session.test` (TESTE 15) |
-| 16 | Campos continuam permitindo selecionar texto | `e2e` demo ("seleção de texto") |
-| 17 | Texto estrutural não pode ser selecionado | `e2e` demo ("seleção de texto") |
+| RN01 | Dois modos Aprender e Conversar | Rotas/templates distintos e política de modo no prompt |
+| RN02 | Progressão de dificuldade | Catálogo ordenado por nível; promoção por desempenho e aulas |
+| RN03 | Adequação ao nível | Recomendações, marcação acima do nível, política de idioma/resposta |
+| RN04 | Não interromper constantemente | Correção leve/equilibrada/detalhada; adiamento e resumo |
+| RN05 | Explicação por nível | PT/EN e apoio em `ai/personality.py`/catálogo |
+| RN06 | Personalização por perfil/desempenho | Objetivo/interesses, próxima aula, dificuldades/revisões |
+| RN07 | Controle dos dados e conversas | Preferência, retenção, apagar história/conta; sem dados da conta anterior |
+| RN08 | Conteúdo próprio | Aulas/palavras/questões/temas preservados do English AI; fontes com licença local |
 
-Os testes 16 e 17 ficam só no navegador real: o jsdom não aplica o CSS do app, então não mede `user-select`.
-Testes adicionais da mesma auditoria: saída em outra aba (`e2e` demo), conta exibida × cookie (`api.test`),
-armazenamento do modo demonstração consistente entre abas (`services.test`), autosave de preferências em sequência
-e clique duplo no nivelamento (`session.test`).
+Progressão não é certificação nem bloqueio automático de todo material acima do
+nível. Novos requisitos técnicos (transação, chave de idempotência, metadata da
+resposta) implementam consistência/transparência; não alteram o escopo acadêmico.
 
-## 11. Fase 2 — página pública, e-mail e recuperação de senha
+## Casos de uso (F2 — UC01–UC12)
 
-### 11.1 Testes pedidos e onde estão
-
-Abreviações: `core` = `packages/core/test/passwordReset.test.ts`, `api` = `apps/api/test/passwordReset.test.ts`,
-`email` = `apps/api/test/email.test.ts`, `web` = `apps/web/test/passwordReset.test.tsx`,
-`landing` = `apps/web/test/landing.test.tsx`, `e2e` = `e2e/*.spec.ts`.
-
-| # | Cenário | Onde |
-| --- | --- | --- |
-| 1 | Pedido com conta existente | `core` ("gera um link só quando a conta existe"), `api`, `e2e` http |
-| 2 | Pedido com e-mail inexistente | `core`, `api`, `web`, `e2e` http ("e-mail sem conta") |
-| 3 | Respostas externas iguais | `api` (mesmo status, corpo e cabeçalhos) |
-| 4 | E-mail/token só quando a conta existe | `core` (retorna `null`), `api` (caixa de saída só com o endereço existente), `e2e` http |
-| 5 | Token válido | `core`, `api`, `web` |
-| 6 | Token inválido | `core`, `api`, `web` |
-| 7 | Token adulterado | `core`, `api` |
-| 8 | Token vencido | `core` (inclusive o limite exato), `api`, `web` |
-| 9 | Uso único | `core` (inclusive envios simultâneos), `api`, `web`, `e2e` http |
-| 10 | Novo pedido invalida o anterior | `core`, `api` |
-| 11 | Senha nova funciona | `core`, `api`, `web`, `e2e` demo e http |
-| 12 | Senha antiga não funciona | `core`, `api`, `web`, `e2e` http |
-| 13 | Política de senha | `core`, `api`, `web` (mesma política do cadastro; erro não consome o link) |
-| 14 | Rate limit | `api` (429 no 11º pedido do mesmo IP) |
-| 15 | Não revela existência de conta | `api` (respostas iguais, nenhum e-mail para endereço desconhecido, logs sem token nem e-mail) |
-| — | E-mail: destinatário, assunto, template, URL, validade, boas-vindas, sem senha, sem hash, falha do mailer | `email`, `api` |
-| — | Falha de SMTP no cadastro (conta continua) e na recuperação (mesma resposta, sem detalhes) | `api` |
-| — | Sessões antigas encerradas após a troca de senha | `core` (versão da sessão), `api` (dois aparelhos, cookie antigo), `web`, `e2e` http |
-| — | Página pública: renderiza, cabeçalho, CTAs, links, Entrar, Criar conta, demonstração, âncoras, celular, sessão ativa em `/`, ausência de conteúdo falso | `landing`, `e2e` demo ("página pública no celular") e http |
-| — | Jornada página pública → cadastro → configuração → nivelamento → Início | `e2e` http |
-| — | Login → esqueci a senha → link pela caixa de saída de teste → senha nova → login; senha antiga recusada | `e2e` http |
-
-Nenhum teste envia e-mail de verdade: `MemoryMailer`/mailer falso nos testes de unidade e integração, caixa de
-saída local no servidor dos testes E2E.
-
-### 11.2 Critérios de aceitação
-
-| Grupo | Critério | Status | Evidência |
+| UC | Caso de uso | Tela / serviço | Alternativas e limites |
 | --- | --- | --- | --- |
-| Página pública | `/` completa: cabeçalho, hero, problema, como funciona, Aprender, Conversar, IA, Progresso, Segurança, chamada final, rodapé | ✅ | `features/landing`, `landing.test` |
-| | Responsiva e sem rolagem horizontal a partir de 320px | ✅ | `e2e` demo (320px e celular), verificação em 320/390/820/1440px |
-| | Acessível (menu com `aria-expanded`, Esc, foco no título da seção, movimento reduzido) | ✅ | `landing.test`, `e2e` demo |
-| | Identidade visual do English AI (mesmos tokens e componentes) | ✅ | `design/screenshots/*-01-pagina-publica.jpg` |
-| E-mail | Serviço centralizado (`EmailService`) | ✅ | `apps/api/src/email/` |
-| | Caixa de saída local e mailer em memória | ✅ | `OutboxMailer`, `MemoryMailer` |
-| | SMTP real configurável | ✅ (não executado contra servidor real — ver L3) | `SmtpMailer`, `email.test` |
-| | Template base, boas-vindas e recuperação | ✅ | `templates/` |
-| | Sem credenciais no front-end; `.env.example` só com exemplos | ✅ | `config/env.ts`, `.env.example` |
-| Recuperação de senha | Pedido real, anti-enumeração, token seguro, só hash no banco, validade, uso único | ✅ | §11.1 |
-| | Página de senha nova; senha nova funciona, antiga não; links inválidos tratados | ✅ | `/redefinir-senha/:token`, §11.1 |
-| Regressão | Logout, cache por conta, sessão entre abas, demo e http continuam funcionando; área interna não redesenhada | ✅ | os 200 testes e os 11 E2E anteriores continuam passando, sem alteração no corpo dos testes (só as linhas de import dos arquivos E2E ganharam os novos helpers); telas internas sem mudanças de estilo |
+| UC01 | Criar conta | `/cadastro`, autenticação | Entrada inválida, senha/termos, conta existente com atalho login |
+| UC02 | Fazer login | `/entrar`, recuperação/redefinição | Credenciais genéricas; senha esquecida; sessão pendente/expirada |
+| UC03 | Configurar perfil | `/configuracao`, `/perfil/editar`, perfil | Objetivo, nível percebido, experiência e interesses persistidos |
+| UC04 | Realizar nivelamento | `/nivelamento`, `/perfil/nivelamento` | Pular, refazer, resultado como estimativa |
+| UC05 | Iniciar aula | `/aprender/aula/<id>`, aprendizagem | Explicação/exemplos, retomada, outra explicação/exemplo |
+| UC06 | Realizar exercício | Aula / sessão de revisão, exercícios | Vazio/malformado, erro de gravação, repetição e reenvio distintos |
+| UC07 | Consultar correção | Feedback de exercício/chat | Formato pedagógico e idioma ajustado |
+| UC08 | Revisar conteúdo | `/revisao`, `/revisao/<id>`, revisão | Dono/conjunto permitido, resultado e próxima data no servidor |
+| UC09 | Conversar com IA | `/conversar`, `/conversar/<id>` | Contexto, preferências, falha provedor, histórico, feedback final |
+| UC10 | Consultar vocabulário | `/vocabulario`, vocabulário | **Parcial:** tradução/exemplo/nível/status; sem pronúncia/áudio no MVP |
+| UC11 | Consultar progresso | `/progresso` e atalho Perfil | Estado vazio, recarga com dados, indicadores reais |
+| UC12 | Configurar preferências | `/preferencias` | **Parcial:** idioma/correção/histórico/meta; sem envio de lembretes |
+
+Numeração da Análise F1 mantida por mapeamento: F1-UC01→UC01;
+F1-UC02→UC04; F1-UC03→UC05+UC06; F1-UC04→UC09; F1-UC05→UC11.
+Fluxo de novo usuário: cadastro → configuração → nivelamento → início;
+Aprender/conversa → resumo/progresso → revisão.
+
+## Evidência automatizada ligada aos identificadores
+
+Os nomes abaixo apontam para testes da aplicação Python sobre SQLite real
+temporário. Parâmetros de um mesmo teste podem gerar vários casos. A tabela
+identifica o que a suíte verifica; sua aprovação e a quantidade executada são
+registradas no relatório de auditoria. Transporte Anthropic controlado e mailer
+falso verificam contratos/falhas, sem comprovar respostas ou entregas externas.
+
+| Identificadores | Arquivo e testes de referência | O que essa evidência demonstra |
+| --- | --- | --- |
+| RF01, RF02; RNF04; UC01, UC02 | [test_auth.py](../tests/test_auth.py): `test_register_login_duplicate_and_validation`, `test_scrypt_node_format_and_malformed_hashes`, `test_reset_single_use_revokes_all_devices_and_old_password`, `test_reset_expiration_boundary_and_old_link_replacement` | Cadastro/login e validação; hash legado; redefinição, TTL/uso único e invalidação |
+| RF03, RF04, RF19; RN06; UC03, UC12 | [test_auth.py](../tests/test_auth.py): `test_profile_preferences_strict_inputs`; [test_learning.py](../tests/test_learning.py): `test_new_user_journey_and_server_progress`; [test_ai.py](../tests/test_ai.py): `test_prompts_do_not_include_unapproved_fields` | Perfil, objetivos, preferências, jornada e contexto mínimo; lembretes permanecem apenas salvos |
+| RF05; RN03; UC04 | [test_learning.py](../tests/test_learning.py): `test_placement_rejects_future_stage_malformed_and_retroactive_changes`, `test_placement_completion_retry_does_not_duplicate_attempts`, `test_parallel_placement_completion_deduplicates_persisted_attempts` | Etapas adaptativas, validação, conclusão persistida e proteção contra reenvio |
+| RF06, RF07, RF08, RF09; RN01, RN08; UC05, UC10 | [test_learning.py](../tests/test_learning.py): `test_catalog_preserves_original_content`, `test_lesson_requires_placement_and_all_exercises`, `test_answer_retry_and_start_retry_preserve_first_attempt_and_resume` | Conteúdo preservado, acesso conforme etapas e retomada; pronúncia/áudio não são testados como recurso |
+| RF10, RF11; RN05; UC06, UC07 | [test_learning.py](../tests/test_learning.py): `test_deterministic_grading`, `test_closed_exercises_never_need_external_ai`, `test_open_write_grammar_is_graded_even_with_light_preferences`, `test_open_assessment_provider_failure_has_no_false_saved_success`; [test_ai.py](../tests/test_ai.py): `test_preserved_grammar_examples` | Gabaritos fechados, diferença entre resposta objetiva/produção livre e falha sem sucesso falso |
+| RF12, RF13, RF14; RN04; UC09 | [test_ai.py](../tests/test_ai.py): `test_policy_preserves_natural_conversation`, `test_demo_keeps_context_recasts_and_announces_mode`, `test_conversation_journey_privacy_feedback_and_repeated_errors`, `test_provider_cannot_force_ambiguous_meaning_rewrites` | Personalidade/contexto, intensidade de correção, naturalidade e feedback; qualidade pedagógica externa exige revisão própria |
+| RF15, RF20; RNF05; RN07 | [test_ai.py](../tests/test_ai.py): `test_privacy_disabled_then_end_deletes_content_but_keeps_metrics`, `test_expired_and_deleted_content_cannot_be_resurrected`, `test_other_account_and_unauthenticated_access_are_blocked`; [test_auth.py](../tests/test_auth.py): `test_delete_account_requires_password_and_cascades` | Histórico opcional, retenção, dono, exclusão e cascatas; não é revisão jurídica |
+| RF16; RN02; UC11 | [test_learning.py](../tests/test_learning.py): `test_new_user_journey_and_server_progress`, `test_level_promotion_requires_all_lessons_and_threshold`, `test_progress_uses_configured_timezone_and_streak`, `test_lesson_completion_idempotent_and_replay_explicit` | Resultado recuperado do banco, progressão, tempo/atividade e conclusão idempotente |
+| RF17, RF18; UC08 | [test_learning.py](../tests/test_learning.py): `test_review_rejects_unrelated_exercise_empty_completion_and_forged_counts`, `test_reviews_owned_by_account`, `test_failed_word_reviews_never_become_learned_and_retry_is_once`, `test_vocabulary_requires_three_successful_sessions_after_a_failure` | Conjunto autorizado, notas calculadas no servidor, dono, revisão e domínio baseado em acertos |
+| RNF04; jornada 6 | [test_security.py](../tests/test_security.py): `test_signed_csrf_token_required`, `test_account_binding_cannot_leak_new_cookie_account`, `test_logout_revokes_copied_cookie`, `test_private_response_headers_and_cookie`, `test_untrusted_body_and_size_are_rejected`, `test_login_abuse_is_limited` | CSRF, isolamento, revogação, limites e entradas malformadas; não é auditoria externa de segurança |
+| RNF03, RNF07 | [test_ai.py](../tests/test_ai.py): `test_live_service_bounds_and_redacts_history_facts_and_output`, `test_official_sdk_errors_are_classified_without_leaking_bodies`, `test_official_sdk_timeout_is_classified`, `test_invalid_provider_responses_fail_without_demo_fallback` | Limites de contexto, timeout/erro seguro e transparência; não mede carga, SLA ou latência real |
+| RNF06, RNF08 | [test_migrations.py](../tests/test_migrations.py): `test_new_database_has_all_fourteen_tables_and_constraints`, `test_legacy_copy_preserves_source_hashes_profiles_and_dates`, `test_import_cli_and_startup_preserve_every_original_column_and_row`, `test_incompatible_legacy_schema_rejected_before_changes`, `test_partial_second_upgrade_can_resume` | Factory/banco isolado, importação/seed sem sobrescrita, esquema, compatibilidade e recuperação no SQLite; não comprova PostgreSQL nem múltiplas instâncias |
+| RNF01, RNF02, RNF09, RNF10; UC01–UC05 | [browser/test_journeys.py](../tests/browser/test_journeys.py): `test_new_user_actual_placement_then_first_lesson`, `test_private_navigation_blocks_anonymous_user`, `test_responsive_landing_and_account_pages` | Navegação por controles reais e larguras 320/820/1440px no Chromium; não comprova usabilidade com pessoas, WCAG completa, Windows ou outros navegadores |
+
+Atomicidade e concorrência têm testes específicos em `test_auth.py`,
+`test_learning.py` e `test_ai.py`: falhas no commit não podem deixar identidade,
+resultado, agendamento ou turno parcial; envios/conclusões concorrentes usam
+conexões SQLite distintas. Estes requisitos de consistência são decisões técnicas
+que preservam as jornadas acadêmicas, sem acrescentar funcionalidades ao MVP.
+
+Regressões adicionais de migração são verificadas em
+[test_legacy_state.py](../tests/test_legacy_state.py):
+`test_old_equal_timestamp_history_keeps_insertion_order_and_provider_context`,
+`test_imported_account_missing_children_logs_in_and_keeps_existing_values` e
+`test_cleanup_and_returning_later_do_not_inflate_study_time`. A manutenção está
+em [test_maintenance.py](../tests/test_maintenance.py), com
+`test_purge_private_data_removes_expired_content_and_old_reset_tokens`.
+Transparência da origem/configuração e retenção aparece em
+[test_ui_contracts.py](../tests/test_ui_contracts.py); os erros e mudanças rápidas
+de preferência usam o navegador real em
+[browser/test_ui_recovery.py](../tests/browser/test_ui_recovery.py).
+
+O reenvio de chat após perda da resposta HTTP usa
+[test_chat_idempotency.py](../tests/test_chat_idempotency.py):
+`test_lost_reply_retry_returns_original_pair_without_provider_or_counter_increment`,
+`test_reused_key_rejects_changed_content_even_when_both_addresses_are_redacted`,
+`test_simultaneous_same_key_commits_one_pair_and_both_callers_recover_it` e
+`test_completed_saved_conversation_can_replay_but_deleted_content_cannot`.
+A jornada de rede interrompida usa
+[browser/test_chat_retry.py](../tests/browser/test_chat_retry.py):
+`test_chat_retries_lost_committed_reply_with_same_key_then_allows_repeated_text`.
+A concorrência garante uma dupla persistida; não garante apenas uma chamada ou
+cobrança externa quando os pedidos chegam simultaneamente.
+
+## Pessoa 2, artefatos e fronteiras do MVP
+
+A especificação de design (`design/`) e o comportamento da IA
+([IA-BEHAVIOR.md](IA-BEHAVIOR.md)) permanecem artefatos acadêmicos. A interface
+navegável agora usa templates/static integrados ao Python. **Arquivo Figma não
+foi criado**; o [FIGMA-GUIDE.md](../design/FIGMA-GUIDE.md) continua guia para a equipe.
+As capturas antigas em `design/screenshots` documentam a referência visual, não
+são evidência de novas jornadas Python.
+
+Preservados: DER/arquitetura, UX, fluxos, personas, conteúdo e divergências D1–D11.
+Lembretes enviados, painel administrativo, voz, pronúncia automática, rankings,
+marketplace, vídeo e certificação permanecem ausentes/futuros conforme escopo.
+
+## Jornadas e aceitação da migração
+
+| Jornada | Fluxo executável | Teste de referência |
+| --- | --- | --- |
+| 1 Novo usuário | Cadastro → perfil → nivelamento → primeira aula | `test_new_user_actual_placement_then_first_lesson` (navegador) |
+| 2 Aprendizagem | Login → aula → exercício → correção → progresso persistido | `test_complete_lesson_resumes_saved_answer_and_keeps_score_after_reload` (navegador) e `test_new_user_journey_and_server_progress` (API) |
+| 3 Conversação | Login → tema → mensagem → resposta identificada → contexto | `test_demo_conversation_feedback_privacy_clear_and_password_confirmed_deletion` (navegador), `test_conversation_journey_privacy_feedback_and_repeated_errors` (API) |
+| 4 Revisão | Dificuldade → fila → atividades → resultado e nova data | `test_low_score_lesson_creates_server_review_and_saves_completed_review` (navegador), testes de pontuação/idempotência em `test_learning.py` |
+| 5 Privacidade | Preferências → histórico → exclusão solicitada | Jornada de conversa/privacidade no navegador; histórico desativado/cascatas em `test_ai.py`/`test_auth.py` |
+| 6 Segurança | Sem sessão/dono incorreto → bloqueio; CSRF/XSS/SQL injection tratados | `test_private_navigation_blocks_anonymous_user` (navegador), `test_security.py` e testes de dono em serviços |
+
+O navegador também executa `test_vocabulary_save_learn_filter_and_reload` e
+`test_password_reset_outbox_link_single_use_and_old_session_revoked`. Estes
+testes estão em [browser/test_journeys.py](../tests/browser/test_journeys.py) e
+usam a aplicação Flask real, CSRF assinado, SQLite temporário e outbox local.
+O teste de conversação usa demonstração identificada; não é prova de API externa.
+
+Também requeridos: instalação pelo README, banco novo e cópia antiga com hashes
+preservados, startup/página pública, mobile, execução principal sem Node,
+documentação coerente e branch/PR no GitHub. Esses critérios não são marcados
+concluídos apenas porque o servidor inicia. O relatório registra a execução e
+qualquer critério ainda sem evidência, incluindo integrações externas/GitHub.
+
+Os 20 critérios do prompt de migração são condições técnicas de entrega; não
+substituem os identificadores dos documentos acadêmicos:
+
+| Nº | Critério de aceitação | Evidência / condição |
+| --- | --- | --- |
+| 1 | Instalar pelo README | Dependências fixadas, venv/Python 3.12 e instalação cloud registrada na auditoria; Windows documentado, sem execução nativa |
+| 2 | Iniciar aplicação | `python app.py`, factory e verificações HTTP registradas na auditoria |
+| 3 | Carregar página inicial | `/` real no Chromium e verificação HTTP |
+| 4 | Cadastro e login | `test_auth.py`, jornada de navegador |
+| 5 | Configurar perfil | `test_profile_preferences_strict_inputs`, novo usuário no navegador |
+| 6 | Nivelamento | Validação/conclusão em `test_learning.py` e nivelamento real no navegador |
+| 7 | Aulas no Modo Aprender | Catálogo e início/retomada em `test_learning.py`, primeira aula no navegador |
+| 8 | Responder/corrigir exercícios | Gabaritos/regras/produção livre em `test_learning.py`; frontend integrado à API |
+| 9 | Progresso persistido | `test_new_user_journey_and_server_progress`, resultados do banco e recarga |
+| 10 | Vocabulário e revisão | Sessão autorizada, status/acertos, intervalo e notas em `test_learning.py` |
+| 11 | Conversação no backend Python | Jornada/API persistida em `test_ai.py`; origem identificada e política de contexto |
+| 12 | IA quando configurada | SDK/contrato/falhas testados com transporte controlado; **chamada Anthropic real pendente de chave/acesso ao modelo** |
+| 13 | Respeitar privacidade | Histórico opcional, expiração/exclusão, saneamento e dono em `test_ai.py`/`test_auth.py`/`test_security.py` |
+| 14 | Jornadas aprovadas | Resultado da execução final registrado na auditoria; API/serviços usam SQLite real, browser usa Flask real |
+| 15 | Interface móvel | Chromium em 320/820/1440px, páginas privadas; aparelhos reais e outros navegadores não executados |
+| 16 | Executar sem Node | `app.py`, dependências Python e interface Jinja/static; TypeScript preservado como legado |
+| 17 | Responsabilidades modulares | Factory, quatro Blueprints, serviços, ORM e camada IA em `ARCHITECTURE.md` |
+| 18 | Rastrear requisitos e testes | Matrizes RF/RNF/RN/UC e índice de testes deste documento |
+| 19 | Documentação atualizada | README, arquitetura, DER, dados/rollback, IA, UX e Windows/VS Code; originais preservados em `legacy/` |
+| 20 | Revisão no GitHub | Branch e commits em `MIGRATION-AUDIT.md`; URL do PR registrada após publicação, sem merge automático |
+
+Sem a chamada externa, o critério 12 permanece com verificação de integração
+controlada e limitação expressa. SMTP real, Windows nativo, WCAG completa,
+PostgreSQL e aparelhos físicos têm limites próprios e não são declarados
+validados por existir código ou instrução de instalação.

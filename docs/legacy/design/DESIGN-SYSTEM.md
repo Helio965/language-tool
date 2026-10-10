@@ -1,15 +1,6 @@
 # Design System — English AI
 
-Os tokens da interface Python estão em
-[`static/css/tokens.css`](../static/css/tokens.css); estilos e adaptações ficam
-em `static/css/ui.css`, `global.css` e `python.css`. Este documento descreve a
-identidade e os tokens atuais, além das metas de design. O mapeamento para
-Jinja e JavaScript está em [COMPONENTS.md](./COMPONENTS.md).
-
-A versão acadêmica anterior está em
-[docs/legacy/design/DESIGN-SYSTEM.md](../docs/legacy/design/DESIGN-SYSTEM.md).
-As capturas TypeScript preservadas são referências históricas; validação da
-versão Python deve ser consultada na [auditoria](../docs/MIGRATION-AUDIT.md).
+> Fonte única dos tokens visuais. A implementação está em [`apps/web/src/styles/tokens.css`](../apps/web/src/styles/tokens.css) e usa **exatamente** os nomes abaixo, para que o protótipo no Figma (ver [FIGMA-GUIDE.md](./FIGMA-GUIDE.md)) e o código falem a mesma língua.
 
 ## 1. Conceito: "caderno vivo"
 
@@ -28,10 +19,7 @@ O que evitamos de propósito: verde vibrante + mascote (associação com Duoling
 
 ## 2. Cores
 
-As razões abaixo são as referências numéricas documentadas para a paleta.
-Os critérios de projeto são WCAG AA: ≥ 4,5:1 para texto comum e ≥ 3:1 para
-componentes. Isso não representa uma auditoria de todos os pares efetivamente
-renderizados pela versão Python; novos usos e estados precisam ser verificados.
+Todos os pares de texto foram verificados com a fórmula de contraste da WCAG 2.1 (nível AA: ≥ 4,5:1 para texto, ≥ 3:1 para bordas de componentes).
 
 ### 2.1 Neutros (papel e tinta)
 
@@ -77,7 +65,7 @@ Feedback **nunca depende só da cor**: sempre há ícone + título ("Muito bem!"
 | Display (títulos, saudação, nome da aula) | **Fraunces** (variável, eixo `SOFT` = 50) | serifa editorial e calorosa — dá identidade de "caderno" sem parecer escolar |
 | Texto e interface | **Atkinson Hyperlegible Next** (variável) | criada para máxima legibilidade (distingue I/l/1, O/0) — ótimo para quem está aprendendo a ler outro idioma |
 
-As fontes são servidas pelo próprio app (arquivos locais preservados de `@fontsource` em `static/fonts/`), sem chamadas a serviços de terceiros (privacidade).
+As fontes são servidas pelo próprio app (pacotes `@fontsource`), sem chamadas a serviços de terceiros (privacidade).
 
 | Token | Mobile | Desktop | Altura de linha | Peso | Fonte |
 |-------|--------|---------|-----------------|------|-------|
@@ -97,8 +85,8 @@ Textos em **inglês** de conteúdo (exemplos, frases de exercício) usam o mesmo
 |-------|--------|
 | Espaço (base 4px) | `--space-1` 4 · `--space-2` 8 · `--space-3` 12 · `--space-4` 16 · `--space-5` 20 · `--space-6` 24 · `--space-8` 32 · `--space-10` 40 · `--space-12` 48 · `--space-16` 64 |
 | Raio | `--radius-s` 8 · `--radius-m` 12 · `--radius-l` 18 · `--radius-xl` 26 · `--radius-pill` 999 |
-| Sombra | `--shadow-1` 0 1px 2px rgba(26,31,58,.06), 0 1px 1px rgba(26,31,58,.04) · `--shadow-2` 0 8px 24px -12px rgba(26,31,58,.22) · `--shadow-pop` 0 18px 44px -16px rgba(26,31,58,.32) |
-| Área de toque | meta **44 × 44 px**; botões `lg` têm 52px de altura e `sm`, para ações secundárias, 36px |
+| Sombra | `--shadow-1` 0 1px 2px rgba(26,31,58,.06) · `--shadow-2` 0 8px 24px -12px rgba(26,31,58,.22) · `--shadow-pop` 0 18px 44px -16px rgba(26,31,58,.32) |
+| Área de toque | mínimo **44 × 44 px** (botões principais 52px de altura) |
 | Foco | contorno 3px `--learn` com 2px de afastamento (`:focus-visible`) |
 
 ## 5. Movimento
@@ -112,12 +100,9 @@ Textos em **inglês** de conteúdo (exemplos, frases de exercício) usam o mesmo
 
 - Entrada de página: elementos sobem 8px e aparecem com atraso escalonado (40ms).
 - Feedback de exercício: painel desliza de baixo para cima.
-- A conversa atual mostra o texto “Lumi está preparando uma resposta…” durante
-  o envio; o estilo histórico de três pontos existe no CSS, mas não é usado
-  pelo módulo atual.
+- IA "digitando": três pontos pulsando dentro de um balão.
 - Barras de progresso animam da posição anterior para a nova.
-- `prefers-reduced-motion: reduce` reduz a duração de animações e transições no
-  CSS global; as âncoras da página pública também evitam rolagem suave.
+- `prefers-reduced-motion: reduce` desativa todas as animações não essenciais.
 
 ## 6. Grade e responsividade (mobile first)
 
@@ -127,19 +112,12 @@ Textos em **inglês** de conteúdo (exemplos, frases de exercício) usam o mesmo
 | Tablet | 600–1023px | trilho lateral de 88px (ícones + rótulo) | 1–2 colunas, margem fluida (`--gutter`) |
 | Desktop | ≥ 1024px | barra lateral de 248px com marca, navegação e nível | conteúdo até 1120px (`--content-max`); telas usam 2 colunas (conteúdo + painel de apoio) |
 
-Em faixas maiores, Início ganha coluna de resumo, Aula ganha sumário das etapas,
-Conversa ganha painel de feedback e Progresso organiza indicadores em grade.
-As telas imersivas escondem a barra inferior no celular; o trilho/barra lateral
-permanece em faixas maiores. Primeiro acesso usa um layout separado.
+O desktop **não estica** o mobile: Início ganha coluna lateral de progresso; Aula ganha sumário fixo das etapas; Conversa ganha painel de "feedback da conversa"; Progresso organiza indicadores em grade.
 
 ## 7. Iconografia e imagem
 
-- Ícones SVG de linha definidos pela macro `icon` em
-  [`templates/macros.html`](../templates/macros.html), traço 2px e tamanho 22px.
-  A ação que contém o ícone fornece rótulo visível ou `aria-label`; o SVG é
-  decorativo. Não há dependência Lucide no runtime Python.
-- Símbolo da marca: dois balões sobrepostos (ultramar atrás, coral à frente),
-  definidos pela macro `logo` no mesmo arquivo.
+- Ícones de linha (Lucide), traço 2px, tamanho 20–24px, sempre com rótulo visível ou `aria-label`.
+- Símbolo da marca: dois balões sobrepostos (ultramar atrás, coral à frente) — ver `apps/web/src/components/Brand.tsx`.
 - Avatar da IA: balão coral com uma pequena estrela de quatro pontas (centelha), indicando "IA".
 - Sem fotos de banco de imagens; ilustrações são composições geométricas simples feitas com as cores do sistema.
 

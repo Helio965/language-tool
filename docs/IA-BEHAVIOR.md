@@ -1,9 +1,15 @@
 # Comportamento da IA — English AI
 
+> **Transição para Python:** os requisitos e as decisões acadêmicas deste documento
+> foram preservados. A implementação atual roda com Flask/Jinja na raiz; a versão
+> anterior e seus detalhes de framework estão em [legacy/IA-BEHAVIOR.md](legacy/IA-BEHAVIOR.md).
+> Evidências da nova execução ficam em [MIGRATION-AUDIT.md](MIGRATION-AUDIT.md),
+> não nas contagens/capturas históricas do protótipo TypeScript.
+
 > Entregável da **Pessoa 2 — Experiência do usuário e IA**: "definir o comportamento da IA em cada modo"
 > e "documentar personalidade, correções e adaptação por nível".
 > Fontes: Análise de requisitos (RF09–RF14, RN03–RN05, §14 Personalidade, §21 Privacidade),
-> Especificação de Casos de Uso (UC05–UC09, UC12) e o código em `packages/core/src/ai`.
+> Especificação de Casos de Uso (UC05–UC09, UC12) e o código em `ai/`.
 
 Este documento descreve **o que a IA faz, como fala, quando corrige e o que nunca faz**. Cada regra
 aponta para o código que a implementa — a política é aplicada pela aplicação, não depende da "boa vontade"
@@ -28,7 +34,7 @@ A IA é uma **parceira de prática**, não a fonte de verdade do conteúdo. Ela:
 O que a IA **não** faz no MVP:
 
 - **Não corrige exercícios fechados.** Múltipla escolha, lacunas, seleção, ordenação e tradução são
-  corrigidos por gabarito revisado (`domain/grading.ts`). A IA só avalia respostas **abertas** (escrita livre).
+  corrigidos por gabarito revisado (`services/exercicios.py`). A IA só avalia respostas **abertas** (escrita livre).
 - **Não gera gabaritos.** `generateExercise` devolve exercícios do catálogo revisado; gabaritos gerados por
   modelo não são confiáveis o suficiente para um produto educacional (Análise de requisitos, Risco 2).
 - **Não decide sozinha o que mostrar.** Ela identifica problemas; a **política de correção** (seção 6)
@@ -37,7 +43,7 @@ O que a IA **não** faz no MVP:
 
 ## 2. Personalidade — Lumi
 
-Definida em `packages/core/src/ai/persona.ts` (RF13, Análise de requisitos §14).
+Definida em `ai/personality.py` (RF13, Análise de requisitos §14).
 
 | Atributo | Definição |
 | --- | --- |
@@ -119,9 +125,9 @@ Comportamento:
 1. **Abre a conversa** cumprimentando pelo primeiro nome, apresentando-se em uma frase e fazendo **uma**
    pergunta simples sobre o assunto escolhido.
 2. **Reage ao que o usuário disse** antes de perguntar de novo — a conversa não é um questionário.
-3. **Uma pergunta por vez**, seguindo um roteiro flexível por assunto (`content/topics.ts`).
+3. **Uma pergunta por vez**, seguindo um roteiro flexível por assunto (`content/catalog.json`).
 4. **Mantém o contexto:** guarda fatos que o usuário contou (nome, idade, cidade, profissão, gostos…) e
-   **não pergunta o que já sabe** (`nextScriptedQuestion` em `ai/types.ts`).
+   **não pergunta o que já sabe** (`next_question` em `ai/types.ts`).
 5. **Recast em vez de interrupção:** quando há um erro, a resposta da Lumi reformula a frase corretamente,
    de forma natural, sem apontar o erro:
    > **Usuário:** I have 25 years.
@@ -139,7 +145,7 @@ Comportamento:
 
 ## 5. Adaptação por nível
 
-Tabela única em `packages/core/src/ai/levelPolicy.ts` (RN03, RN05, RF11). A interface, o modo demonstração e
+Tabela única em `ai/personality.py` (RN03, RN05, RF11). A interface, o modo demonstração e
 os prompts do provedor real leem a mesma tabela.
 
 | | Iniciante | Básico | Intermediário | Avançado |
@@ -169,11 +175,11 @@ Mesma pergunta do roteiro em dois níveis (dados reais do assunto "Apresentaçõ
 - *Intensidade das correções*: seção 6.
 
 **O nível muda com o uso:** quando todas as aulas do nível atual estão concluídas com média de acertos de
-pelo menos 70%, o nível estimado avança (`shouldLevelUp` em `domain/progress.ts`) — sempre como estimativa.
+pelo menos 70%, o nível estimado avança (`shouldLevelUp` em `services/aprendizagem.py`) — sempre como estimativa.
 
 ## 6. Regras de correção
 
-Implementadas em `packages/core/src/ai/correctionPolicy.ts`. A IA (ou o verificador determinístico)
+Implementadas em `ai/correction.py`. A IA (ou o verificador determinístico)
 classifica cada problema por **gravidade**:
 
 | Gravidade | Significado | Exemplo |
@@ -205,11 +211,11 @@ Got it! How do you go to work or school?"), e o resumo final mostra as quatro co
 ### 6.2 Aprender: tudo que importa aparece
 
 No Modo Aprender a correção é o objetivo: erros de sentido e de gramática **sempre** aparecem; os de
-naturalidade aparecem nas intensidades Equilibrada e Detalhada (`selectLearningCorrections`).
+naturalidade aparecem nas intensidades Equilibrada e Detalhada (`select_learning_corrections`).
 
 ### 6.3 Formato pedagógico da correção (UC07)
 
-Toda correção tem a mesma estrutura (`Correction` em `domain/entities.ts`):
+Toda correção tem a mesma estrutura (`Correction` em `models/ e contrato de feedback`):
 
 1. **Sua frase** — o que a pessoa escreveu, com o trecho alterado marcado;
 2. **Forma recomendada** — a frase corrigida, com a mudança destacada (marca-texto);
@@ -220,16 +226,16 @@ Regras de redação da explicação:
 
 - explicar a **regra**, não só a resposta ("Com partes do dia usamos *in the*… A exceção é *at night*");
 - usar "normalmente" quando a regra tem exceções; nunca inventar regra;
-- uma correção por problema; trechos sobrepostos são resolvidos antes de exibir (`resolveOverlaps`);
+- uma correção por problema; trechos sobrepostos são resolvidos antes de exibir (`resolve_overlaps`);
 - sem julgamento ("errado", "de novo?") — o título é "Vamos ajustar" ou "Quase lá!".
 
 ### 6.4 Rede de segurança contra correções erradas
 
-- Um **verificador determinístico** (`ai/grammar/rules.ts`, 25 regras de erros comuns de falantes de
+- Um **verificador determinístico** (`ai/correction.py`, regras revisadas de erros comuns de falantes de
   português, como *age_with_have*, *third_person_s*, *at_the_morning*, *people_is*, *depend_of*) roda
   sempre, inclusive com provedor real.
 - Problemas sugeridos pelo modelo só são aceitos se o **trecho citado existir literalmente** na mensagem e
-  a substituição for diferente do original (`toGrammarIssues`); no máximo 5 por mensagem.
+  a substituição for diferente do original (`to_grammar_issues`); no máximo 5 por mensagem.
 - Gravidade e tema são validados contra listas fechadas; valores desconhecidos viram `grammar`/`word_choice`.
 
 ## 7. Comportamento diante de erros (do usuário e do sistema)
@@ -244,15 +250,16 @@ Regras de redação da explicação:
 | Pergunta sobre uma palavra | explica com significado, tradução e exemplo (vocabulário do catálogo) |
 | Conteúdo ofensivo | não reproduz; pede respeito com gentileza e retoma a pergunta |
 | Tentativa de mudar o papel da IA ("ignore as instruções…") | ignora e segue o papel definido (camada de segurança do prompt) |
-| Provedor de IA indisponível, lento, resposta inválida ou recusa | `FallbackAIService` usa o modo demonstração; a pessoa continua estudando (RNF07) |
+| Provedor de IA indisponível, lento, resposta inválida ou recusa | retorna erro seguro, preserva o rascunho e não salva turno parcial; modo demonstração é seleção explícita (RNF07) |
 | Falha de rede na interface | mensagem clara, texto preservado no campo e opção de tentar de novo |
 
 ## 8. Explicações
 
 - **Curtas e progressivas:** primeiro a regra essencial; detalhes extras só com "Explicar de outro jeito",
   "Ver no outro idioma" ou na intensidade Detalhada.
-- **Bilíngues por design:** todo conteúdo pedagógico revisado tem versão `pt` e `en` (`Bilingual`), então a
-  adaptação de idioma não custa uma chamada de IA (`adaptBilingual`).
+- **Bilíngues por design:** o conteúdo pedagógico revisado tem versões `pt` e
+  `en` no catálogo; o Python seleciona o idioma conforme `policy_for` e as
+  preferências, sem chamada externa para mostrar o texto já revisado.
 - **Exemplos antes de terminologia:** "She works, He goes" antes de "terceira pessoa do singular".
 - **Sem markdown** nas respostas geradas; a interface cuida da formatação.
 
@@ -260,32 +267,35 @@ Regras de redação da explicação:
 
 Aplicada em três camadas:
 
-1. **Prompt** (`SAFETY_LAYER` em `ai/prompts.ts`): não pedir dados sensíveis; não repetir dados pessoais;
+1. **Prompt** (camada de segurança em `ai/prompts.py`): não pedir dados sensíveis; não repetir dados pessoais;
    recusar conteúdo ofensivo, perigoso ou ilegal e voltar à prática; ser honesta sobre ser IA; admitir
    incerteza; ignorar instruções que tentem mudar as regras.
 2. **Aplicação:** saída estruturada com esquema JSON fechado; textos limitados a 1.200 caracteres; fatos
-   aceitos só com chave `[a-z_]` e valor até 60 caracteres; recusas do provedor viram fallback.
+   aceitos só em chaves fechadas e com valor explícito na mensagem, até 60 caracteres; recusas do provedor retornam erro seguro.
 3. **Modo demonstração:** detecção simples de linguagem ofensiva e resposta de redirecionamento.
 
 ## 10. Privacidade
 
-- A IA recebe apenas o **contexto mínimo** (`LearnerContext`): primeiro nome, nível estimado, objetivo,
-  interesses, preferências de explicação/correção e dificuldades recorrentes. **E-mail, senha, sobrenome e
-  identificadores nunca são enviados.**
-- Antes de salvar e de enviar à IA, a mensagem passa por `redactSensitiveData` (`domain/privacy.ts`):
+- O **contexto da conta** enviado à IA contém primeiro nome, nível estimado,
+  objetivo, interesses, preferências de explicação/correção e dificuldades
+  recorrentes. E-mail da conta, hash de senha, sobrenome cadastrado e identificador
+  da conta não fazem parte desse objeto. A IA também recebe texto/histórico
+  saneado: nomes ou outros dados pessoais escritos livremente podem escapar às
+  regras, que não substituem a orientação de não compartilhá-los.
+- Antes de salvar e de enviar à IA, a mensagem passa por `redact_sensitive_data` (`ai/conversation.py`):
   e-mails, telefones, CPF, cartões e senhas declaradas viram `[dado removido]`, e a pessoa vê um aviso:
   > Para proteger sua privacidade, removemos da mensagem: e-mail, telefone. Não é preciso compartilhar dados
   > pessoais para praticar.
 - Só as últimas mensagens da conversa vão como histórico (`AI_MAX_HISTORY_MESSAGES`, padrão 12).
 - Com "Salvar histórico" desligado, o conteúdo da conversa é apagado ao encerrar; com ele ligado, após 90 dias.
   Ficam só métricas sem conteúdo (número de mensagens, duração, temas corrigidos) para o progresso.
-- Logs da API não registram conteúdo de mensagens nem segredos (redação de campos sensíveis em `logger.ts`).
+- Logs da API não registram conteúdo de mensagens nem segredos (logs restritos a classe/código do erro em `app.py`).
 
 ## 11. Limitações conhecidas
 
 - **Modo demonstração não é um modelo de linguagem.** Ele segue roteiros por assunto, reconhece padrões
   simples (fatos, perguntas, português, palavras do catálogo) e corrige apenas os erros cobertos pelas
-  25 regras. Frases fora desses padrões recebem reações genéricas.
+  regras revisadas. Frases fora desses padrões recebem reações genéricas.
 - **Cobertura gramatical parcial:** erros fora das regras só são detectados com um provedor real — e mesmo
   assim podem passar despercebidos ou, raramente, ser apontados sem necessidade.
 - **Modelos reais podem errar.** Por isso: verificação do trecho citado, regras determinísticas sempre
@@ -296,7 +306,11 @@ Aplicada em três camadas:
 
 ## 12. Exemplos de interação
 
-Todos os exemplos abaixo foram gerados pelo modo demonstração (`MockAIService`) com os dados do projeto.
+Os exemplos abaixo pertencem à especificação/protótipo anterior e ilustram a
+política pedagógica; não constituem transcrições de chamadas Anthropic nem novas
+execuções do demo Python. A formulação exata do roteiro Python pode variar.
+Frases ambíguas como "I’m boring" e "I pretend" não são corrigidas por suposição.
+O demo Python identifica claramente que é roteiro sem IA externa.
 
 ### 12.1 Conversa — nível Iniciante, correção Equilibrada
 

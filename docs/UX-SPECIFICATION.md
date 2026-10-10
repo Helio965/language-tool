@@ -1,5 +1,12 @@
 # Especificação de UX — English AI
 
+> **Transição para Python:** os requisitos e as decisões acadêmicas deste documento
+> foram preservados. As tabelas expressam padrões de UX e metas; sua presença não
+> significa auditoria completa de acessibilidade. A implementação atual roda com Flask/Jinja na raiz; a versão
+> anterior e seus detalhes de framework estão em [legacy/UX-SPECIFICATION.md](legacy/UX-SPECIFICATION.md).
+> Evidências da nova execução ficam em [MIGRATION-AUDIT.md](MIGRATION-AUDIT.md),
+> não nas contagens/capturas históricas do protótipo TypeScript.
+
 > Como a plataforma deve se comportar do ponto de vista de quem usa.
 > Complementa [USER-FLOWS.md](./USER-FLOWS.md) (fluxos), [IA-BEHAVIOR.md](./IA-BEHAVIOR.md) (IA),
 > [../design/DESIGN-SYSTEM.md](../design/DESIGN-SYSTEM.md) (tokens visuais),
@@ -13,7 +20,7 @@ que estudam pelo celular em sessões curtas e têm receio de errar ao falar ingl
 
 | Persona (proto) | Contexto | O que precisa da interface |
 | --- | --- | --- |
-| **Alex**, 27, analista (conta demo) | estudou na escola, trava na hora de conversar; objetivo: Conversar | praticar sem medo, correções discretas, saber o que revisar |
+| **Alex**, 27, analista (persona de referência) | estudou na escola, trava na hora de conversar; objetivo: Conversar | praticar sem medo, correções discretas, saber o que revisar |
 | **Bia**, 19, universitária | iniciante, estuda no ônibus | aulas curtas, explicações em português, feedback imediato |
 | **Carla**, 38, profissional | intermediária, quer inglês para o trabalho | conversas sobre trabalho, explicações em inglês, correção detalhada |
 
@@ -63,7 +70,7 @@ Atkinson Hyperlegible) — não é um segundo design system.
 
 | Ordem | Seção (âncora) | Conteúdo |
 | --- | --- | --- |
-| 1 | Hero (`#inicio`) | título "Aprenda inglês no seu ritmo, com uma IA que realmente explica", subtítulo, **Começar gratuitamente** · **Já tenho conta** · (demo) **Explorar demonstração com dados de exemplo**; fatos do conteúdo (aulas, exercícios, temas); prévia do app (aula e conversa) |
+| 1 | Hero (`#inicio`) | título "Aprenda inglês no seu ritmo, com uma IA que realmente explica", subtítulo, **Começar gratuitamente** · **Já tenho conta**; fatos do conteúdo (aulas, exercícios, temas); prévia do app (aula e conversa), identificada como demonstração |
 | 2 | Problema (`#problema`) | 7 dificuldades comuns, cada uma com o que o produto faz |
 | 3 | Como funciona (`#como-funciona`) | 5 passos numerados: conta → objetivos → nivelamento → aprender ou conversar → evolução |
 | 4 | Modo Aprender (`#aprender`) | recursos + exemplo de exercício com o cartão de correção real |
@@ -72,7 +79,7 @@ Atkinson Hyperlegible) — não é um segundo design system.
 | 7 | Progresso (`#progresso`) | métricas acompanhadas + prévia marcada como **Exemplo ilustrativo** |
 | 8 | Personalização (`#personalizacao`) | nível, objetivo, desempenho, erros recorrentes, vocabulário, progresso |
 | 9 | Privacidade e segurança (`#seguranca`) | 7 garantias + aviso de que o texto de privacidade é informativo |
-| 10 | Chamada final | "Seu próximo passo no inglês pode começar agora." + Criar conta · Entrar · (demo) Testar a demonstração |
+| 10 | Chamada final | "Seu próximo passo no inglês pode começar agora." + Criar conta · Entrar |
 | 11 | Rodapé | Sobre o projeto (`#sobre`, inclusive o que ainda não faz parte do produto) · Produto · Conta · Informações · Legal |
 
 **Navegação.** Cabeçalho fixo: logo (volta ao topo), seções e **Entrar** / **Criar conta**. Abaixo de 1100px, as
@@ -82,13 +89,14 @@ fecha o menu); abaixo de 600px, "Criar conta" vai para dentro do menu. Links de 
 quando a pessoa não pediu movimento reduzido (`prefers-reduced-motion`). Chegar por `/#seguranca` abre direto
 na seção.
 
-**`/` × `/inicio`.** `/` é só para visitantes: com sessão, a guarda `PublicOnly` leva à etapa pendente
+**`/` × `/inicio`.** `/` é só para visitantes: com sessão, a guarda de `blueprints/pages.py` leva à etapa pendente
 (configuração, nivelamento) ou ao Início. `/inicio` é a área autenticada.
 
 **Honestidade (regra de conteúdo).** Nada de depoimentos, números de usuários, porcentagens de melhora, parceiros
-ou certificações. Números só do próprio conteúdo (calculados a partir do `core`); exemplos de correção gerados pelo
-verificador gramatical do projeto; prévias de dados marcadas como ilustrativas. Ações de demonstração aparecem só
-no modo demonstração.
+ou certificações. Números só do próprio conteúdo (calculados a partir de `content/catalog.py`); exemplos de correção gerados pelo
+verificador gramatical do projeto; prévias de dados marcadas como ilustrativas. O
+modo demonstrativo da IA aparece identificado na área de conversação. Ele requer
+cadastro na aplicação Python, com persistência no servidor.
 
 **Telas imersivas** (aula, conversa, revisão, edição de perfil): escondem a navegação principal e mostram uma
 barra de foco com "voltar", título e, quando faz sentido, progresso da etapa. Assim a pessoa não sai sem querer
@@ -105,12 +113,12 @@ redefinição de senha, que abre com ou sem sessão.
 | Ação principal | um botão primário por tela/etapa, no fim do conteúdo; em formulários, ocupa a largura toda no celular |
 | Validação de formulário | ao sair do campo e ao enviar; mensagem abaixo do campo, ligada por `aria-describedby`; foco vai ao primeiro campo com erro |
 | Senha | requisitos visíveis enquanto digita (✓/○, com texto para leitor de tela); botão "mostrar senha" |
-| Salvamento | preferências salvam na hora (toast "Preferência salva."); formulários longos salvam ao concluir |
+| Salvamento | preferências salvam ao alterar, em fila ordenada com confirmação; falha mostra erro e restaura o valor salvo do campo; perfil salva ao concluir |
 | Ações destrutivas | sempre com diálogo de confirmação; excluir conta exige a senha |
 | Tempo de espera da IA | estado explícito ("Lumi está preparando uma resposta…", "A IA está analisando sua frase…"); a mensagem enviada aparece imediatamente |
 | Falha ao enviar | o texto volta para o campo (com o foco), com mensagem clara e possibilidade de reenviar |
 | Exercícios | responder → **Verificar** (desabilitado até haver resposta) → feedback → **Continuar** (recebe o foco) |
-| Conversa | Enter envia, Shift+Enter quebra linha; limite de 600 caracteres com contador nos últimos 100 |
+| Conversa | Enter envia, Shift+Enter quebra linha; limite de 600 caracteres no campo e no servidor |
 | Navegação | itens com `aria-current="page"`; título da página recebe o foco a cada troca de rota |
 | Botões assíncronos | mostram o andamento ("Entrando…", "Saindo…", "Excluindo…"), não aceitam clique repetido e voltam ao normal se a ação falhar |
 | Sair da conta | leva ao login com o aviso discreto "Você saiu da sua conta."; nunca mostra "sessão expirou" |
@@ -120,14 +128,15 @@ redefinição de senha, que abre com ou sem sessão.
 
 ## 5. Estados de interface
 
-Toda tela que carrega dados implementa os quatro estados:
+Os estados são apresentados por templates, mensagens e helpers de
+`static/js/common.js`; não existem componentes React na aplicação principal:
 
 | Estado | Componente | Comportamento | Exemplo |
 | --- | --- | --- | --- |
-| **Carregando** | `Skeleton` (listas e cartões) ou `LoadingState` (tela/ação) | forma do conteúdo final, sem saltos de layout; `role="status"` | "Preparando sua aula…" |
-| **Vazio** | `EmptyState` | explica por que está vazio e oferece a próxima ação | Progresso sem atividade → "Começar minha primeira aula" |
-| **Erro** | `QueryErrorState` (tela) / `ActionError` (ação) | mensagem em linguagem comum + a ação que faz sentido para o tipo de erro (tabela abaixo); nunca mostra detalhes técnicos | "Sem conexão com o servidor. Verifique sua internet e tente de novo." |
-| **Sucesso** | toast, feedback do exercício, resumo | confirma o que aconteceu e indica o próximo passo | "Conta criada! Vamos personalizar seus estudos." |
+| **Carregando** | status inicial de `feature.html`, botão ocupado e status do chat | `role="status"` ou `aria-busy`; bloqueio de cliques repetidos | "Lumi está preparando uma resposta…" |
+| **Vazio** | helper `empty()` e estados do painel | explica por que está vazio e oferece a próxima ação | Progresso sem atividade → primeira aula |
+| **Erro** | helpers `load()`, `showError()` e `fieldsError()` | mensagem em linguagem comum, reenvio conforme erro; sem detalhes técnicos | "Sem conexão com o servidor. Verifique sua internet e tente de novo." |
+| **Sucesso** | `toast()`, feedback do exercício, resumo | confirma o que aconteceu e indica o próximo passo | "Preferência salva." |
 
 Erros não terminam em beco sem saída — a ação depende do tipo:
 
@@ -145,7 +154,7 @@ Estados específicos do domínio:
 | Estado | Onde | Tratamento |
 | --- | --- | --- |
 | IA pensando | chat, escrita livre, "Explicar de outro jeito" | avatar animado + texto; respeita movimento reduzido |
-| IA indisponível | qualquer chamada de IA | a aplicação usa o modo demonstração automaticamente; nada quebra para a pessoa |
+| IA indisponível | qualquer chamada de IA | erro seguro; rascunho preservado; demonstração só por configuração explícita, sem fallback automático |
 | Dado pessoal removido | chat | aviso abaixo da mensagem (ver IA-BEHAVIOR §10) |
 | Conversa encerrada | chat | composer substituído por aviso + "Ver feedback" |
 | Histórico desativado | Conversar, chat, resumo | aviso informativo de que o conteúdo é apagado ao encerrar |
@@ -212,9 +221,9 @@ marca-texto (`--marker`) e o trecho original com sublinhado ondulado.
 
 Meta: **WCAG 2.1 nível AA**.
 
-| Item | Como foi atendido |
+| Item | Padrão aplicado / limite de evidência |
 | --- | --- |
-| Contraste | todos os pares de texto verificados (DESIGN-SYSTEM §2); texto ≥ 4,5:1, bordas de controles ≥ 3:1 |
+| Contraste | tokens preservados do DESIGN-SYSTEM §2; meta de texto ≥ 4,5:1 e bordas ≥ 3:1; sem nova auditoria completa das combinações dinâmicas |
 | Teclado | todos os controles são elementos nativos (`button`, `a`, `input`, `textarea`, `dialog`); ordem lógica; Esc fecha diálogos |
 | Foco visível | anel de 3px em `:focus-visible` em todos os controles, inclusive opções de exercício |
 | Pular navegação | link "Pular para o conteúdo" em todas as telas |
@@ -223,7 +232,7 @@ Meta: **WCAG 2.1 nível AA**.
 | Idioma | `lang="pt-BR"` na página e `lang="en"` em frases em inglês, para pronúncia correta no leitor de tela |
 | Alvos de toque | 44×44px em botões, campos, navegação e opções (`--touch`); botões pequenos de ações secundárias têm 36px, acima do mínimo de 24px da WCAG 2.2 (2.5.8) |
 | Movimento | `prefers-reduced-motion` desativa animações não essenciais |
-| Texto | tamanhos em `rem`; sem rolagem horizontal de 320px a 1920px (verificado também em 640, 853 e 1024px, que equivalem a zoom de 200%, 150% e 125% numa tela de 1280px); fonte Atkinson Hyperlegible para leitura |
+| Texto | tamanhos em `rem`, fonte Atkinson Hyperlegible; a suíte Python mede rolagem horizontal em 320, 820 e 1440px; outras larguras/zoom exigem execução própria |
 | Seleção de texto | restrita a campos editáveis só por CSS (`user-select`), sem bloquear eventos: foco, teclado, leitores de tela e copiar/colar nos campos funcionam normalmente |
 | Diálogos | `<dialog>` nativo modal (foco preso), título ligado por `aria-labelledby` com id único, fecha com Esc, X e clique fora |
 | Cor | nenhuma informação transmitida só por cor |
@@ -252,7 +261,7 @@ Seguem DESIGN-SYSTEM §8. Exemplos-chave:
 | Recuperação de senha | "Se existir uma conta com este e-mail, enviaremos as instruções de recuperação." + (http) "Confira a caixa de entrada e a pasta de spam. O link vale por 15 minutos e só pode ser usado uma vez." |
 | Redefinição — link indisponível | "Este link venceu" · "Este link já foi usado" · "Link inválido", sempre com **Pedir um novo link** e **Voltar para o login** |
 | Redefinição — sucesso | "Senha redefinida com sucesso." + "Por segurança, as sessões abertas com a senha antiga foram encerradas." + **Entrar** |
-| Simulação (modo demonstração) | "Simulação do modo demonstração — Nenhum e-mail real é enviado na demonstração." |
+| E-mail em desenvolvimento | Transporte `outbox`: arquivo local para abrir o link; nenhum e-mail real é entregue. A demonstração da IA é uma configuração independente do transporte de e-mail |
 | Resultado do nivelamento | nível estimado + "Este resultado é uma estimativa pedagógica para personalizar seus estudos — não é uma certificação oficial de proficiência." |
 | Revisão | motivo explícito: "Você teve dificuldade com Simple Present nos últimos exercícios." |
 
@@ -262,9 +271,12 @@ Seguem DESIGN-SYSTEM §8. Exemplos-chave:
 - Página "Privacidade e dados" mostra o que é coletado, para quê e por quanto tempo; permite desativar o
   histórico, apagar todas as conversas e excluir a conta.
 - O chat lembra, no rodapé, para não compartilhar dados pessoais.
-- O modo demonstração guarda tudo apenas no navegador e diz isso na página pública ("os dados ficam apenas neste navegador e a IA é simulada") e na barra lateral do app.
-- Na recuperação de senha, a resposta nunca revela se o e-mail tem conta. A demonstração mostra uma simulação
-  identificada e nunca finge que um e-mail real foi enviado.
+- O modo demonstrativo da IA usa o mesmo backend/banco da aplicação Python:
+  respostas são roteirizadas e identificadas, mas dados de aprendizagem ficam no
+  SQLite do servidor. A persistência só no navegador pertence ao demo legado.
+- Na recuperação de senha, a resposta nunca revela se o e-mail tem conta. O
+  transporte local `outbox` gera arquivos privados sem alegar entrega SMTP real;
+  o guia de desenvolvimento explica como abrir o link nesses arquivos.
 - Os e-mails (boas-vindas e recuperação) nunca contêm senha e dizem como ignorar a mensagem se ela não foi pedida.
 
 ## 12. Como validar a experiência (sugestão para a equipe)

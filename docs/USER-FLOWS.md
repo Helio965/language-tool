@@ -1,5 +1,11 @@
 # Fluxos de usuário — English AI
 
+> **Transição para Python:** os requisitos e as decisões acadêmicas deste documento
+> foram preservados. A implementação atual roda com Flask/Jinja na raiz; a versão
+> anterior e seus detalhes de framework estão em [legacy/USER-FLOWS.md](legacy/USER-FLOWS.md).
+> Evidências da nova execução ficam em [MIGRATION-AUDIT.md](MIGRATION-AUDIT.md),
+> não nas contagens/capturas históricas do protótipo TypeScript.
+
 > Base: Fluxograma de caso de uso (F3), Especificação de Casos de Uso UC01–UC12 (F2) e Análise de requisitos §12–13 (F1). As decisões sobre pontos divergentes estão em [MVP-SCOPE.md §5](./MVP-SCOPE.md#5-divergências-entre-os-materiais-e-decisões-tomadas).
 
 ## 1. Fluxo principal (fluxograma do projeto)
@@ -32,11 +38,15 @@ flowchart TD
     RV --> PR
 ```
 
-A porta de entrada é a página pública (`/`), com "Começar gratuitamente", "Já tenho conta" e, no modo
-demonstração, "Explorar demonstração". Quem já tem sessão e abre `/` vai direto para a etapa pendente (ou para o
-Início) — a página pública é só para visitantes.
+A porta de entrada é a página pública (`/`), com "Começar gratuitamente", "Já tenho conta".
+Na versão Python, cadastre uma conta para navegar; o provedor demonstrativo é
+identificado, com dados persistidos no servidor. Quem já tem sessão e abre `/`
+vai direto para a etapa pendente (ou para o Início) — a página pública é só para visitantes.
 
-Regra: **o usuário nunca repete uma etapa concluída**. A sessão guarda `nextStep` (`onboarding` → `placement` → `ready`), e as rotas protegidas redirecionam para a etapa pendente.
+Regra: **o usuário nunca repete uma etapa concluída automaticamente**. O serviço
+calcula `nextStep` (`onboarding` → `placement` → `ready`) a partir do perfil
+persistido, e as rotas protegidas redirecionam para a etapa pendente. Editar perfil
+e refazer o nivelamento continuam disponíveis por escolha do usuário.
 
 ## 2. Cadastro (UC01)
 
@@ -50,7 +60,7 @@ flowchart TD
     F -- inválido (A1) --> D
     F -- conta existe (A2) --> G[Aviso + atalho "Entrar com este e-mail"]
     F -- criada --> H[Feedback "Conta criada!"] --> I[Configuração inicial]
-    F -- criada --> W[E-mail de boas-vindas em segundo plano<br/>modo http · falha não desfaz a conta]
+    F -- criada --> W[E-mail de boas-vindas em segundo plano<br/>outbox local ou SMTP configurado · falha não desfaz a conta]
 ```
 
 ## 3. Login (UC02) e recuperação de senha
@@ -72,8 +82,8 @@ flowchart TD
 ```mermaid
 flowchart TD
     A[/recuperar-senha/] --> B[E-mail] --> C["Resposta igual para qualquer e-mail:<br/>'Se existir uma conta…'"]
-    C -- modo http, conta existe --> D[E-mail com link<br/>vale 15 min · uso único]
-    C -- modo demonstração --> E[Simulação identificada na tela<br/>nenhum e-mail real é enviado]
+    C -- SMTP configurado, conta existe --> D[E-mail com link<br/>vale 15 min · uso único]
+    C -- desenvolvimento sem SMTP --> E[Caixa de saída local<br/>nenhum e-mail real é enviado]
     D --> F[/redefinir-senha/:token/]
     E --> F
     F --> G{Situação do link}
@@ -207,5 +217,9 @@ Progresso (aba principal ou Perfil → Seu progresso) → resumo (nível estimad
 
 ## 11. Preferências e dados (UC12, RF20)
 
-Perfil → Preferências → idioma das explicações · intensidade das correções · preferências de conversa · histórico · lembretes · meta diária → salvo automaticamente com confirmação. A escolha aparece na hora; as alterações são enviadas em ordem, uma por vez, e se uma falhar a tela volta a mostrar o que está salvo.
+Perfil → Preferências → idioma das explicações · intensidade das correções ·
+preferências de conversa · histórico · lembretes · meta diária → salvo
+automaticamente com confirmação. As alterações são enviadas em ordem, uma por
+vez; falha mostra uma mensagem acionável e restaura o valor salvo do campo,
+sem apresentar sucesso. A preferência de lembretes não dispara envio no MVP.
 Perfil → Privacidade e dados → o que coletamos → apagar histórico de conversas → excluir conta (confirmação com senha).

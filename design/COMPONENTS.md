@@ -1,185 +1,98 @@
 # Componentes — English AI
 
-> Biblioteca de componentes do protótipo (`apps/web/src/components`). Cada componente usa só os tokens de
-> [DESIGN-SYSTEM.md](./DESIGN-SYSTEM.md). Para recriar no Figma, ver [FIGMA-GUIDE.md](./FIGMA-GUIDE.md) —
-> os nomes de propriedades abaixo são os mesmos das *variants* sugeridas.
+A interface atual usa Flask/Jinja, CSS e JavaScript de apresentação. Este
+documento mapeia o design para os arquivos executados pela versão Python.
+A especificação acadêmica anterior, com nomes React e suas variantes, está em
+[docs/legacy/design/COMPONENTS.md](../docs/legacy/design/COMPONENTS.md).
 
-Convenções:
+Os tokens estão em [tokens.css](../static/css/tokens.css). Os estilos
+compartilhados ficam em [ui.css](../static/css/ui.css), que importa `fonts.css`
+e `global.css`; [python.css](../static/css/python.css) adapta esses estilos ao
+HTML atual. As variantes de [FIGMA-GUIDE.md](./FIGMA-GUIDE.md) são propostas de
+design; não equivalem a uma API de componentes React instalada.
 
-- **Cor de acento por modo:** componentes com `accent` usam `--accent`, que vale `--learn` (azul) no Modo
-  Aprender e `--talk` (coral) no Modo Conversação (`[data-mode]`).
-- **Tamanho de toque:** controles interativos têm no mínimo 44px de altura (`--touch`), exceto o botão `sm`
-  (36px), usado só em ações secundárias.
-- **Foco:** anel de 3px `--learn` em `:focus-visible`, com 2px de afastamento.
+## 1. Mapeamento atual
 
----
-
-## 1. Ações
-
-### Button — `Button.tsx`
-
-| Propriedade | Valores | Observações |
+| Peça visual | Template, macro ou função atual | Estilos e comportamento |
 | --- | --- | --- |
-| `variant` | `primary` (tinta), `accent` (cor do modo), `secondary` (contorno), `ghost` (texto), `danger` (amora) | um `primary`/`accent` por tela |
-| `size` | `sm` 36px · `md` 44px · `lg` 52px | `lg` para a ação principal no celular |
-| `block` | sim/não | ocupa a largura toda |
-| `icon` / `iconEnd` | ícone Lucide | ícone de seta no fim indica avanço |
-| `loading` + `loadingLabel` | — | troca o texto ("Criando sua conta…"), mostra spinner e bloqueia clique duplo |
-| `to` | rota | renderiza um link com a mesma aparência (navegação ≠ ação) |
+| Botão e link de ação | macro `button` em [macros.html](../templates/macros.html); `button`, `link`, `busy`, `action` em [common.js](../static/js/common.js) | `.button-*`; estado pendente altera rótulo, desabilita e define `aria-busy` |
+| Campo e senha | macro `field`; [auth/form.html](../templates/auth/form.html) | `.field-*`; mostrar/ocultar em `initCommon`, erros por campo em `fieldsError` |
+| Requisitos da senha | `#password-checks` em `auth/form.html` | [auth.js](../static/js/auth.js) atualiza comprimento, letra e número |
+| Opções, chips e seleção segmentada | HTML nativo nos templates e módulos de cada fluxo | `.choice-*`; radio/checkbox, `fieldset`/`legend`; `hydrate` atualiza estado visual |
+| Cartão, título e indicador numérico | macro `header`; `card`, `stat` em `common.js` | `.display-card`, `.display-pageHeader`, `.display-stat` |
+| Barra e anel de progresso | macros `progress_bar`, `ring`; função `progress`; `<progress>` nos fluxos de foco | `.display-progress`, `.display-ring`; nomes acessíveis e valores |
+| Correção | macro `correction` nas prévias públicas; função `correction` para dados da API | `.correction-*`; frases com `lang="en"`, explicação em `<details>` na conversa |
+| Marca, avatar e ícones | macros `logo`, `avatar`, `icon`; função `avatar` em `common.js` | SVG inline; `.brand-*`, `.ui-icon`; SVG decorativo com `aria-hidden` |
+| Carregamento, vazio e erro | `.states-loading` nos templates; `empty`, `load`, `showError` em `common.js` | regiões `role="status"` e `role="alert"` conforme o estado |
+| Diálogo e aviso curto | `<dialog id="ui-dialog">`, `#toast` em [base.html](../templates/base.html) | `dialog`, `toast` em `common.js`; título associado e `aria-live` |
+| Navegação | `base.html` | `.shell-*`; barra inferior, trilho e barra lateral com media queries |
+| Barra de foco | templates de aula, conversa, revisão, configuração e nivelamento | `.focusbar-*`; saída, título e progresso quando aplicável |
+| Página pública | [landing.html](../templates/landing.html) | `.landing-*`; menu e âncoras em `initCommon` |
 
-Estados: padrão, hover (eleva 1px), pressionado, foco, desabilitado (50% de opacidade), carregando.
-Em telas de até 420px, rótulos longos quebram linha em vez de empurrar o layout para fora da tela.
+## 2. Ações e formulários
 
-## 2. Formulários
+A macro `button` recebe `label`, `href`, `variant`, `size`, `id` e `attrs`.
+Com `href`, gera um link; sem ele, um botão `type="button"`. Formulários declaram
+separadamente os botões `type="submit"`. As classes oferecem `primary`, `accent`,
+`secondary`, `ghost`, `danger` e tamanhos `sm`, `md`, `lg`. A meta de toque é
+44px; `sm` tem 36px e fica reservado a ações secundárias.
 
-### TextField / PasswordField — `TextField.tsx`
+Os campos têm rótulo visível. `fieldsError` associa mensagens com
+`aria-describedby`, define `aria-invalid` e foca o primeiro campo informado
+pela API. `auth.js` atualiza os requisitos da senha e bloqueia envios
+simultâneos. A validação definitiva permanece nos serviços Python.
 
-Rótulo sempre visível acima do campo; dica e erro abaixo, ligados por `aria-describedby`.
-Estados: vazio, preenchido, foco, erro (`aria-invalid`, borda e mensagem em `--error`), desabilitado.
-`PasswordField` acrescenta o botão "Mostrar/Ocultar senha".
+Preferências usam radios e checkboxes em
+[configuracoes/preferences.html](../templates/configuracoes/preferences.html).
+[account.js](../static/js/account.js) enfileira alterações, envia cada mudança à
+API e mostra “Preferência salva.” após sucesso. Se houver erro, restaura o campo
+a partir do último estado salvo e mostra a mensagem. A tela atual não inclui a
+prévia ao vivo de correção da especificação acadêmica anterior.
 
-### PasswordChecklist — `features/auth/PasswordChecklist.tsx`
+## 3. Peças pedagógicas
 
-Requisitos da senha ao vivo (✓ atendido / ○ pendente, com texto para leitor de tela), usados como dica do campo
-de senha no **cadastro** e na **redefinição de senha** — uma única política (`passwordChecks` do core).
+**Correção:** exercícios e resumos apresentam Sua frase → Forma recomendada →
+Explicação, com dica quando fornecida. A conversa usa You said → More natural →
+Por quê?, com `<details>` recolhido. `common.js` destaca os trechos descritos em
+`changes`; a macro Jinja das prévias públicas destaca a recomendação completa.
 
-### Checkbox — `Controls.tsx`
+**Exercícios:** [learning.js](../static/js/learning.js) usa o mesmo executor
+visual para aulas e revisões: enunciado, resposta, Verificar, feedback e próxima
+ação. Tipos: múltipla escolha, seleção de palavra, lacuna, tradução e escrita.
+A API Python emite atividades, corrige respostas e calcula resultados. O
+feedback combina cor, símbolo, título e explicação; a explicação de apoio pode
+ser aberta em outro idioma. Após verificar, os campos ficam desabilitados e o
+foco segue para a próxima ação.
 
-Caixa 22px + texto (pode conter link). Mostra erro abaixo quando obrigatório (aceite dos termos).
+**Conversa:** [conversation.js](../static/js/conversation.js) apresenta
+mensagens, traduções disponíveis, correções, contadores e resumo. O estado
+pendente usa o texto “Lumi está preparando uma resposta…”. Os estilos históricos
+de três pontos em `ui.css` não são usados pelo fluxo atual.
 
-### Switch — `Controls.tsx`
+## 4. Estados, diálogos e navegação
 
-Interruptor com título e descrição, usado em preferências (`role="switch"`, `aria-checked`).
+`load` mostra Tentar de novo para falhas recuperáveis e omite essa ação para
+`NOT_FOUND`, `FORBIDDEN`, `VALIDATION`. A API redireciona ao login quando a sessão
+termina; `showError` omite esse erro na tela anterior.
 
-### ChoiceGroup — `Controls.tsx`
+Os diálogos usam `<dialog>` nativo, título associado, botão de fechar e
+fechamento pelo fundo; o navegador oferece modalidade e Escape. Cada abertura
+substitui o conteúdo e as ações. O aviso curto usa uma região `aria-live`.
 
-Grupo de opções em cartão (rádio ou múltipla seleção) com título, descrição e ícone opcionais.
+`base.html` monta a navegação autenticada e Pular para o conteúdo. No celular,
+telas imersivas escondem a barra inferior; a barra lateral permanece em faixas
+maiores. Configuração e nivelamento têm layout próprio. A navegação usa URLs
+Flask. O provedor `mock`/`demo` recebe identificação de IA em demonstração;
+essa indicação descreve respostas simuladas. Os dados da conta são persistidos
+no backend Python, conforme [ARCHITECTURE.md](../docs/ARCHITECTURE.md).
 
-| Propriedade | Valores |
-| --- | --- |
-| `multiple` | rádio (padrão) ou checkbox |
-| `columns` | 1, 2 ou 3 |
-| `tone(option)` | `correct` (verde) / `incorrect` (amora) — usado no feedback dos exercícios |
-| `disabled` | trava as opções após verificar |
+## 5. Checklist para novas peças
 
-Usado em: configuração inicial, nivelamento, exercícios de múltipla escolha/seleção, intensidade de correção.
+Este checklist define objetivos de revisão; não certifica todas as telas:
 
-### SegmentedControl — `Controls.tsx`
-
-2–3 opções curtas lado a lado (idioma das explicações, tamanho das respostas).
-
-### Chip — `Controls.tsx`
-
-Etiqueta compacta, opcionalmente selecionável. Tons: `neutral`, `learn`, `talk`, `success`, `almost`,
-`error`, `marker` ("Para você"). Usado em interesses, meta diária, filtros do vocabulário.
-
-## 3. Exibição
-
-| Componente | Função | Variações |
-| --- | --- | --- |
-| **Card** (`Display.tsx`) | superfície de conteúdo | `tone`: `default`, `flat`, `accent`, `learn`, `talk`, `ink` (escuro), `marker` |
-| **PageHeader** | título da página (recebe foco na navegação) + subtítulo + `eyebrow` | — |
-| **SectionTitle** | título de seção com ação opcional à direita | — |
-| **StatTile** | número grande + rótulo + dica + ícone | — |
-| **ProgressBar** | barra com rótulo acessível | `tone`: `accent`, `learn`, `talk`, `success`, `ink`; `size`: `sm`, `md` |
-| **ProgressRing** | anel com valor no centro (meta de hoje, resultado da aula) | `tone`: `success`, `learn`, `talk` |
-| **LevelBadge** | "Nível estimado: Básico" com ícone de barras | prefixo configurável |
-| **ModeBadge** | "Modo Aprender" / "Modo Conversação" | `mode`: `learn`, `talk` |
-| **Highlight** | marca-texto em um trecho da frase de exemplo | — |
-
-## 4. Componentes pedagógicos
-
-### CorrectionCard — `CorrectionCard.tsx`
-
-O componente central da proposta pedagógica (UC07).
-
-| Variante | Onde | Estrutura |
-| --- | --- | --- |
-| `learn` | exercícios, resumo da conversa, preferências (pré-visualização) | **Sua frase** (trecho original com sublinhado ondulado) → **Forma recomendada · gravidade** (mudança com marca-texto) → **Explicação** → **Dica** opcional |
-| `chat` | abaixo da mensagem do usuário na conversa | "You said" → "More natural" → botão **Por quê?** (`aria-expanded`) que revela a explicação — recolhida por padrão |
-
-Gravidade exibida: "Muda o sentido", "Gramática", "Mais natural".
-
-### ExerciseRunner — `features/exercises/ExerciseRunner.tsx`
-
-Sequência de exercícios: cabeçalho ("Exercício 2 de 6" + tipo) → enunciado → resposta → **Verificar** →
-painel de feedback (`role="status"`) → **Continuar**.
-
-| Tipo | Entrada |
-| --- | --- |
-| Múltipla escolha | `ChoiceGroup` |
-| Complete a lacuna | campo dentro da frase |
-| Selecione a palavra | `ChoiceGroup` com a frase preenchida ao vivo |
-| Traduza | área de texto |
-| Escreva sua resposta | área de texto com contador de palavras; corrigida por regras + IA |
-
-Painel de feedback: `correct` (verde), `almost` (âmbar), `incorrect` (amora), sempre com ícone + título +
-explicação; "Ver no outro idioma" quando há apoio bilíngue.
-
-## 5. Marca e IA — `Brand.tsx`
-
-| Componente | Uso |
-| --- | --- |
-| **LogoMark** | símbolo de dois balões sobrepostos (ultramar + coral) |
-| **Logo** | símbolo + "English" + selo "AI" em marca-texto; versão `inverse` |
-| **AssistantAvatar** | balão coral com centelha; `thinking` anima enquanto a IA responde |
-
-## 6. Estados — `States.tsx`
-
-| Componente | Uso | Acessibilidade |
-| --- | --- | --- |
-| **LoadingState** | carregamento de tela ou ação longa, com texto | `role="status"`, `aria-live="polite"` |
-| **Skeleton** | listas/cartões carregando | decorativo |
-| **EmptyState** | sem dados, com explicação e ação | — |
-| **ErrorState** | falha ao carregar; `onRetry` ("Tentar de novo") só quando repetir pode resolver, e `actions` para outras saídas (ex.: voltar à lista) | `role="alert"` |
-| **InlineAlert** | mensagens dentro de formulários e fluxos | `error` → `role="alert"`; `info`/`success`/`almost` → `role="status"` |
-
-Componentes de erro com regra de produto (`apps/web/src/app/`):
-
-| Componente | Uso |
-| --- | --- |
-| **QueryErrorState** | erro ao carregar dados, com a ação certa por tipo: rede/servidor/IA/limite → "Tentar de novo"; não encontrado/sem acesso → "Voltar"; sessão → aviso neutro "Verificando sua sessão…" e "Entrar novamente" (nunca "Tentar de novo") |
-| **ActionError** | erro de uma ação (enviar, salvar, concluir); omite erros de sessão, que são avisados uma única vez no login |
-| **SignOutDialog** | confirmação "Sair da conta?" nas etapas obrigatórias do primeiro acesso (configuração inicial e nivelamento), com loading e erro |
-
-## 7. Sobreposições — `Overlay.tsx`
-
-| Componente | Uso |
-| --- | --- |
-| **Dialog** | confirmação (encerrar conversa, apagar histórico, excluir conta) e detalhes da palavra; `<dialog>` nativo, Esc, X e clique fora fecham, foco preso no diálogo; título com id único (`useId`) |
-| **Toast** (`useToast`) | confirmação curta ("Preferência salva."), some sozinho, `aria-live` |
-
-## 8. Layout — `layouts/`
-
-| Componente | Função |
-| --- | --- |
-| **AppShell** | navegação principal responsiva (barra inferior / trilho / barra lateral), link "Pular para o conteúdo", foco no título a cada rota; esconde a navegação em rotas imersivas; no modo demonstração, a barra lateral mostra o aviso "Modo demonstração — seus dados ficam salvos só neste navegador" |
-| **AuthLayout** | telas de conta (entrar, cadastro, recuperar e redefinir senha) com marca e coluna de apoio no desktop |
-| **FocusBar** (`components/FocusBar.tsx`) | barra das telas imersivas: voltar/sair, título, barra de progresso da etapa e ação à direita (ex.: "Encerrar") |
-
-## 9. Página pública — `features/landing/`
-
-Composição da página `/` com os mesmos tokens e componentes do app (Button, CorrectionCard, ProgressBar,
-ProgressRing, StatTile, Logo, AssistantAvatar):
-
-| Peça | Função |
-| --- | --- |
-| **LandingHeader** | cabeçalho fixo: logo, seções, Entrar/Criar conta; abaixo de 1100px, **Menu de seções** (`aria-expanded`, `aria-controls`, Esc fecha e devolve o foco) |
-| **LandingSections** | hero, problema, como funciona, Aprender, Conversar, IA, progresso, personalização, segurança e chamada final; cada seção tem `id` de âncora e título focável |
-| **LandingFooter** | Sobre o projeto (com o que ainda não existe) e colunas Produto, Conta, Informações, Legal |
-| **useSectionNavigation** | âncoras acessíveis: atualiza o endereço sem nova entrada no histórico, leva o foco ao título, rola suavemente só sem `prefers-reduced-motion` |
-| **landingContent.ts** | textos e fatos; números calculados a partir do conteúdo do core |
-
-Padrões visuais novos (só nesta página): seções com fundo de ponta a ponta alternando papel e superfície,
-cartões de passo numerados com ícone em círculo amarelo, chamada final em azul-marinho com botão marca-texto, e o
-selo tracejado **Exemplo ilustrativo** para prévias com dados fictícios.
-
-## 10. Checklist para um componente novo
-
-- [ ] usa só tokens (cor, espaço, raio, sombra, tipografia);
-- [ ] funciona com teclado e tem foco visível;
-- [ ] tem rótulo acessível e não depende só de cor;
-- [ ] alvo de toque ≥ 44px (ou justificativa);
-- [ ] cobre os estados: padrão, foco, desabilitado, carregando/erro quando aplicável;
-- [ ] respeita `prefers-reduced-motion`;
-- [ ] textos seguem a voz da marca (DESIGN-SYSTEM §8).
+- [ ] reutilizar tokens de cor, espaço, raio, sombra e tipografia;
+- [ ] funcionar com teclado, foco visível e rótulos acessíveis;
+- [ ] apresentar feedback em texto, além da cor;
+- [ ] revisar alvos de toque, estados pendentes e falhas;
+- [ ] respeitar `prefers-reduced-motion`;
+- [ ] seguir a voz em [DESIGN-SYSTEM.md](./DESIGN-SYSTEM.md).

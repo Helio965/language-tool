@@ -1,138 +1,136 @@
-# Modelo de dados — English AI
+# Modelo de dados — English AI em Python
 
-> Base: Análise de requisitos §20 (Usuário, Perfil de aprendizagem, Aula, Exercício, Vocabulário, Conversação, Progresso) + entidades de apoio necessárias aos casos de uso (ExerciseAttempt, UserVocabulary, Message, Review, Preference).
-> O esquema executável está em [`apps/api/src/db/schema.sql`](../apps/api/src/db/schema.sql) e os tipos em [`packages/core/src/domain/entities.ts`](../packages/core/src/domain/entities.ts).
+A origem acadêmica continua sendo a Análise de requisitos §20 (Usuário, Perfil,
+Aula, Exercício, Vocabulário, Conversação, Progresso) e os casos de uso F2.
+[O modelo anterior está preservado](legacy/DATABASE-MODEL.md). A implementação
+atual está em `models/`, com SQLAlchemy 2 e migrações Alembic em `migrations/`.
 
-## 1. Rastreabilidade das entidades
+## Entidades e rastreabilidade
 
-| Entidade | Origem nos documentos | Atributos dos documentos | Atributos de apoio (decisão técnica) |
-|----------|----------------------|--------------------------|--------------------------------------|
-| **User** | §20 Usuário | id, nome, e-mail, credenciais, preferências | `role` (ator Administrador, D7), `terms_accepted_at` (privacidade), `session_version` (encerra sessões ao redefinir a senha) |
-| **PasswordResetToken** | UC02 (recuperação de senha) | — | hash SHA-256 do token, validade, uso único (`used_at`), criação — ver [EMAIL-AND-AUTH.md](./EMAIL-AND-AUTH.md) |
-| **LearningProfile** | §20 Perfil de aprendizagem, UC03, UC04 | nível, objetivo, dificuldades, progresso | nível percebido, experiência anterior, interesses (UC03), pontuação e data do nivelamento |
-| **Preference** | UC12, RF19 | idioma das explicações, intensidade das correções, preferências de conversação, histórico, notificações, aprendizagem | meta diária |
-| **Lesson** | §20 Aula | título, nível, conteúdo, tópico, exercícios | ordem (RN02), minutos estimados |
-| **Exercise** | §20 Exercício | pergunta, alternativas/resposta esperada | tipo, explicação PT/EN, tema (skill) |
-| **ExerciseAttempt** | §20 Exercício ("resposta do usuário, resultado"), UC06 | resposta do usuário, resultado | contexto (aula, nivelamento, revisão), data |
-| **Vocabulary** | §20 Vocabulário | palavra, significado, exemplos, nível | tradução, classe gramatical, tópico; `phonetic` preparado (pronúncia futura) |
-| **UserVocabulary** | §20 Vocabulário ("frequência de revisão"), RF17 | frequência de revisão | status, vezes revisada, próxima revisão |
-| **Conversation** | §20 Conversação | usuário, mensagens, contexto, data, configurações de retenção | assunto, nível no início, metadados mínimos (nº de mensagens, temas corrigidos) |
-| **Message** | §20 Conversação ("mensagens") | — | papel, conteúdo, tradução de apoio, correções exibidas e adiadas, avisos |
-| **Progress** | §20 Progresso | conteúdos concluídos, desempenho, métricas de estudo | por aula: status, acertos, nota, tempo |
-| **Review** | §20 Progresso ("revisões"), UC08 | revisões | tipo, referência, motivo, vencimento, passo do intervalo |
+| Tabela / modelo | Origem | Responsabilidade |
+| --- | --- | --- |
+| `users` / `User` | RF01–RF03, UC01–UC03 | Identidade, hash de senha, aceite dos termos, papel, versão da sessão |
+| `password_reset_tokens` / `PasswordResetToken` | UC02, segurança | Hash SHA-256 do token, validade, uso único |
+| `learning_profiles` / `LearningProfile` | RF03–RF05, RN06, UC03–UC04 | Objetivo, interesses, nível percebido/estimado, dificuldades, etapas concluídas |
+| `preferences` / `Preferences` | RF19, RN07, UC12 | Idioma, correção, tradução, histórico, meta, lembrete salvo |
+| `lessons` / `Lesson` | RF06–RF07, RN02, UC05 | Conteúdo, ordem, nível e tempo estimado |
+| `exercises` / `Exercise` | RF09–RF11, UC06–UC07 | Pergunta, opções, respostas aceitas e tema pedagógico |
+| `vocabulary` / `Vocabulary` | RF08, UC10 | Palavra, tradução, significado, exemplos, nível, campo fonético futuro |
+| `lesson_vocabulary` / `LessonVocabulary` | RF07–RF08 | Associação entre aula e palavras (14ª tabela, não omitida do DER) |
+| `exercise_attempts` / `ExerciseAttempt` | RF10, RF15–RF16 | Resposta e correção persistidas, contexto e passagem de aprendizagem |
+| `user_vocabulary` / `UserVocabulary` | RF17–RF18, UC08/UC10 | Status estudado, revisões e próxima data |
+| `progress` / `Progress` | RF16, UC11 | Andamento e resultado por usuário/aula |
+| `reviews` / `Review` | RF18, UC08 | Motivo, prazo, sessão de atividades e resultado |
+| `conversations` / `Conversation` | RF12–RF15, RN07, UC09 | Dono, assunto, contexto mínimo, retenção e resumo |
+| `messages` / `Message` | RF12–RF15, UC09 | Turnos, correções, tradução e origem da resposta de IA |
 
-> **Indicadores agregados** (taxa de acertos, dias de estudo, sequência, tempo total, erros recorrentes) **não são armazenados**: são calculados a partir de Progress, ExerciseAttempt, Review, UserVocabulary e Conversation (`packages/core/src/domain/progress.ts`). Em escala, podem ser materializados (ver ARCHITECTURE.md §Escalabilidade).
+São preservadas **14 tabelas de domínio**, além de `alembic_version`, usada para
+controle técnico da migração. Datas do legado continuam como texto ISO 8601 UTC;
+listas/objetos JSON existentes são lidos como JSON pelo ORM, sem exportação de
+contas nem renumeração de identificadores.
 
-## 2. DER
+## DER implementado
 
 ```mermaid
 erDiagram
-    USER ||--|| LEARNING_PROFILE : "possui"
-    USER ||--|| PREFERENCE : "configura"
-    USER ||--o{ PROGRESS : "registra"
-    USER ||--o{ EXERCISE_ATTEMPT : "responde"
-    USER ||--o{ USER_VOCABULARY : "estuda"
-    USER ||--o{ REVIEW : "revisa"
-    USER ||--o{ CONVERSATION : "conversa"
-    USER ||--o{ PASSWORD_RESET_TOKEN : "pede redefinição"
-    LESSON ||--o{ EXERCISE : "contém"
-    LESSON ||--o{ PROGRESS : "é acompanhada em"
-    LESSON }o--o{ VOCABULARY : "apresenta (lesson_vocabulary)"
-    EXERCISE ||--o{ EXERCISE_ATTEMPT : "recebe"
-    VOCABULARY ||--o{ USER_VOCABULARY : "é estudada em"
-    CONVERSATION ||--o{ MESSAGE : "contém"
-
-    USER {
+    USERS ||--o| LEARNING_PROFILES : possui
+    USERS ||--o| PREFERENCES : configura
+    USERS ||--o{ PASSWORD_RESET_TOKENS : solicita
+    USERS ||--o{ EXERCISE_ATTEMPTS : responde
+    USERS ||--o{ USER_VOCABULARY : estuda
+    USERS ||--o{ PROGRESS : registra
+    USERS ||--o{ REVIEWS : revisa
+    USERS ||--o{ CONVERSATIONS : conversa
+    LESSONS ||--o{ EXERCISES : contem
+    LESSONS ||--o{ LESSON_VOCABULARY : apresenta
+    VOCABULARY ||--o{ LESSON_VOCABULARY : pertence
+    VOCABULARY ||--o{ USER_VOCABULARY : estudada
+    LESSONS ||--o{ PROGRESS : acompanha
+    LESSONS o|--o{ EXERCISE_ATTEMPTS : referencia
+    REVIEWS o|--o{ EXERCISE_ATTEMPTS : agrupa
+    CONVERSATIONS ||--o{ MESSAGES : contem
+    USERS {
         text id PK
-        text name
         text email UK
+        text name
         text password_hash
+        int session_version
         text role
         text created_at
         text terms_accepted_at
-        int session_version
     }
-    PASSWORD_RESET_TOKEN {
-        text id PK
-        text user_id FK
-        text token_hash UK "SHA-256; o token só existe no e-mail"
-        text expires_at
-        text used_at "nulo até ser usado"
-        text created_at
-    }
-    LEARNING_PROFILE {
+    LEARNING_PROFILES {
         text user_id PK,FK
         text goal
-        text perceived_level
-        text prior_experience
-        int conversation_interest
-        int professional_interest
-        text interest_areas "JSON"
         text estimated_level
+        text perceived_level
+        json interest_areas
+        json difficulties
         int placement_score
         text placement_completed_at
         text onboarding_completed_at
-        text difficulties "JSON"
-        text updated_at
     }
-    PREFERENCE {
+    PREFERENCES {
         text user_id PK,FK
         text explanation_language
         text correction_intensity
-        text reply_length
-        int show_translations
-        int save_conversation_history
-        int study_reminders
+        bool save_conversation_history
+        bool study_reminders
         int daily_goal_minutes
-        text updated_at
     }
-    LESSON {
+    PASSWORD_RESET_TOKENS {
+        text id PK
+        text user_id FK
+        text token_hash UK
+        text expires_at
+        text used_at
+    }
+    LESSONS {
         text id PK
         text level
         int sort_order
         text title
-        text topic
-        text content "JSON"
-        int estimated_minutes
+        json content
     }
-    EXERCISE {
+    EXERCISES {
         text id PK
         text lesson_id FK
         text type
         text prompt
-        text options "JSON"
-        text accepted_answers "JSON"
+        json accepted_answers
         text skill_tag
-    }
-    EXERCISE_ATTEMPT {
-        text id PK
-        text user_id FK
-        text exercise_id
-        text lesson_id FK
-        text skill_tag
-        text context
-        text answer
-        int is_correct
-        text created_at
     }
     VOCABULARY {
         text id PK
         text word
         text translation
-        text meaning
-        text part_of_speech
         text level
-        text topic
-        text examples "JSON"
+        json examples
         text phonetic
+    }
+    LESSON_VOCABULARY {
+        text lesson_id PK,FK
+        text vocabulary_id PK,FK
+    }
+    EXERCISE_ATTEMPTS {
+        text id PK
+        text user_id FK
+        text exercise_id
+        text lesson_id FK
+        text review_id FK
+        text passage_id
+        text idempotency_key
+        text context
+        text answer
+        bool is_correct
+        json feedback
     }
     USER_VOCABULARY {
         text user_id PK,FK
         text vocabulary_id PK,FK
         text status
         int times_reviewed
-        text first_seen_at
-        text last_reviewed_at
+        int success_streak
         text next_review_at
     }
     PROGRESS {
@@ -143,231 +141,143 @@ erDiagram
         int total_count
         int score
         int time_spent_seconds
-        text started_at
-        text completed_at
-        text updated_at
+        text passage_id
+        json completion_result
     }
-    REVIEW {
+    REVIEWS {
         text id PK
         text user_id FK
         text kind
         text ref_id
-        text reason
         text status
+        text reason
         text due_at
-        int interval_step
-        int times_reviewed
-        int last_score
-        int time_spent_seconds
-        text last_reviewed_at
-        text created_at
+        json session_exercise_ids
+        text session_started_at
+        json completion_result
     }
-    CONVERSATION {
+    CONVERSATIONS {
         text id PK
         text user_id FK
         text topic_id
-        text title
-        text level_at_start
-        text context "JSON"
+        json context
         text retention
         text expires_at
-        int user_message_count
-        text corrected_skills "JSON"
         text content_deleted_at
-        text created_at
-        text updated_at
         text ended_at
     }
-    MESSAGE {
+    MESSAGES {
         text id PK
         text conversation_id FK
         text role
         text content
-        text translation
-        text corrections "JSON"
-        text deferred_corrections "JSON"
-        text notices "JSON"
-        text created_at
+        json corrections
+        json deferred_corrections
+        text provider
+        text generation_mode
+        text model
+        text idempotency_key
+        text request_fingerprint
+        json reply_metadata
     }
 ```
 
-### Observações do modelo
+`exercise_attempts.exercise_id` permanece sem FK para `exercises`: nivelamento e
+revisões de palavras usam identificadores do catálogo (`vocab:<id>`) que não são
+linhas da tabela de exercícios de aula. A aplicação valida esses identificadores
+e sua pertença ao contexto; o DER não representa uma FK inexistente.
 
-- **Exercícios de nivelamento e de vocabulário** não são linhas de `EXERCISE`: são gerados a partir do catálogo (`placement:*`, `vocab:*`). Por isso `exercise_attempt.exercise_id` **não** tem chave estrangeira — apenas `lesson_id` tem. Essa decisão evita criar uma entidade extra de "Nivelamento" não prevista nos documentos; o resultado do nivelamento fica no `LEARNING_PROFILE`.
-- **Review.ref_id** é polimórfico (id de aula, tag de tema ou `vocabulary`), conforme `kind`.
-- **Exclusão de dados (RF20):** todas as tabelas do usuário usam `ON DELETE CASCADE` a partir de `USER` (inclusive `PASSWORD_RESET_TOKEN`).
-- **Recuperação de senha:** `PASSWORD_RESET_TOKEN` guarda só o hash do token; no máximo um pedido ativo por conta (um novo pedido apaga os anteriores); pedidos vencidos há mais de um dia são removidos pela limpeza periódica. `USER.session_version` sobe a cada redefinição e invalida os tokens de sessão emitidos antes.
-- **Migrações:** o esquema é idempotente (`CREATE … IF NOT EXISTS`); colunas novas em bancos existentes entram por migrações aditivas em `apps/api/src/db/database.ts` (ex.: `session_version` com padrão 0), sem apagar dados.
-- **Retenção (RN07):** ao expirar ou ao ser apagada, uma conversa perde as mensagens e os fatos do contexto; ficam só metadados sem conteúdo (`user_message_count`, `corrected_skills`) para o progresso.
-- **Campos JSON**: listas pequenas e de leitura conjunta (interesses, exemplos, correções). Em PostgreSQL, viram `jsonb`.
-- **Datas** em ISO 8601 UTC (texto) para portabilidade entre navegador, API e banco.
+## Regras de integridade, índices e exclusão
 
-## 3. Diagrama de classes (domínio e serviços)
+As FKs de dados do usuário apontam para `users` com `ON DELETE CASCADE`;
+`messages` depende de `conversations`. Excluir conta exige senha e elimina seus
+dados relacionados. Tentativas têm `lesson_id` e `review_id` com `SET NULL`:
+remover a entidade de referência não transforma uma tentativa válida em órfã
+incompatível. `lesson_vocabulary`, progresso e palavras estudadas usam PK composta.
+
+| Restrição / índice | Efeito |
+| --- | --- |
+| `users.email`, `password_reset_tokens.token_hash` únicos | Impedem duplicação de conta/hash de token |
+| `idx_password_reset_user_created`, `idx_password_reset_expires` | Limitam pedidos e permitem limpeza |
+| `idx_attempts_user_created` | Recupera tentativas e indicadores |
+| `uq_attempt_user_idempotency` (`user_id`, `idempotency_key`) | Reenvio da mesma operação não cria outra tentativa |
+| `idx_reviews_user_status_due` | Ordena a fila da pessoa |
+| `uq_pending_review_reference` parcial (`status = 'pending'`) | Evita duas revisões pendentes da mesma referência |
+| `idx_conversations_user_updated`, índice parcial de expiração | Histórico e retenção |
+| `idx_messages_conversation_created` | Ordenação dos turnos |
+| `uq_message_conversation_request_role` (`conversation_id`, `idempotency_key`, `role`) | Uma mensagem de cada papel por envio; permite recuperar a dupla após perda da resposta HTTP |
+
+Enums de nível, modo de correção, papel, contexto, status e retenção têm
+restrições SQL. As validações de entrada nos serviços continuam necessárias;
+constraints não substituem autorização. Em SQLite, `foreign_keys=ON` deve ser
+aplicado a **cada conexão**.
+
+## Evolução aditiva e cálculos
+
+Campos acrescentados ao esquema anterior:
+
+- `progress.passage_id`, `completion_result`: sessão de aula e resultado reutilizável.
+- `exercise_attempts.passage_id`, `review_id`, `idempotency_key`, `feedback`: contexto preciso e proteção contra reenvio.
+- `reviews.session_exercise_ids`, `session_started_at`, `completion_result`: conjunto de atividades e resultado conferido no servidor.
+- `user_vocabulary.success_streak`: sequência de acertos separada do total de revisões.
+- `messages.provider`, `generation_mode`, `model`: identifica demonstração, resposta real e abertura revisada do catálogo.
+- `messages.idempotency_key`, `request_fingerprint`, `reply_metadata`: vincula envio/reenvio ao mesmo texto e conserva o resultado do turno para recuperação; não são campos públicos da mensagem.
+
+Taxa de acertos, dias ativos, sequência, tempo, temas e palavras são calculados a
+partir das linhas persistidas. O navegador não determina a nota de conclusão.
+Novas tentativas intencionais têm passagem/chave próprias; a repetição da mesma
+requisição deve devolver seu resultado anterior.
+
+O catálogo próprio fica em `content/catalog.json`, acessado por Python em
+`content/catalog.py`, e é a fonte pedagógica para apresentação/correção. O seed
+insere somente IDs e associações ausentes de forma idempotente; não atualiza nem
+apaga linhas existentes. Campos personalizados do cache SQLite legado permanecem
+preservados, sem oferecer edição/execução de conteúdo personalizado nesta versão.
+Um banco antigo com catálogo completo mantém as contagens e hashes das colunas
+originais; um catálogo incompleto recebe inserções esperadas, que devem ser
+registradas separadamente na comparação. A adoção de esquema antigo valida tabelas/colunas, PK/FK e ações de exclusão,
+UNIQUE de e-mail/hash, formatos JSON, integridade e referências. Duplicatas de
+revisão pendente bloqueiam o índice novo: reconcilie a cópia explicitamente,
+sem apagar dados da origem. As revisões são aditivas, sem rebuild/drop de tabelas.
+O planejamento e a verificação dos dados anteriores
+(contagem + hash canônico das **colunas originais** de cada tabela) estão em
+[PYTHON-MIGRATION.md](PYTHON-MIGRATION.md).
+
+## Diagrama de responsabilidades
 
 ```mermaid
 classDiagram
-    direction LR
-
-    class User {
-      +id: string
-      +name: string
-      +email: string
-      +role: UserRole
-      +createdAt: ISODate
-      +termsAcceptedAt: ISODate
-    }
-    class LearningProfile {
-      +goal: Goal
-      +perceivedLevel: PerceivedLevel
-      +priorExperience: PriorExperience
-      +interestAreas: InterestArea[]
-      +estimatedLevel: Level
-      +placementScore: number
-      +difficulties: SkillTag[]
-    }
-    class Preferences {
-      +explanationLanguage: auto|pt|en
-      +correctionIntensity: light|balanced|detailed
-      +replyLength: short|balanced
-      +showTranslations: boolean
-      +saveConversationHistory: boolean
-      +studyReminders: boolean
-      +dailyGoalMinutes: number
-    }
-    class Lesson {
-      +id: string
-      +level: Level
-      +title: string
-      +topic: string
-      +explanation: Bilingual[]
-      +examples: Example[]
-      +exercises: Exercise[]
-    }
-    class Exercise {
-      +id: string
-      +type: ExerciseType
-      +prompt: string
-      +options: string[]
-      +acceptedAnswers: string[]
-      +explanation: ExplanationText
-      +skillTag: SkillTag
-    }
-    class ExerciseAttempt {
-      +answer: string
-      +isCorrect: boolean
-      +context: lesson|placement|review
-    }
-    class VocabularyEntry {
-      +word: string
-      +translation: string
-      +meaning: string
-      +level: Level
-    }
-    class UserVocabulary {
-      +status: learning|learned
-      +timesReviewed: number
-      +nextReviewAt: ISODate
-    }
-    class Conversation {
-      +topicId: string
-      +context: ConversationContext
-      +retention: saved|ephemeral
-      +expiresAt: ISODate
-    }
-    class Message {
-      +role: user|assistant
-      +content: string
-      +translation: string
-      +corrections: Correction[]
-      +deferredCorrections: Correction[]
-    }
-    class Correction {
-      +original: string
-      +suggestion: string
-      +explanation: string
-      +severity: meaning|grammar|naturalness
-    }
-    class Progress {
-      +status: in_progress|completed
-      +score: number
-      +timeSpentSeconds: number
-    }
-    class Review {
-      +kind: lesson|skill|vocabulary
-      +reason: ReviewReason
-      +dueAt: ISODate
-      +intervalStep: number
-    }
-
-    User "1" -- "1" LearningProfile
-    User "1" -- "1" Preferences
-    User "1" -- "*" Progress
-    User "1" -- "*" ExerciseAttempt
-    User "1" -- "*" UserVocabulary
-    User "1" -- "*" Review
-    User "1" -- "*" Conversation
-    Lesson "1" *-- "*" Exercise
-    Lesson "*" -- "*" VocabularyEntry
-    Exercise "1" -- "*" ExerciseAttempt
-    VocabularyEntry "1" -- "*" UserVocabulary
-    Conversation "1" *-- "*" Message
-    Message "1" *-- "*" Correction
-
-    class AIService {
-      <<interface>>
-      +providerName: string
-      +startConversation(input) AssistantReply
-      +conversation(input) ConversationTurnOutput
-      +explain(input) string
-      +anotherExample(input) Example
-      +correct(input) CorrectOutput
-      +generateExercise(input) Exercise
-    }
-    class MockAIService
-    class LLMAIService
-    class FallbackAIService
+    class User
+    class LearningProfile
+    class Preferences
+    class Lesson
+    class Exercise
+    class Vocabulary
+    class ExerciseAttempt
+    class Progress
+    class Review
+    class Conversation
+    class Message
     class AIProvider {
-      <<interface>>
-      +name: string
-      +complete(request) string
+        <<interface>>
+        complete(system, messages)
     }
     class AnthropicProvider
-    AIService <|.. MockAIService
-    AIService <|.. LLMAIService
-    AIService <|.. FallbackAIService
-    LLMAIService --> AIProvider
+    class DemoProvider
+    User "1" --> "0..1" LearningProfile
+    User "1" --> "0..1" Preferences
+    User "1" --> "*" Progress
+    User "1" --> "*" Review
+    User "1" --> "*" ExerciseAttempt
+    User "1" --> "*" Conversation
+    Lesson "1" --> "*" Exercise
+    Lesson "*" --> "*" Vocabulary
+    Conversation "1" --> "*" Message
     AIProvider <|.. AnthropicProvider
-
-    class DataStore {
-      <<interface>>
-      +users
-      +profiles
-      +preferences
-      +progress
-      +attempts
-      +userVocabulary
-      +reviews
-      +conversations
-      +messages
-      +passwordResets
-      +deleteUserData(userId)
-    }
-    class SqliteDataStore
-    class DocumentStore
-    DataStore <|.. SqliteDataStore
-    DataStore <|.. DocumentStore
+    AIProvider <|.. DemoProvider
 ```
 
-## 4. Índices
-
-| Tabela | Índice | Motivo |
-|--------|--------|--------|
-| users | `UNIQUE(email)` | login e verificação de conta existente (UC01-A2) |
-| password_reset_tokens | `UNIQUE(token_hash)` | busca do link pelo hash |
-| password_reset_tokens | `(user_id, created_at)` | pedido mais recente da conta (intervalo mínimo entre e-mails) |
-| password_reset_tokens | `(expires_at)` | limpeza de pedidos vencidos |
-| exercise_attempts | `(user_id, created_at)` | progresso, dificuldades recentes |
-| reviews | `(user_id, status, due_at)` | fila de revisão |
-| conversations | `(user_id, updated_at)` | histórico |
-| conversations | `(expires_at)` parcial onde `content_deleted_at IS NULL` | limpeza por retenção |
-| messages | `(conversation_id, created_at)` | leitura da conversa |
+O diagrama de classes registra responsabilidades conceituais. Os modelos ORM
+estão separados por contexto; funções de serviço aplicam autorização, transação
+e regras pedagógicas. PostgreSQL é uma evolução prevista: schema portável não
+é evidência de teste em um servidor PostgreSQL real.

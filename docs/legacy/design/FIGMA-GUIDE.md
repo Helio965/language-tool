@@ -2,23 +2,16 @@
 
 ## Situação atual (leia primeiro)
 
-- **O repositório não fornece um arquivo ou link de protótipo no Figma.** Este
-  guia orienta a criação manual; não registra publicação de um arquivo externo.
-- **A interface navegável atual usa Flask/Jinja** (`templates/` e `static/`), com
-  backend Python. O provedor `mock`/`demo` apresenta identificação de respostas
-  simuladas; sem configuração utilizável, operações dependentes de IA podem
-  informar indisponibilidade. As rotas estão mapeadas em
-  [SCREEN-SPECIFICATIONS.md](./SCREEN-SPECIFICATIONS.md). Como rodar:
-  [README.md](../README.md).
-- **As imagens em [`screenshots/`](./screenshots)** foram capturadas do protótipo TypeScript anterior em celular (390px), tablet
-  (820px) e desktop (1440px). Servem de referência histórica para quem for montar
-  o arquivo no Figma; não são evidência de validação da interface Python atual.
+- **Nenhum arquivo foi criado no Figma.** Este ambiente de desenvolvimento não tem acesso ao Figma, então não
+  existe link de protótipo no Figma e nada aqui deve ser apresentado como se existisse.
+- **O protótipo navegável existe e é a aplicação web** (`apps/web`), que roda sem backend e sem chave de API no
+  modo demonstração. Ele cobre os fluxos pedidos para a Pessoa 2 (login, cadastro, início, Aprender e
+  Conversação) e o restante do MVP. Como rodar: [README.md](../README.md).
+- **As imagens em [`screenshots/`](./screenshots)** foram capturadas desse protótipo em celular (390px), tablet
+  (820px) e desktop (1440px). Servem de referência para quem for montar o arquivo no Figma.
 
-Este guia descreve tokens atuais e variantes de design propostas. Os nomes
-visuais podem ser mantidos no Figma; a implementação correspondente usa macros
-Jinja, templates e funções JavaScript, conforme
-[COMPONENTS.md](./COMPONENTS.md). A versão acadêmica anterior está preservada em
-[docs/legacy/design/FIGMA-GUIDE.md](../docs/legacy/design/FIGMA-GUIDE.md).
+Este guia descreve como a equipe pode reproduzir o protótipo no Figma **mantendo os mesmos nomes de tokens e
+componentes do código**, para que design e implementação não se separem.
 
 ---
 
@@ -36,14 +29,12 @@ Jinja, templates e funções JavaScript, conforme
 | `🗂️ Referências` | as capturas de `design/screenshots`, travadas, para comparar |
 
 Nomes de frames: `<largura>/<nº>-<tela>/<estado>`, por exemplo `390/09-aula/feedback-incorreto`, seguindo a
-numeração da [especificação acadêmica preservada](../docs/legacy/design/SCREEN-SPECIFICATIONS.md).
-Para os arquivos e rotas atuais, use [SCREEN-SPECIFICATIONS.md](./SCREEN-SPECIFICATIONS.md).
+numeração de [SCREEN-SPECIFICATIONS.md](./SCREEN-SPECIFICATIONS.md).
 
 ## 2. Variáveis (Figma Variables)
 
-Crie as coleções abaixo. Os nomes usam `/` para agrupar; a coluna Token CSS
-indica a correspondência com `static/css/tokens.css` (por exemplo,
-`neutral/paper` corresponde a `--paper`).
+Crie as coleções abaixo. Os nomes usam `/` para agrupar, mas o último segmento é **idêntico** ao token CSS
+(`apps/web/src/styles/tokens.css`).
 
 ### 2.1 Coleção `color/primitive`
 
@@ -110,17 +101,13 @@ Fontes gratuitas no Google Fonts: **Fraunces** (títulos) e **Atkinson Hyperlegi
 | `h3` | Atkinson, bold | 18 | 18 | títulos de cartão |
 | `body` | Atkinson | 16 | 16 | texto corrido, mensagens |
 | `small` | Atkinson | 14 | 14 | descrições, metadados |
-| `caption` | Atkinson, bold, caixa alta, +6% | 12,5 | 12,5 | rótulos ("SUA FRASE") |
+| `caption` | Atkinson, bold, caixa alta, +4% | 12,5 | 12,5 | rótulos ("SUA FRASE") |
 
 Os tamanhos fluidos do código (`clamp`) viram dois estilos no Figma (celular e desktop).
 
 ## 4. Componentes e variants
 
 Use **Auto Layout** em todos, com espaçamentos ligados às variáveis `space/*`.
-Esta tabela é uma biblioteca sugerida para o Figma. Variantes como prévia de
-correção, gravidade, contador de palavras e indicador de três pontos precisam
-ser comparadas com a tela atual antes de serem apresentadas como implementadas.
-O mapeamento efetivo está em [COMPONENTS.md](./COMPONENTS.md).
 
 | Componente | Propriedades (variants) |
 | --- | --- |
@@ -153,9 +140,7 @@ Detalhes de cada um: [COMPONENTS.md](./COMPONENTS.md).
 | Tablet | 820×1180 | 8 colunas, margem 32, gutter 16 (à direita do trilho de 88px) | `NavBar/rail` |
 | Desktop | 1440×900 | 12 colunas, conteúdo até 1120, gutter 24 (à direita da barra de 248px) | `NavBar/sidebar` |
 
-Telas imersivas (aula, conversa, revisão) usam uma barra de foco e escondem a
-barra inferior no celular. No layout Python atual, o trilho/barra lateral
-permanece em telas maiores. Configuração e nivelamento têm layout próprio.
+Telas imersivas (aula, conversa, revisão) usam `FocusBar` no lugar da navegação.
 
 ## 6. Protótipo conectado (fluxos)
 
@@ -167,7 +152,7 @@ Pessoa 2):
 | **Cadastro** | 01 Página pública → 02 Cadastro (vazio → erros → preenchido) → 05 Configuração (3 etapas) → 06 Nivelamento (intro → pergunta → resultado) → 07 Início | *On tap*, *Smart animate* nas etapas |
 | **Login** | 01 → 03 Entrar (erro) → 07 Início | — |
 | **Modo Aprender** | 07 Início → 09 Aula (apresentação → explicação → exemplos → vocabulário → exercício → feedback correto/incorreto → resumo) | overlay do feedback deslizando de baixo |
-| **Modo Conversação** | 10 Conversar → 11 Conversa (abertura → preparando resposta → correção recolhida → "Por quê?" aberto) → diálogo Encerrar → 12 Feedback | simular espera; o tempo de resposta real depende da API |
+| **Modo Conversação** | 10 Conversar → 11 Conversa (abertura → digitando → resposta com correção recolhida → "Por quê?" aberto) → diálogo Encerrar → 12 Feedback | *After delay* 800ms para o indicador "digitando" |
 | **Progresso** | 07 Início → 13 Progresso → 14 Revisão | — |
 
 Comece pelo celular; tablet e desktop só para Início, Aula, Conversa e Progresso, que mudam de estrutura
@@ -179,18 +164,13 @@ Comece pelo celular; tablet e desktop só para Início, Aula, Conversa e Progres
 2. Construa cada tela por cima da referência, com opacidade 30%, usando só componentes e variáveis.
 3. Ao terminar, oculte a referência e compare lado a lado.
 
-Para gerar novas capturas, siga a instalação e a inicialização do
-[README.md](../README.md), execute `python app.py` no ambiente configurado e
-capture nas mesmas larguras. Identifique a revisão Python, o provedor de IA e
-os estados capturados. Registre checks executados em
-[MIGRATION-AUDIT.md](../docs/MIGRATION-AUDIT.md), sem reaproveitar resultados
-históricos como se fossem validações novas.
+Para gerar novas capturas após mudanças, rode o protótipo (`npm run dev`) e capture nas mesmas larguras.
 
 ## 8. Mantendo design e código alinhados
 
 - Mudou uma cor ou espaçamento? Altere **o token** em `tokens.css` e a variável de mesmo nome no Figma — e
   atualize [DESIGN-SYSTEM.md](./DESIGN-SYSTEM.md) com o novo contraste.
-- Componente novo no Figma → macro/template correspondente em `templates/` e uma linha em COMPONENTS.md.
+- Componente novo no Figma → mesmo nome em `apps/web/src/components` e uma linha em COMPONENTS.md.
 - Textos da interface: a fonte da verdade é o código; copie do protótipo para o Figma, não o contrário.
 
 ## 9. Checklist de entrega no Figma
