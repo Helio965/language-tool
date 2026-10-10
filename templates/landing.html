@@ -1,0 +1,237 @@
+{% extends 'base.html' %}
+{% from 'macros.html' import logo, button, icon, avatar, correction, progress_bar, ring %}
+{% macro section_heading(id, kicker, title, intro='') %}
+<div class="landing-sectionHead">
+  <span class="landing-sectionKicker">{{ kicker }}</span>
+  <h2 id="{{ id }}-title" tabindex="-1" class="landing-sectionTitle">{{ title }}</h2>
+  {% if intro %}<p class="landing-sectionIntro">{{ intro }}</p>{% endif %}
+</div>
+{% endmacro %}
+{% macro feature_list(items) %}
+<ul class="landing-featureList">
+  {% for title, text in items %}<li>{{ icon('check') }}<span><strong>{{ title }}.</strong> {{ text }}</span></li>{% endfor %}
+</ul>
+{% endmacro %}
+{% block content %}
+<div class="landing-page landing-main">
+  <header class="landing-header">
+    <div class="landing-headerInner">
+      <a href="#inicio" class="landing-brand" data-section-link aria-label="English AI — início da página">{{ logo() }}</a>
+      <nav id="landing-nav" aria-label="Seções da página" class="landing-nav">
+        <ul class="landing-navList">
+          {% for id, label in [('inicio','Início'), ('como-funciona','Como funciona'), ('aprender','Aprender'), ('conversar','Conversar'), ('ia','IA'), ('progresso','Progresso'), ('seguranca','Segurança')] %}
+          <li><a href="#{{ id }}" class="landing-navLink" data-section-link>{{ label }}</a></li>
+          {% endfor %}
+        </ul>
+        <div class="landing-navAccount">{{ button('Criar conta','/cadastro') }}</div>
+      </nav>
+      <div class="landing-headerActions">
+        {{ button('Entrar','/entrar','ghost','sm') }}
+        <a href="/cadastro" class="button-button button-primary button-sm landing-headerSignup">Criar conta</a>
+        <button id="landing-menu-button" type="button" class="landing-menuButton" aria-label="Menu de seções" aria-expanded="false" aria-controls="landing-nav" data-menu-toggle>{{ icon('menu') }}</button>
+      </div>
+    </div>
+  </header>
+
+  <section id="inicio" class="landing-hero" aria-labelledby="inicio-title">
+    <div class="landing-heroText reveal">
+      <span class="landing-kicker">{{ icon('sparkles') }} Inglês com inteligência artificial</span>
+      <h1 id="inicio-title" tabindex="-1" class="landing-heroTitle">Aprenda inglês no seu ritmo, com uma IA que <span class="marker">realmente explica</span>.</h1>
+      <p class="landing-heroLead">A plataforma reúne aulas estruturadas, exercícios, conversação e feedback personalizado em uma experiência adaptada ao seu nível — com explicações em português quando você precisa.</p>
+      <div class="landing-heroActions">{{ button('Começar gratuitamente','/cadastro','primary','lg') }}{{ button('Já tenho conta','/entrar','secondary','lg') }}</div>
+      <ul class="landing-heroFacts" aria-label="O que já está disponível">
+        <li><strong>{{ counts.lessons }}</strong> aulas por nível</li>
+        <li><strong>{{ counts.exercises }}</strong> exercícios</li>
+        <li><strong>{{ counts.topics }}</strong> temas de conversa</li>
+      </ul>
+    </div>
+    <div class="landing-heroPreview" aria-label="Prévia do aplicativo (exemplo ilustrativo)" role="group">
+      <span class="landing-exampleTag">Exemplo ilustrativo</span>
+      <div class="landing-previewCard landing-previewLesson">
+        <span class="landing-previewLabel">{{ icon('book') }} Aprender · Iniciante</span>
+        <strong class="landing-previewTitle">Verbo to be (ser e estar)</strong>
+        {{ progress_bar(0.6, 'Progresso da aula (exemplo)', 'learn') }}
+        <span class="landing-previewHint">Continuar de onde parei</span>
+      </div>
+      <div class="landing-previewCard landing-previewChat">
+        <span class="landing-previewLabel">{{ icon('messages') }} Conversar</span>
+        <p class="landing-bubbleUser" lang="en">I have 25 years.</p>
+        <p class="landing-bubbleNote"><span>More natural</span><strong lang="en">I'm <mark class="marker">25 years old</mark>.</strong></p>
+        <div class="landing-bubbleAi">{{ avatar() }}<span lang="en">Oh, so you're 25! What do you do?</span></div>
+        <span class="landing-previewHint">Lumi, a assistente de IA, mantém a conversa fluindo.</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="problema" class="landing-section landing-sectionTinted" aria-labelledby="problema-title">
+    {{ section_heading('problema','O desafio','Estudar inglês sozinho costuma travar nos mesmos pontos','Dificuldades comuns de quem aprende por conta própria — e o que o English AI faz em cada caso.') }}
+    <ul class="landing-problemGrid">
+      {% for symbol, title, text in [
+        ('compass','Não saber por onde começar','O nivelamento estima seu nível e a trilha indica sempre a próxima aula.'),
+        ('heart','Medo de errar','Na conversa, a IA responde com naturalidade e corrige sem constranger. Errar faz parte.'),
+        ('messages','Falta de prática','O Modo Conversação oferece prática escrita em temas do dia a dia, quando você quiser.'),
+        ('lightbulb','Explicações complicadas','Explicações curtas, em português nos níveis iniciais, e um botão para “explicar de outro jeito”.'),
+        ('layers','Conteúdo espalhado','Aulas, exercícios, vocabulário e revisão no mesmo lugar, na ordem certa.'),
+        ('sliders','Pouca personalização','Seu objetivo, nível, interesses e erros recorrentes orientam recomendações e revisões.'),
+        ('calendar','Dificuldade de manter a rotina','Aulas curtas, meta diária e sequência de dias para o estudo caber no seu dia.')
+      ] %}
+      <li class="landing-problemCard"><span class="landing-iconBadge">{{ icon(symbol) }}</span><h3>{{ title }}</h3><p>{{ text }}</p></li>
+      {% endfor %}
+    </ul>
+  </section>
+
+  <section id="como-funciona" class="landing-section" aria-labelledby="como-funciona-title">
+    {{ section_heading('como-funciona','Como funciona','Do cadastro à primeira aula em poucos minutos','Cinco passos, sempre na mesma ordem. Você pode parar e continuar depois de onde estava.') }}
+    <ol class="landing-steps">
+      {% for symbol, title, text in [
+        ('user','Crie sua conta','Nome, e-mail e senha. Leva menos de um minuto.'),
+        ('target','Defina seus objetivos','Conte por que quer aprender, como descreve seu inglês e quais temas interessam a você.'),
+        ('gauge','Faça seu nivelamento','Perguntas em etapas estimam seu nível. Também dá para começar do zero.'),
+        ('split','Aprenda ou converse','Siga a trilha de aulas ou pratique conversando com a IA. Você escolhe o modo.'),
+        ('trending','Acompanhe sua evolução','Progresso, revisões e vocabulário mostram o que você já domina e o que vale revisar.')
+      ] %}
+      <li class="landing-step"><span class="landing-stepNumber" aria-hidden="true">{{ '%02d'|format(loop.index) }}</span><span class="landing-stepIcon">{{ icon(symbol) }}</span><h3>{{ title }}</h3><p>{{ text }}</p></li>
+      {% endfor %}
+    </ol>
+  </section>
+
+  <section id="aprender" class="landing-section landing-modeSection" data-mode="learn" aria-labelledby="aprender-title">
+    <div class="landing-split">
+      <div>
+        {{ section_heading('aprender','Modo Aprender','Aulas curtas, com explicação, prática e revisão','Cada aula segue o mesmo caminho: entender, ver exemplos, praticar e receber a correção explicada.') }}
+        {{ feature_list([
+          ('Aulas estruturadas por nível','Trilha Iniciante → Básico → Intermediário → Avançado, com aulas curtas e objetivas.'),
+          ('Explicação que você entende','Texto direto, com a opção de pedir uma explicação de outro jeito.'),
+          ('Exemplos','Frases de exemplo com tradução, e um novo exemplo quando você pedir.'),
+          ('Vocabulário','As palavras de cada aula ficam no seu Vocabulário, com significado e exemplos.'),
+          ('Exercícios de 5 tipos','Múltipla escolha, lacuna, seleção de palavra, tradução e escrita livre.'),
+          ('Correção na hora','Você vê a forma recomendada e o porquê do erro, não só “certo” ou “errado”.'),
+          ('Revisão espaçada','O que você erra volta para revisão em intervalos de 1, 3, 7, 14 e 30 dias.')
+        ]) }}
+        <p class="landing-smallNote">Conteúdo atual: {{ counts.lessons }} aulas e {{ counts.words }} palavras de vocabulário. A trilha intermediária e avançada está em expansão.</p>
+      </div>
+      <div class="landing-visual" role="group" aria-label="Exemplo ilustrativo de exercício corrigido">
+        <span class="landing-exampleTag">Exemplo ilustrativo</span>
+        <div class="landing-exercise"><span class="landing-previewLabel">Exercício · escrita livre</span><p class="landing-exercisePrompt">Escreva uma frase sobre a rotina de alguém.</p><p class="landing-exerciseAnswer" lang="en">She go to school every day.</p></div>
+        {{ correction({'original':'She go to school every day.','suggestion':'She goes to school every day.','explanation':'No presente simples, he, she e it usam o verbo com -s. Por isso, go muda para goes.','severity':'Gramática','tip':'Pense em quem faz a ação: she → goes.'}) }}
+      </div>
+    </div>
+  </section>
+
+  <section id="conversar" class="landing-section landing-modeSection" data-mode="talk" aria-labelledby="conversar-title">
+    <div class="landing-split landing-splitReverse">
+      <div>
+        {{ section_heading('conversar','Modo Conversação','Pratique conversando, sem medo de errar','Escolha um tema e converse por escrita com a IA. Ela adapta o vocabulário ao seu nível e explica as correções.') }}
+        <div class="landing-principle"><strong>Naturalidade &gt; correção excessiva</strong><p>A conversa continua fluindo. A IA corrige o que atrapalha o entendimento ou se repete, e deixa os detalhes para o resumo no final.</p></div>
+        {{ feature_list([
+          ('Conversa natural','A IA responde como uma parceira de prática, com perguntas que mantêm o assunto vivo.'),
+          ('Temas variados',(counts.topics|string) ~ ' temas para começar, como trabalho, viagens e situações do dia a dia.'),
+          ('Contexto','As respostas consideram as mensagens anteriores da conversa.'),
+          ('No seu nível','Vocabulário, tamanho das respostas e apoio em português se ajustam ao seu nível.'),
+          ('Correções no seu estilo','Leve, equilibrada ou detalhada: você escolhe quanto quer ser corrigido.'),
+          ('Resumo ao final','Pontos para praticar e aulas que ajudam, sem interromper a conversa a cada frase.')
+        ]) }}
+      </div>
+      <div class="landing-visual landing-chat" role="group" aria-label="Exemplo ilustrativo de conversa com correção">
+        <span class="landing-exampleTag">Exemplo ilustrativo</span>
+        <div class="landing-bubbleAi">{{ avatar() }}<span lang="en">What does your brother like to drink?</span></div>
+        <p class="landing-bubbleUser" lang="en">He don't like coffee. He prefers tea.</p>
+        {{ correction({'original':"He don't like coffee.",'suggestion':"He doesn't like coffee.",'explanation':'Com he, she e it, a forma negativa no presente simples usa does not ou doesn’t.','severity':'Gramática','tip':"He doesn't · They don't"}, chat=true) }}
+        <div class="landing-bubbleAi">{{ avatar() }}<span lang="en">Tea is a great choice! Does he drink it every day?</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="ia" class="landing-section landing-sectionTinted" aria-labelledby="ia-title">
+    {{ section_heading('ia','Inteligência artificial','Mais que um chatbot: uma IA que ensina','A IA trabalha a serviço da aula: explica, adapta, corrige e acompanha — sempre deixando claro que é uma IA.') }}
+    <div class="landing-split">
+      <ul class="landing-capabilities">
+        {% for title, text in [
+          ('Explica conteúdos','Gramática e vocabulário em linguagem simples, com exemplos.'),
+          ('Adapta explicações','Explica de outro jeito quando a primeira explicação não funcionou.'),
+          ('Considera seu nível','Português nos primeiros níveis; mais inglês conforme você avança.'),
+          ('Identifica erros','Encontra o que atrapalha a frase: gramática, sentido ou naturalidade.'),
+          ('Explica correções','Mostra a forma recomendada, o porquê e, quando ajuda, uma dica.'),
+          ('Pratica conversação','Lumi, a assistente, conversa em inglês sobre o tema que você escolher.'),
+          ('Dá feedback','Resume o que praticar e cria revisões a partir dos seus erros.')
+        ] %}<li><h3>{{ title }}</h3><p>{{ text }}</p></li>{% endfor %}
+      </ul>
+      <div class="landing-visual" role="group" aria-label="Exemplo ilustrativo de correção explicada">
+        <span class="landing-exampleTag">Exemplo ilustrativo</span>
+        {{ correction({'original':'I have 25 years.','suggestion':"I'm 25 years old.",'explanation':'Em inglês, usamos o verbo to be para dizer a idade. A expressão years old completa a frase.','severity':'Mais natural','tip':"I am 25 years old. → I'm 25 years old."}) }}
+        <p class="landing-honesty">A IA pode errar e as correções são sugestões. Sem um provedor de IA configurado, as respostas seguem roteiros e regras de erros comuns; com um provedor configurado, a conversa fica livre. O aplicativo informa quando a conversa é simulada.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="progresso" class="landing-section" aria-labelledby="progresso-title">
+    <div class="landing-split landing-splitReverse">
+      <div>
+        {{ section_heading('progresso','Progresso','Veja sua evolução com clareza','A tela de Progresso reúne o que você estudou, o que acertou e o que vale revisar.') }}
+        <ul class="landing-metricList">{% for metric in ['Aulas concluídas','Exercícios feitos','Taxa de acerto','Palavras estudadas','Tempo de estudo','Sequência de dias','Conteúdos para revisar','Nível estimado'] %}<li>{{ icon('check') }} {{ metric }}</li>{% endfor %}</ul>
+      </div>
+      <div class="landing-visual" role="group" aria-label="Exemplo ilustrativo da tela de Progresso">
+        <div class="landing-progressPreview">
+          <span class="landing-exampleTag">Exemplo ilustrativo</span>
+          <div class="landing-progressTop">{{ ring(0.7,'Meta de hoje: 7 de 10 minutos (exemplo)','7/10',84) }}<div class="landing-progressLevel"><span class="landing-previewLabel">Nível estimado · Básico</span>{{ progress_bar(0.4,'Avanço no nível (exemplo)','learn') }}</div></div>
+          <div class="landing-statGrid">{% for label, value in [('Aulas concluídas','4'),('Taxa de acerto','82%'),('Palavras estudadas','23'),('Sequência','3 dias')] %}<div class="display-stat"><span class="display-statLabel">{{ label }}</span><strong class="display-statValue">{{ value }}</strong></div>{% endfor %}</div>
+        </div>
+        <p class="landing-smallNote">Os números da sua conta aparecem depois que você começa a estudar.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="personalizacao" class="landing-section landing-sectionTinted" aria-labelledby="personalizacao-title">
+    {{ section_heading('personalizacao','Personalização','Uma experiência que considera você','Sem mágica: regras claras do sistema, combinadas com as preferências que você escolhe.') }}
+    <ul class="landing-personalGrid">
+      {% for title, text in [
+        ('Nível','Explicações, exemplos e conversas no nível estimado pelo nivelamento.'),
+        ('Objetivo','Seu objetivo e seus interesses destacam temas de conversa “para você”.'),
+        ('Desempenho','A próxima aula e a meta de hoje aparecem logo no Início.'),
+        ('Erros recorrentes','Os erros que se repetem viram revisões e aparecem no seu progresso.'),
+        ('Vocabulário','Palavras estudadas voltam para revisão no momento certo.'),
+        ('Progresso','O que você já concluiu define a próxima aula sugerida e o avanço dentro do seu nível.')
+      ] %}<li><h3>{{ title }}</h3><p>{{ text }}</p></li>{% endfor %}
+    </ul>
+  </section>
+
+  <section id="seguranca" class="landing-section" aria-labelledby="seguranca-title">
+    {{ section_heading('seguranca','Privacidade e segurança','Seus dados protegidos e sob o seu controle','Segurança pensada desde o início, com a coleta mínima necessária para o aprendizado.') }}
+    <ul class="landing-securityGrid">
+      {% for symbol, title, text in [
+        ('key','Senhas protegidas','Guardadas apenas como hash (scrypt), nunca em texto.'),
+        ('cookie','Sessão protegida','A sessão fica em um cookie que o JavaScript da página não consegue ler.'),
+        ('mail','Recuperação de senha segura','O link enviado por e-mail vale por pouco tempo, funciona uma única vez e encerra as sessões antigas.'),
+        ('history','Histórico sob seu controle','Salvar conversas é opcional, e as conversas salvas são apagadas automaticamente depois de um prazo.'),
+        ('trash','Exclusão de dados','Você pode apagar suas conversas ou excluir a conta com todos os dados.'),
+        ('server','Chaves só no servidor','Nenhuma chave de IA ou credencial fica no navegador; a IA recebe apenas o necessário.'),
+        ('scale','Princípios da LGPD','Coleta mínima, finalidade explicada na tela de privacidade e transparência sobre o uso dos dados.')
+      ] %}<li><span class="landing-iconBadge">{{ icon(symbol) }}</span><div><h3>{{ title }}</h3><p>{{ text }}</p></div></li>{% endfor %}
+    </ul>
+    <p class="landing-smallNote">Projeto acadêmico: o texto de privacidade é informativo e não substitui uma revisão jurídica. <a href="/termos-e-privacidade">Ler termos e privacidade</a>.</p>
+  </section>
+
+  <section class="landing-cta" aria-labelledby="cta-title">
+    <h2 id="cta-title" class="landing-ctaTitle">Seu próximo passo no inglês <span class="marker">pode começar agora</span>.</h2>
+    <p>Crie sua conta, faça o nivelamento e comece pela primeira aula ou por uma conversa.</p>
+    <div class="landing-ctaActions"><a href="/cadastro" class="button-button button-primary button-lg landing-ctaPrimary">Criar conta {{ icon('arrow-right') }}</a>{{ button('Entrar','/entrar','secondary','lg') }}</div>
+  </section>
+
+  <footer class="landing-footer">
+    <div class="landing-footerInner">
+      <section id="sobre" class="landing-footerAbout" aria-labelledby="sobre-title">
+        {{ logo() }}<h2 id="sobre-title" tabindex="-1">Sobre o projeto</h2>
+        <p>O English AI é uma plataforma de aprendizado de inglês com inteligência artificial, desenvolvida como projeto acadêmico. Esta é a primeira versão (MVP): aulas, exercícios, conversação com IA, revisão e progresso.</p>
+        <p>Ainda não fazem parte do produto: voz e reconhecimento de pronúncia, chamadas ao vivo, gamificação avançada e ranking, certificação oficial.</p>
+      </section>
+      <nav class="landing-footerNav" aria-label="Rodapé">
+        <div><h2>Produto</h2><ul>{% for id, label in [('aprender','Aprender'),('conversar','Conversar'),('ia','Inteligência artificial'),('progresso','Progresso')] %}<li><a href="#{{ id }}" data-section-link>{{ label }}</a></li>{% endfor %}</ul></div>
+        <div><h2>Conta</h2><ul><li><a href="/entrar">Entrar</a></li><li><a href="/cadastro">Criar conta</a></li><li><a href="/recuperar-senha">Recuperar senha</a></li></ul></div>
+        <div><h2>Informações</h2><ul>{% for id, label in [('como-funciona','Como funciona'),('seguranca','Privacidade e segurança'),('sobre','Sobre o projeto')] %}<li><a href="#{{ id }}" data-section-link>{{ label }}</a></li>{% endfor %}</ul></div>
+        <div><h2>Legal</h2><ul><li><a href="/termos-e-privacidade">Termos de uso</a></li><li><a href="/termos-e-privacidade">Política de privacidade</a></li></ul></div>
+      </nav>
+    </div>
+    <p class="landing-footerBottom">English AI · Projeto acadêmico — MVP em desenvolvimento.</p>
+  </footer>
+</div>
+{% endblock %}

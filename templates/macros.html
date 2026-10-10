@@ -1,0 +1,39 @@
+{% macro icon(name) -%}
+{% set paths = {
+'home':'M3 10l9-7 9 7v10H3z M9 20v-7h6v7', 'book':'M3 4h6l3 2 3-2h6v16h-6l-3 2-3-2H3z M12 6v16',
+'messages':'M3 3h14v11H8l-5 4z M17 8h4v13l-5-3h-5v-4', 'chart':'M4 3v18h17 M8 16v-5 M13 16V7 M18 16V4',
+'user':'M16 6a4 4 0 1 1-8 0a4 4 0 0 1 8 0 M4 21v-3a8 8 0 0 1 16 0v3',
+'arrow-right':'M4 12h16 M14 6l6 6-6 6', 'arrow-left':'M20 12H4 M10 6l-6 6 6 6', 'close':'M6 6l12 12 M6 18L18 6',
+'check':'M5 12l4 4L19 6', 'menu':'M4 5h16 M4 12h16 M4 19h16', 'refresh':'M20 8a8 8 0 1 0 0 8 M20 3v5h-5',
+'clock':'M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20 M12 6v6l4 2', 'sparkles':'M12 2l3 7 7 3-7 3-3 7-3-7-7-3 7-3z',
+'shield':'M12 2l9 4v6c0 6-9 10-9 10S3 18 3 12V6z M8 12l3 3 5-6', 'target':'M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20 M12 7a5 5 0 1 0 0 10a5 5 0 0 0 0-10',
+'trash':'M3 6h18 M9 6V3h6v3 M6 6l1 15h10l1-15 M10 10v7 M14 10v7', 'mail':'M2 4h20v16H2z M2 4l10 9L22 4',
+'sliders':'M4 3v18 M12 3v18 M20 3v18 M1 8h6 M9 16h6 M17 8h6', 'history':'M3 8V3 M3 8h5 M4 7a9 9 0 1 1-1 8 M12 7v5l3 2',
+'key':'M15 3a6 6 0 1 0 0 12a6 6 0 0 0 0-12 M9 11l-7 7v4h4v-3h3v-3', 'calendar':'M3 5h18v16H3z M7 2v6 M17 2v6 M3 10h18',
+'lightbulb':'M8 17c0-3-3-4-3-8a7 7 0 0 1 14 0c0 4-3 5-3 8z M9 21h6', 'layers':'M12 2L2 7l10 5 10-5z M2 12l10 5 10-5 M2 17l10 5 10-5',
+'heart':'M12 21L3 12C-3 3 9-1 12 6c3-7 15-3 9 6z', 'trending':'M3 17l6-6 4 4 8-10 M15 5h6v6',
+'compass':'M12 2a10 10 0 1 0 0 20a10 10 0 0 0 0-20 M16 8l-3 5-5 3 3-5z',
+'split':'M12 21V11 M12 11l-7-7 M5 4h5 M5 4v5 M12 11l7-7 M19 4h-5 M19 4v5',
+'gauge':'M3 18a10 10 0 1 1 18 0 M12 12l5-5', 'cookie':'M20 12a8 8 0 1 1-8-8c0 5 3 8 8 8 M8 9h.1 M7 15h.1 M12 17h.1',
+'server':'M3 3h18v7H3z M3 14h18v7H3z M7 6h.1 M7 17h.1', 'scale':'M12 3v18 M5 21h14 M4 7h16 M5 7l-4 9h8z M19 7l-4 9h8z'
+} %}<svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{ paths.get(name, paths['sparkles']) }}"/></svg>
+{%- endmacro %}
+
+{% macro logo(inverse=false) -%}
+<span class="brand-logo {% if inverse %}brand-inverse{% endif %}"><svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true"><rect x="4" y="6" width="28" height="22" rx="8" fill="var(--learn)"/><path d="M10 26v9l8-7z" fill="var(--learn)"/><rect x="16" y="16" width="28" height="22" rx="8" fill="var(--talk)"/><path d="M38 36v9l-8-7z" fill="var(--talk)"/><path d="M16 16h16v12H16z" fill="var(--ink)"/></svg><span class="brand-wordmark">English<span class="brand-ai">AI</span></span></span>
+{%- endmacro %}
+
+{% macro avatar(size=32) -%}<span class="brand-avatar" aria-hidden="true"><svg viewBox="0 0 40 40" width="{{ size }}" height="{{ size }}"><rect x="2" y="3" width="36" height="30" rx="11" fill="var(--talk)"/><path d="M10 31v7l7-6z" fill="var(--talk)"/><path d="M20 9.5c.9 4.4 2.6 6.1 7 7-4.4.9-6.1 2.6-7 7-.9-4.4-2.6-6.1-7-7 4.4-.9 6.1-2.6 7-7z" fill="#fff"/></svg></span>{%- endmacro %}
+
+{% macro button(label, href='', variant='primary', size='md', id='', attrs='') -%}
+{% if href %}<a href="{{ href }}"{% else %}<button type="button"{% endif %} class="button-button button-{{ variant }} button-{{ size }}" {% if id %}id="{{ id }}"{% endif %} {{ attrs|safe }}>{{ label }}{% if href %}</a>{% else %}</button>{% endif %}
+{%- endmacro %}
+
+{% macro progress_bar(value, label, tone='learn') -%}<div class="display-progress display-progress_sm" role="progressbar" aria-label="{{ label }}" aria-valuenow="{{ (value * 100)|round|int }}" aria-valuemin="0" aria-valuemax="100"><span class="display-progressFill display-fill_{{ tone }}" data-progress="{{ (value * 100)|round|int }}"></span></div>{%- endmacro %}
+{% macro ring(value,label,text='',size=84) -%}<div class="display-ring" role="img" aria-label="{{ label }}"><svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="44" fill="none" stroke="var(--paper-deep)" stroke-width="8"/><circle cx="50" cy="50" r="44" fill="none" stroke="var(--success)" stroke-width="8" stroke-linecap="round" stroke-dasharray="276.46" stroke-dashoffset="{{ 276.46 * (1-value) }}" transform="rotate(-90 50 50)"/></svg><span class="display-ringLabel">{{ text }}</span></div>{%- endmacro %}
+
+{% macro correction(data, chat=false) -%}<div class="correction-{{ 'chat' if chat else 'card' }}"><div class="correction-row"><span class="caption">{{ 'You said' if chat else 'Sua frase' }}</span><p class="correction-original" lang="en">{{ data.original }}</p></div><div class="correction-row"><span class="caption">{{ 'More natural' if chat else 'Forma recomendada' }}</span><p class="correction-suggestion" lang="en"><mark class="marker">{{ data.suggestion }}</mark></p></div>{% if chat %}<details><summary>Por quê?</summary><p>{{ data.explanation }}</p></details>{% else %}<div class="correction-row"><span class="caption">Explicação</span><p>{{ data.explanation }}</p>{% if data.tip %}<p class="correction-tip">{{ data.tip }}</p>{% endif %}</div>{% endif %}</div>{%- endmacro %}
+
+{% macro field(name,label,type='text',autocomplete='',required=true) -%}<div class="field-field"><label for="{{ name }}" class="field-label">{{ label }}</label><div class="field-control"><input class="field-input" id="{{ name }}" name="{{ name }}" type="{{ type }}" autocomplete="{{ autocomplete }}" {% if required %}required{% endif %}{% if type == 'password' %} maxlength="1024"{% endif %}>{% if type == 'password' %}<button type="button" class="field-adornment" data-password-toggle="{{ name }}" aria-label="Mostrar senha" aria-pressed="false">{{ icon('shield') }}</button>{% endif %}</div><p id="{{ name }}-error" class="field-error" role="alert" hidden></p></div>{%- endmacro %}
+
+{% macro header(title,subtitle='') -%}<header class="display-pageHeader"><div class="display-pageHeaderText"><h1 data-page-title tabindex="-1">{{ title }}</h1>{% if subtitle %}<p class="display-subtitle">{{ subtitle }}</p>{% endif %}</div></header>{%- endmacro %}
