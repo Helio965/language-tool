@@ -108,7 +108,6 @@ mensagens, sem tabela nova nem mudança das colunas originais.
   real permanecem conforme o escopo acadêmico/roadmap.
 - Anthropic e SMTP só têm verificação real quando suas credenciais estiverem
   configuradas e a chamada/entrega tiverem sido executadas.
-- Branch e commits devem ser publicados com Pull Request; merge da `main`
-  depende de autorização. As etapas/commits realizados estão no
-  [relatório de auditoria](MIGRATION-AUDIT.md); a URL do PR será registrada
-  após sua criação.
+- Branch e commits estão publicados no [PR #4](https://github.com/Helio965/language-tool/pull/4),
+  em rascunho para revisão. A `main` não recebeu merge. As etapas e evidências
+  estão no [relatório de auditoria](MIGRATION-AUDIT.md).

@@ -251,12 +251,15 @@ Branch: `codex/python-flask-migration`; baseline: `067fd06`; tag:
 | `1980def` | Corpus, nivelamento, aprendizagem, revisão, vocabulário e progresso |
 | `6249301` | SDK Anthropic, conversação privada e reenvio idempotente |
 | `2044458` | Jinja/static, 15 casos de navegador e configuração VS Code |
+| `ad41588` | Arquitetura, requisitos, evidências e instruções Windows/VS Code |
 
 Arquivos principais: `app.py`, `config.py`, `extensions.py`, `requirements.*`,
 `.env.example`, `blueprints/`, `services/`, `models/`, `migrations/`, `database/`,
 `content/`, `ai/`, `templates/`, `static/`, `tests/`, `.vscode/`, README,
 `docs/` e `design/`. Documentação/legado têm revisão própria após os módulos.
 
-O acesso GitHub e a permissão de publicação foram confirmados. A URL do Pull
-Request será registrada após publicar a branch e criar a revisão.
-Não há merge automático da `main`.
+Branch e tag de restauração publicadas. Pull Request em rascunho para revisão:
+[PR #4](https://github.com/Helio965/language-tool/pull/4).
+O histórico completo, incluindo o registro final desta entrega, está nos
+[commits do PR](https://github.com/Helio965/language-tool/pull/4/commits).
+A `main` permanece no baseline; não foi feito merge.
