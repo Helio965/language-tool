@@ -20,6 +20,7 @@ csrf = CSRFProtect()
 limiter = Limiter(key_func=get_remote_address, default_limits=["200 per minute"])
 migrate = Migrate()
 
+
 def ai_account_key():
     return f"user:{current_user.id}" if current_user.is_authenticated else f"ip:{get_remote_address()}"
 
@@ -35,4 +36,18 @@ ai_daily_limit = limiter.shared_limit(
 )
 ai_minute_limit = limiter.shared_limit(
     "10 per minute", scope="external-ai-minute-account", key_func=ai_account_key
+)
+
+
+# Account quotas alone cannot constrain total spending if an attacker creates
+# many accounts. This deployment-wide limit shares one key across all accounts
+# and all paid-AI endpoints. Use a shared storage backend in production.
+ai_global_daily_limit = limiter.shared_limit(
+    lambda: (
+        f"{current_app.config.get('AI_GLOBAL_DAILY_REQUEST_LIMIT', 1000)} per day"
+        if current_app.config.get("AI_PROVIDER") == "anthropic"
+        else "1000000 per day"
+    ),
+    scope="external-ai-daily-global",
+    key_func=lambda: "all-accounts",
 )
