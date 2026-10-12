@@ -128,3 +128,44 @@ def test_account_quotas_are_independent_even_for_same_ip(tmp_path):
         with app.app_context():
             db.session.remove()
             db.engine.dispose()
+
+
+def test_global_ai_quota_limits_multiple_accounts(tmp_path):
+    app = create_app({
+        "TESTING": True,
+        "SECRET_KEY": "a-long-secret-for-testing-global-quotas",
+        "SQLALCHEMY_DATABASE_URI": f"sqlite:///{tmp_path / 'quota_global.db'}",
+        "AUTO_INIT_DB": True,
+        "WTF_CSRF_ENABLED": False,
+        "RATELIMIT_ENABLED": True,
+        "RATELIMIT_STORAGE_URI": "memory://",
+        "AI_PROVIDER": "anthropic",
+        "AI_DAILY_REQUEST_LIMIT": 100,
+        "AI_GLOBAL_DAILY_REQUEST_LIMIT": 10,
+        "ANTHROPIC_API_KEY": "",
+        "MAIL_TRANSPORT": "disabled",
+    })
+    users = []
+    try:
+        for name in ("first", "second"):
+            client = app.test_client()
+            response = client.post("/api/auth/register", json={
+                "name": "Audit " + name,
+                "email": name + "@example.test",
+                "password": "TestPassword123",
+                "passwordConfirmation": "TestPassword123",
+                "acceptedTerms": True,
+            })
+            assert response.status_code == 201
+            users.append(client)
+
+        attempts = [
+            users[index % 2].post("/api/conversations", json={"topicId": "introductions"}).status_code
+            for index in range(11)
+        ]
+        assert attempts[:10] == [503] * 10
+        assert attempts[10] == 429
+    finally:
+        with app.app_context():
+            db.session.remove()
+            db.engine.dispose()
