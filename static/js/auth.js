@@ -116,7 +116,7 @@ export async function init() {
           { public: true },
         );
         render(
-          `<h1 data-page-title tabindex="-1">Recuperar senha</h1><div class="states-inline states-inline_success" role="status">${h(result.message)}</div><p>Confira a caixa de entrada e a pasta de spam. O link vale por ${h(result.expiresInMinutes)} minutos e só pode ser usado uma vez.</p>${result.deliveryConfigured === false ? '<p class="states-inline states-inline_info">O envio de e-mail precisa ser configurado para entregar o link de recuperação.</p>' : ""}<div class="row-actions">${link("Voltar para o login", "/entrar", "secondary")}${link("Usar outro e-mail", "/recuperar-senha", "ghost")}</div>`,
+          `<h1 data-page-title tabindex="-1">Recuperar senha</h1><div class="states-inline states-inline_success" role="status">${h(result.message)}</div><p>Verifique a caixa de entrada e o spam. Caso receba o link, ele vale por ${h(result.expiresInMinutes)} minutos e só pode ser usado uma vez.</p>${result.deliveryConfigured === false ? '<p class="states-inline states-inline_info">O envio de e-mail precisa ser configurado para entregar o link de recuperação.</p>' : ""}<div class="row-actions">${link("Voltar para o login", "/entrar", "secondary")}${link("Usar outro e-mail", "/recuperar-senha", "ghost")}</div>`,
           $("#auth-content"),
         );
       }

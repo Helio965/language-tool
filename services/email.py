@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from email.message import EmailMessage
 from html import escape
 from pathlib import Path
-from threading import Lock
+from threading import BoundedSemaphore, Lock
 from urllib.parse import quote, urlsplit
 
 
@@ -32,10 +32,10 @@ def render_email(kind, user, app_url, token=None, ttl=15):
         )
         button = "Redefinir senha"
         notice = f"Este link vale por {ttl} minutos e só pode ser usado uma vez. Se você não pediu a redefinição, ignore este e-mail."
-    footer = "Este é um e-mail automático do English AI. Nunca pedimos nem enviamos senhas por e-mail. English AI · Projeto acadêmico."
-    html = f'''<!DOCTYPE html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>English AI</title>
+    footer = "Este é um e-mail automático do English AI. Nunca pedimos nem enviamos senhas por e-mail. English AI · Sua jornada no inglês."
+    html = f"""<!DOCTYPE html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>English AI</title>
 <body style="margin:0;background:#f7f3ec;font-family:Arial,sans-serif;color:#1a1f3a"><table role="presentation" width="100%"><tr><td align="center" style="padding:24px"><table role="presentation" style="width:100%;max-width:600px"><tr><td style="padding:28px;background:#fffdf9;border:1px solid #e4dccd;border-radius:18px">
-<h1 style="font-family:Georgia,serif">{escape(title)}</h1><p style="line-height:1.6">{escape(description)}</p><table role="presentation"><tr><td style="background:#2f45c6;border-radius:12px;padding:14px"><a href="{escape(url, quote=True)}" style="color:white;text-decoration:none">{escape(button)}</a></td></tr></table><p style="padding:16px;background:#fdf0d8">{escape(notice)}</p><p>Se o botão não funcionar, copie este endereço: <a href="{escape(url, quote=True)}">{escape(url)}</a></p><p style="font-size:12px">{escape(footer)}</p></td></tr></table></td></tr></table></body></html>'''
+<h1 style="font-family:Georgia,serif">{escape(title)}</h1><p style="line-height:1.6">{escape(description)}</p><table role="presentation"><tr><td style="background:#2f45c6;border-radius:12px;padding:14px"><a href="{escape(url, quote=True)}" style="color:white;text-decoration:none">{escape(button)}</a></td></tr></table><p style="padding:16px;background:#fdf0d8">{escape(notice)}</p><p>Se o botão não funcionar, copie este endereço: <a href="{escape(url, quote=True)}">{escape(url)}</a></p><p style="font-size:12px">{escape(footer)}</p></td></tr></table></td></tr></table></body></html>"""
     return {
         "to": user.email,
         "kind": kind,
@@ -57,12 +57,15 @@ class EmailService:
         )
         self._pending = set()
         self._lock = Lock()
+        # Best-effort delivery is bounded; a durable queue is a deployment
+        # requirement when messages must survive process restarts.
+        self._slots = BoundedSemaphore(32)
 
     def send_welcome(self, user):
-        self.dispatch(render_email("welcome", user, self.app_url))
+        return self.dispatch(render_email("welcome", user, self.app_url))
 
     def send_password_reset(self, user, token, expires_in_minutes):
-        self.dispatch(
+        return self.dispatch(
             render_email(
                 "password_reset", user, self.app_url, token, expires_in_minutes
             )
@@ -71,18 +74,32 @@ class EmailService:
     def dispatch(self, message):
         if self.transport == "disabled":
             self.logger.info("email.skipped kind=%s", message["kind"])
-            return
+            return False
         if self.transport == "memory":
             self.messages.append(message)
-            return
-        task = self._pool.submit(self._send_safely, message)
+            return True
+        if not self._slots.acquire(blocking=False):
+            self.logger.error("email.queue_full kind=%s", message["kind"])
+            return False
+        try:
+            task = self._pool.submit(self._send_safely, message)
+        except Exception as error:
+            self._slots.release()
+            self.logger.error(
+                "email.queue_failed kind=%s code=%s",
+                message["kind"],
+                type(error).__name__,
+            )
+            return False
         with self._lock:
             self._pending.add(task)
         task.add_done_callback(self._discard)
+        return True
 
     def _discard(self, task):
         with self._lock:
             self._pending.discard(task)
+        self._slots.release()
 
     def _send_safely(self, message):
         try:
@@ -142,7 +159,9 @@ class EmailService:
                         connection.login(
                             self.config["SMTP_USER"], self.config["SMTP_PASSWORD"]
                         )
-                    connection.send_message(email)
+                    refused = connection.send_message(email)
+                    if refused:
+                        raise smtplib.SMTPRecipientsRefused(refused)
             self.logger.info(
                 "email.sent kind=%s transport=%s", message["kind"], self.transport
             )
@@ -154,13 +173,14 @@ class EmailService:
                 type(error).__name__,
             )
 
-    def idle(self):
-        while True:
-            with self._lock:
-                pending = list(self._pending)
-            if not pending:
-                return
-            wait(pending, timeout=25)
+    def idle(self, timeout=25):
+        """Wait a bounded time for currently queued messages; return completion."""
+        with self._lock:
+            pending = list(self._pending)
+        if not pending:
+            return True
+        _done, remaining = wait(pending, timeout=timeout)
+        return not remaining
 
 
 def init_email(app):

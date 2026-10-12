@@ -1,12 +1,11 @@
 """Alembic usa a conexão da application factory, incluindo bancos em memória."""
 
-from logging.config import fileConfig
 from alembic import context
 from flask import current_app
 
 config = context.config
-if config.config_file_name:
-    fileConfig(config.config_file_name)
+# The hosting application owns logging. Reconfiguring root handlers here would
+# disable its safe error logs every time automatic migrations run.
 database = current_app.extensions["migrate"].db
 target_metadata = database.metadata
 

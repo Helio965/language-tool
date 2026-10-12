@@ -424,7 +424,7 @@ def test_password_reset_outbox_link_single_use_and_old_session_revoked(
         reset_page.get_by_label("E-mail", exact=True).fill(email)
         reset_page.locator("#auth-submit").click()
         expect(
-            reset_page.get_by_text("Se existir uma conta com este e-mail", exact=False)
+            reset_page.get_by_text("Solicitação recebida.", exact=False)
         ).to_be_visible()
         web["app"].extensions["email_service"].idle()
         records = [

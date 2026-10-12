@@ -15,7 +15,8 @@ from services.common import AppError, now, iso, now_iso, new_id, require_user
 from services.perfil import defaults, load_profile, load_preferences
 
 RESET_MESSAGE = (
-    "Se existir uma conta com este e-mail, enviaremos as instruções de recuperação."
+    "Solicitação recebida. Se houver uma conta elegível, as instruções poderão chegar por e-mail. "
+    "Se não receber, verifique o spam e tente novamente mais tarde."
 )
 EMAIL_PATTERN = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]{2,}$")
 TOKEN_PATTERN = re.compile(r"^[A-Za-z0-9_-]{43}$")
@@ -234,6 +235,12 @@ def request_reset(email):
     error = validate_email(email)
     if error:
         raise AppError("VALIDATION", "Dados inválidos.", fields={"email": error})
+    if current_app.extensions["email_service"].transport == "disabled":
+        raise AppError(
+            "EMAIL_UNAVAILABLE",
+            "A recuperação por e-mail está indisponível no momento. Tente novamente mais tarde.",
+            503,
+        )
     user = db.session.scalar(
         db.select(User).where(User.email == email.strip().lower()).with_for_update()
     )
