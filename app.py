@@ -11,7 +11,7 @@ from sqlalchemy import event, text
 from sqlalchemy.engine import Engine
 from werkzeug.exceptions import HTTPException
 
-from config import ROOT, load_config, number
+from config import ROOT, load_config, number, validate_config
 from extensions import csrf, db, limiter, login_manager, migrate
 from services.common import AppError
 
@@ -32,6 +32,19 @@ def create_app(config=None):
         app.config.update(config)
     elif config is not None:
         app.config.from_object(config)
+    if (isinstance(config, dict) and "SECRET_KEY" in config) or (
+        config is not None and hasattr(config, "SECRET_KEY")
+    ):
+        app.config["SESSION_SECRET_CONFIGURED"] = True
+    validate_config(app.config)
+    if app.config.get("TRUSTED_PROXY_COUNT"):
+        from werkzeug.middleware.proxy_fix import ProxyFix
+
+        # Only enable behind the documented single trusted proxy. Host stays
+        # bound to APP_PUBLIC_URL rather than trusting X-Forwarded-Host.
+        app.wsgi_app = ProxyFix(
+            app.wsgi_app, x_for=1, x_proto=1, x_host=0, x_port=0, x_prefix=0
+        )
     Path(app.instance_path).mkdir(parents=True, exist_ok=True)
     db.init_app(app)
     login_manager.init_app(app)
@@ -58,6 +71,12 @@ def create_app(config=None):
 
     @app.before_request
     def bind_account():
+        if app.config["APP_ENV"] == "production" and not request.is_secure:
+            raise AppError(
+                "HTTPS_REQUIRED",
+                "Use uma conexão segura para acessar a plataforma.",
+                400,
+            )
         if not request.path.startswith("/api/"):
             return
         if request.path in {"/api/auth/register", "/api/auth/login"}:
@@ -92,25 +111,64 @@ def create_app(config=None):
     @app.errorhandler(AppError)
     def domain_error(error):
         db.session.rollback()
-        return jsonify(
-            error={"code": error.code, "message": error.message, "fields": error.fields}
-        ), error.status
+        return (
+            jsonify(
+                error={
+                    "code": error.code,
+                    "message": error.message,
+                    "fields": error.fields,
+                }
+            ),
+            error.status,
+        )
+
+    @app.get("/api/ready")
+    def readiness():
+        """Configuration readiness; never imply a paid provider call succeeded."""
+        db.session.execute(text("SELECT 1"))
+        ai = app.extensions["english_ai"].metadata()
+        services = {
+            "database": True,
+            "aiConfigured": ai["mode"] == "live",
+            "emailConfigured": app.extensions["email_service"].transport == "smtp",
+        }
+        ready = all(services.values())
+        return jsonify(status="ready" if ready else "unavailable", services=services), (
+            200 if ready else 503
+        )
 
     @app.errorhandler(CSRFError)
     def invalid_csrf(_error):
-        return jsonify(
-            error={"code": "CSRF", "message": "Atualize a página e tente novamente."}
-        ), 400
+        return (
+            jsonify(
+                error={
+                    "code": "CSRF",
+                    "message": "Atualize a página e tente novamente.",
+                }
+            ),
+            400,
+        )
 
     @app.errorhandler(HTTPException)
     def http_error(error):
         if request.path.startswith("/api/"):
-            return jsonify(
-                error={"code": str(error.code), "message": "Requisição não permitida."}
-            ), error.code
-        return render_template(
-            "error.html", status=error.code, message="Esta página não está disponível."
-        ), error.code
+            return (
+                jsonify(
+                    error={
+                        "code": str(error.code),
+                        "message": "Requisição não permitida.",
+                    }
+                ),
+                error.code,
+            )
+        return (
+            render_template(
+                "error.html",
+                status=error.code,
+                message="Esta página não está disponível.",
+            ),
+            error.code,
+        )
 
     @app.errorhandler(Exception)
     def unexpected(error):
@@ -118,20 +176,28 @@ def create_app(config=None):
         # Log only the exception class: database/provider errors can contain private data.
         app.logger.error("request.failed type=%s", type(error).__name__)
         if request.path.startswith("/api/"):
-            return jsonify(
-                error={
-                    "code": "INTERNAL",
-                    "message": "Não foi possível concluir. Tente novamente.",
-                }
-            ), 500
-        return render_template(
-            "error.html",
-            status=500,
-            message="Não foi possível concluir. Tente novamente.",
-        ), 500
+            return (
+                jsonify(
+                    error={
+                        "code": "INTERNAL",
+                        "message": "Não foi possível concluir. Tente novamente.",
+                    }
+                ),
+                500,
+            )
+        return (
+            render_template(
+                "error.html",
+                status=500,
+                message="Não foi possível concluir. Tente novamente.",
+            ),
+            500,
+        )
 
     @app.after_request
     def headers(response):
+        if app.config["APP_ENV"] == "production" and request.is_secure:
+            response.headers["Strict-Transport-Security"] = "max-age=31536000"
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "same-origin"

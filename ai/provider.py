@@ -3,7 +3,7 @@
 import json
 import re
 
-from flask import current_app
+from flask import current_app, has_app_context
 
 from ai.conversation import (
     DemoAIService,
@@ -33,7 +33,7 @@ class ProviderError(AppError):
 
     def __init__(self, reason="unavailable"):
         messages = {
-            "not_configured": "A IA externa não está configurada. Configure o provedor ou selecione o modo demonstração.",
+            "not_configured": "A IA está indisponível no momento. A configuração do serviço precisa ser concluída pelo responsável pela plataforma.",
             "authentication": "Não foi possível autenticar o serviço de IA. Verifique a configuração no servidor.",
             "rate_limit": "O serviço de IA atingiu o limite de solicitações. Aguarde e tente novamente.",
             "timeout": "A IA demorou para responder. Sua mensagem não foi salva; tente novamente.",
@@ -218,9 +218,11 @@ class LLMAIService:
             "provider": self.provider_name,
             "mode": self.mode if configured else "unconfigured",
             "model": self.model,
-            "notice": "Lumi é uma IA e pode errar."
-            if configured
-            else "IA externa sem configuração. Nenhuma resposta será simulada como IA real.",
+            "notice": (
+                "Lumi é uma IA e pode errar."
+                if configured
+                else "IA externa sem configuração. Nenhuma resposta será simulada como IA real."
+            ),
         }
 
     def _request(self, learner, mode, task, schema, history=None, user_message=None):
@@ -253,12 +255,22 @@ class LLMAIService:
             raw = self.provider.complete(
                 {"system": system, "messages": messages, "jsonSchema": schema}
             )
-        except ProviderError:
+            return validate_response(raw, schema)
+        except ProviderError as error:
+            if has_app_context():
+                current_app.logger.warning(
+                    "ai.failed provider=%s reason=%s", self.provider_name, error.reason
+                )
             raise
         except Exception as exc:
             # Adapters must not leak credentials or provider response bodies.
+            if has_app_context():
+                current_app.logger.warning(
+                    "ai.failed provider=%s code=%s",
+                    self.provider_name,
+                    type(exc).__name__,
+                )
             raise ProviderError("unavailable") from exc
-        return validate_response(raw, schema)
 
     def start_conversation(self, data):
         if data.get("lessonOpener"):
@@ -286,9 +298,11 @@ class LLMAIService:
             context["askedQuestionIds"].append(first["id"])
         return {
             "reply": redact_sensitive_data(parsed["reply"])["text"],
-            "translation": redact_sensitive_data(parsed["translation"])["text"] or None
-            if learner.get("showTranslations")
-            else None,
+            "translation": (
+                redact_sensitive_data(parsed["translation"])["text"] or None
+                if learner.get("showTranslations")
+                else None
+            ),
             "context": context,
             "ai": self.metadata(),
         }
@@ -327,10 +341,10 @@ class LLMAIService:
         return {
             "reply": redact_sensitive_data(parsed["reply"])["text"],
             "translation": (
-                redact_sensitive_data(parsed["translation"])["text"] or None
-            )
-            if learner.get("showTranslations")
-            else None,
+                (redact_sensitive_data(parsed["translation"])["text"] or None)
+                if learner.get("showTranslations")
+                else None
+            ),
             "context": context,
             "issues": issues,
             "ai": self.metadata(),
@@ -395,8 +409,14 @@ class LLMAIService:
 
 
 def create_ai_service(config):
-    provider = config.get("AI_PROVIDER", "mock")
+    provider = config.get("AI_PROVIDER") or (
+        "anthropic" if config.get("APP_ENV") == "production" else "mock"
+    )
     if provider in {"mock", "demo"}:
+        if config.get("APP_ENV") == "production":
+            raise ValueError(
+                "O provedor demonstrativo não está disponível em produção."
+            )
         return DemoAIService()
     if provider == "anthropic":
         return LLMAIService(
