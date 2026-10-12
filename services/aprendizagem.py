@@ -63,11 +63,11 @@ def summarize(lesson, progress, level, recommended_id=None):
         "summary": lesson["summary"],
         "estimatedMinutes": lesson["estimatedMinutes"],
         "exerciseCount": len(lesson["exercises"]),
-        "status": "completed"
-        if record and record.status == "completed"
-        else "in_progress"
-        if record
-        else "available",
+        "status": (
+            "completed"
+            if record and record.status == "completed"
+            else "in_progress" if record else "available"
+        ),
         "score": record.score if record and record.status == "completed" else None,
         "recommended": lesson["id"] == recommended_id,
         "aboveLevel": catalog.LEVELS.index(lesson["level"])
@@ -331,12 +331,16 @@ def complete_lesson(user_id, lesson_id, time_spent_seconds=0):
         "score": score,
         "timeSpentSeconds": seconds,
         "newWords": new_words,
-        "levelUp": {"level": promoted, "label": catalog.LEVEL_LABELS[promoted]}
-        if promoted
-        else None,
-        "nextLesson": summarize(next_lesson, progress, effective, next_lesson["id"])
-        if next_lesson
-        else None,
+        "levelUp": (
+            {"level": promoted, "label": catalog.LEVEL_LABELS[promoted]}
+            if promoted
+            else None
+        ),
+        "nextLesson": (
+            summarize(next_lesson, progress, effective, next_lesson["id"])
+            if next_lesson
+            else None
+        ),
         "takeaways": lesson["takeaways"],
         "practiceTopicId": f"lesson:{lesson_id}",
         "reviewSuggested": score < 70,
@@ -356,7 +360,8 @@ def explain_again(user_id, lesson_id, attempt=0):
     from ai.provider import get_ai_service
 
     bundle = learner_bundle(user_id)
-    text = get_ai_service().explain(
+    service = get_ai_service()
+    text = service.explain(
         {
             "learner": bundle["learner"],
             "lesson": require_lesson(lesson_id),
@@ -364,7 +369,11 @@ def explain_again(user_id, lesson_id, attempt=0):
             "attempt": attempt,
         }
     )
-    return {"text": text, "language": bundle["learner"]["explanationLanguage"]}
+    return {
+        "text": text,
+        "language": bundle["learner"]["explanationLanguage"],
+        "ai": service.metadata(),
+    }
 
 
 def another_example(user_id, lesson_id, attempt=0):
@@ -376,10 +385,12 @@ def another_example(user_id, lesson_id, attempt=0):
         raise AppError("VALIDATION", "Número de exemplos inválido.")
     from ai.provider import get_ai_service
 
-    return get_ai_service().another_example(
+    service = get_ai_service()
+    result = service.another_example(
         {
             "learner": learner_bundle(user_id)["learner"],
             "lesson": require_lesson(lesson_id),
             "attempt": attempt,
         }
     )
+    return {**result, "ai": service.metadata()}

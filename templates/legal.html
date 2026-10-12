@@ -1,1 +1,22 @@
-{% extends 'base.html' %}{% from 'macros.html' import logo,header %}{% block content %}<div class="settings-publicPage"><a href="/" aria-label="English AI — página inicial">{{ logo() }}</a>{{ header('Termos de uso e privacidade') }}<div class="settings-stack"><section class="display-card"><h2>Sobre o English AI</h2><ul class="settings-list"><li>Projeto acadêmico — MVP em desenvolvimento, oferecido para estudo e validação.</li><li>O nível exibido é uma estimativa pedagógica, não uma certificação oficial de proficiência.</li><li>A assistente de IA pode cometer erros. Use as explicações como apoio ao estudo.</li><li>Use a plataforma com respeito: conteúdo ofensivo ou ilegal não é permitido.</li></ul></section><section class="display-card"><h2>Privacidade</h2>{% include 'data_policy.html' %}</section><p class="muted">Texto informativo do projeto acadêmico. A política definitiva deve ser revisada antes do uso em produção.</p></div></div>{% endblock %}
+{% extends 'base.html' %}
+{% from 'macros.html' import logo,header %}
+{% block content %}
+<div class="settings-publicPage">
+  <a href="/" aria-label="English AI — página inicial">{{ logo() }}</a>
+  {{ header('Termos de uso e privacidade') }}
+  <div class="settings-stack">
+    <p class="states-inline states-inline_info">Documento informativo provisório. A oferta comercial depende de revisão jurídica e da identificação do responsável e do canal de contato para privacidade.</p>
+    <section class="display-card">
+      <h2>Sobre o English AI</h2>
+      <ul class="settings-list">
+        <li>Aulas, exercícios e prática escrita de inglês com acompanhamento de progresso.</li>
+        <li>O nível exibido é uma estimativa pedagógica, sem certificação oficial de proficiência.</li>
+        <li>A assistente de IA pode cometer erros. Use as explicações como apoio ao estudo. Respostas demonstrativas são identificadas; a disponibilidade da geração externa depende do serviço configurado.</li>
+        <li>Use a plataforma com respeito: conteúdo ofensivo ou ilegal não é permitido.</li>
+      </ul>
+    </section>
+    <section class="display-card"><h2>Privacidade</h2>{% include 'data_policy.html' %}</section>
+    <section class="display-card"><h2>Informações ainda necessárias</h2><p>O responsável pela operação deverá fornecer sua identificação, contato, condições de acesso e atendimento, bases legais do tratamento, informações sobre fornecedores, transferência internacional e retenção de backups antes da disponibilização comercial.</p><p>Este documento não declara conformidade integral com a LGPD.</p></section>
+  </div>
+</div>
+{% endblock %}

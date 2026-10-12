@@ -333,7 +333,7 @@ export function initCommon() {
     $("#landing-nav").classList.toggle("landing-navOpen", open);
   });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && landingMenu) {
+    if (event.key === "Escape" && landingMenu?.getAttribute("aria-expanded") === "true") {
       landingMenu.setAttribute("aria-expanded", "false");
       $("#landing-nav").classList.remove("landing-navOpen");
       landingMenu.focus();

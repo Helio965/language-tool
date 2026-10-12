@@ -34,7 +34,7 @@ export function init() {
     form.addEventListener("change", (event) => {
       const input = event.target,
         name = input.name;
-      if (!name) return;
+      if (!name || input.disabled || name === "studyReminders") return;
       const value =
         input.type === "checkbox"
           ? input.checked

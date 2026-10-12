@@ -148,8 +148,11 @@ async function lesson() {
     setStage(next);
     draw();
   };
+  function origin(ai) {
+    return ai ? `<span class="caption">${ai.mode === "demo" ? "Demonstração · roteiro local" : "Gerado por IA · pode conter erros"}</span>` : "";
+  }
   function example(item) {
-    return `<li class="lesson-example"><p class="lesson-exampleEn" lang="en">${highlighted(item.en, item.highlight ? [{ to: item.highlight }] : [], "to")}</p><p class="lesson-examplePt">${h(item.pt)}</p></li>`;
+    return `<li class="lesson-example">${origin(item.ai)}<p class="lesson-exampleEn" lang="en">${highlighted(item.en, item.highlight ? [{ to: item.highlight }] : [], "to")}</p><p class="lesson-examplePt">${h(item.pt)}</p></li>`;
   }
   async function finish() {
     const result = await api(`/lessons/${id}/complete`, "POST", {
@@ -209,7 +212,7 @@ async function lesson() {
             $("#lesson-extra").insertAdjacentHTML(
               "beforeend",
               card(
-                `<span class="caption">Lumi · outra forma de explicar</span><p>${h(result.text)}</p>`,
+                `${origin(result.ai)}<span class="caption">Lumi · outra forma de explicar</span><p>${h(result.text)}</p>`,
               ),
             );
           },

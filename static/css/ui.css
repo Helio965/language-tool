@@ -3593,16 +3593,6 @@ fieldset:disabled .choice-option {
 
 /* ---------- Progresso ---------- */
 
-.landing-exampleTag {
-  justify-self: start;
-  padding: 2px 10px;
-  border: 1px dashed var(--line-input);
-  border-radius: var(--radius-pill);
-  font-size: var(--text-caption);
-  font-weight: 700;
-  color: var(--ink-3);
-}
-
 .landing-progressPreview {
   display: grid;
   gap: var(--space-5);

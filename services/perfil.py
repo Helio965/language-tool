@@ -163,6 +163,15 @@ def update_preferences(user_id, data):
     if errors:
         raise AppError("VALIDATION", "Preferências inválidas.", fields=errors)
     preferences = load_preferences(user_id)
+    if (
+        "study_reminders" in updates
+        and updates["study_reminders"] != preferences.study_reminders
+    ):
+        raise AppError(
+            "FEATURE_UNAVAILABLE",
+            "Os lembretes de estudo estão indisponíveis. Sua preferência anterior foi preservada.",
+            409,
+        )
     # Conversas encerradas perdem conteúdo; a conversa ativa passa à retenção temporária.
     if updates.get("save_conversation_history") is False:
         timestamp = now_iso()
