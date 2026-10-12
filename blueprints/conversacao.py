@@ -3,7 +3,7 @@
 from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
 
-from extensions import ai_daily_limit, ai_minute_limit, limiter
+from extensions import ai_daily_limit, ai_global_daily_limit, ai_minute_limit, limiter
 from services import conversacao
 from services.common import body
 
@@ -25,6 +25,7 @@ def history():
 @bp.post("/conversations")
 @login_required
 @ai_daily_limit
+@ai_global_daily_limit
 @ai_minute_limit
 @limiter.limit("20 per minute")
 def start():
@@ -46,6 +47,7 @@ def get(conversation_id):
 @bp.post("/conversations/<conversation_id>/messages")
 @login_required
 @ai_daily_limit
+@ai_global_daily_limit
 @ai_minute_limit
 @limiter.limit("30 per minute")
 def send(conversation_id):
