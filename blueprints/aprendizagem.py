@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 from flask_login import current_user, login_required
 from services.common import AppError, body
 from services import aprendizagem, nivelamento, progresso, revisao, vocabulario
-from extensions import limiter
+from extensions import ai_daily_limit, ai_minute_limit, limiter
 
 bp = Blueprint("aprendizagem", __name__, url_prefix="/api")
 ai_limit = limiter.shared_limit("30 per minute", scope="educational-ai")
@@ -71,6 +71,8 @@ def lesson_start(lesson_id):
 
 @bp.post("/lessons/<lesson_id>/exercises/<exercise_id>/answer")
 @login_required
+@ai_daily_limit
+@ai_minute_limit
 @ai_limit
 def lesson_answer(lesson_id, exercise_id):
     data = body()
@@ -97,6 +99,8 @@ def lesson_complete(lesson_id):
 
 @bp.post("/lessons/<lesson_id>/explain")
 @login_required
+@ai_daily_limit
+@ai_minute_limit
 @ai_limit
 def lesson_explain(lesson_id):
     return jsonify(
@@ -108,6 +112,8 @@ def lesson_explain(lesson_id):
 
 @bp.post("/lessons/<lesson_id>/example")
 @login_required
+@ai_daily_limit
+@ai_minute_limit
 @ai_limit
 def lesson_example(lesson_id):
     return jsonify(
@@ -151,6 +157,8 @@ def review_session(review_id):
 
 @bp.post("/reviews/<review_id>/answers")
 @login_required
+@ai_daily_limit
+@ai_minute_limit
 @ai_limit
 def review_answer(review_id):
     data = body()
