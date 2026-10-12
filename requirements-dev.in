@@ -1,0 +1,4 @@
+# Validation tools; production installs requirements.txt only.
+-r requirements.in
+pytest>=8,<10
+playwright>=1.56,<2
