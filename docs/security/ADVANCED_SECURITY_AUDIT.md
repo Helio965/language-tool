@@ -96,7 +96,7 @@ A migração [0004_conversation_claim.py](../../migrations/versions/0004_convers
 
 Autenticação, banco, stack, design e funções educacionais foram preservados. Os 20 commits preexistentes do PR permanecem no histórico. Relação final de alterações desta continuação:
 
-31 arquivos nesta continuação, 30 no diff final do PR contra main. `blueprints/aprendizagem.py` e `blueprints/conversacao.py` voltaram ao conteúdo de main ao remover os decorators pagos; `blueprints/auth.py` já estava alterado antes desta rodada e continua no PR. Os 20 commits anteriores são preservados; três commits novos agrupam integração/consumo/logs, concorrência/migração e documentação.
+31 arquivos nesta continuação, 30 no diff final do PR contra main. `blueprints/aprendizagem.py` e `blueprints/conversacao.py` voltaram ao conteúdo de main ao remover os decorators pagos; `blueprints/auth.py` já estava alterado antes desta rodada e continua no PR. Os 20 commits anteriores são preservados; quatro commits novos agrupam integração/consumo/logs, concorrência/migração, documentação e diagnóstico do CI.
 
 | Arquivo modificado nesta continuação | Link |
 | --- | --- |
@@ -222,4 +222,4 @@ Não permanece achado confirmado sem correção no código dentro do conjunto re
 | Riscos pendentes | IA/SMTP reais, orçamento financeiro, Redis/TLS/WSGI/proxy implantados, crash/lease/cobrança externa e Windows; seção 6 |
 | Status final | Pronto para revisão do código; integrações reais e infraestrutura permanecem não validadas, conforme seção 6 |
 
-A aprovação local acima é uma medição concluída. O CI deve aprovar o SHA publicado; seu resultado e link de execução são registrados na descrição do PR para evitar atribuir a um commit novo o resultado do head inicial.
+A aprovação local acima é uma medição concluída. A execução isolada de backend também aprovou 353 casos, com 15 browser deselected, em 71,50 s. O CI escreve JUnit e publica nomes de testes com falha como anotações, preservando o resultado e sem incluir conteúdo/credenciais nas anotações. O CI deve aprovar o SHA publicado; seu resultado e link de execução são registrados na descrição do PR para evitar atribuir a um commit novo o resultado do head inicial.

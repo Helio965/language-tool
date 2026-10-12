@@ -27,7 +27,25 @@ jobs:
       - name: Run backend/security regression
         env:
           AI_PROVIDER: mock
-        run: python -m pytest -m "not browser" -q
+        run: python -m pytest -m "not browser" -q --junitxml="${{ runner.temp }}/backend-results.xml"
+      - name: Annotate backend regression failures
+        if: always()
+        env:
+          PYTEST_RESULTS_PATH: ${{ runner.temp }}/backend-results.xml
+        run: |
+          python - <<'PY'
+          import os
+          from pathlib import Path
+          from xml.etree import ElementTree
+          report = Path(os.environ["PYTEST_RESULTS_PATH"])
+          if report.exists():
+              for case in ElementTree.parse(report).iter("testcase"):
+                  if case.find("failure") is not None or case.find("error") is not None:
+                      # Report static test names without bodies, credentials or parameters.
+                      name = case.get("name", "unknown").split("[", 1)[0]
+                      identity = case.get("classname", "pytest") + "::" + name
+                      print("::error title=Backend regression::" + identity)
+          PY
   browser:
     runs-on: ubuntu-latest
     timeout-minutes: 15
