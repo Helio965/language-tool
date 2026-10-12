@@ -8,6 +8,7 @@
 | Data | 12/10/2026, referência de calendário `America/Sao_Paulo` |
 | Base da auditoria | `main`, commit `b77e724`, após o merge do PR de migração Python #4 |
 | Branch de trabalho | `security/sql-injection-audit` |
+| Pull Request | [PR #5](https://github.com/Helio965/language-tool/pull/5), aberto para revisão; sem merge automático |
 | Aplicação principal | Python 3.12.14, Flask 3.1.3, Jinja, HTML/CSS/JavaScript; Flask-Login 0.6.3, Flask-WTF 1.3.0 e Flask-Limiter 4.1.1 |
 | Persistência principal | SQLite, SQLAlchemy 2.0.54 e Alembic 1.20.0; 14 tabelas de domínio, além da tabela de controle Alembic |
 | Código legado preservado | TypeScript, React, Express, Node 22 e `better-sqlite3`; análise estática separada, sem execução de ataques nesse backend |
