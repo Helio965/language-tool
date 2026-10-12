@@ -71,8 +71,8 @@ def _delete_content(conversation, timestamp=None):
 
 def _owned(user_id, conversation_id, require_content=False):
     require_user(user_id)
-    conversation = db.session.get(Conversation, conversation_id)
-    if conversation is None or conversation.user_id != user_id:
+    conversation = db.session.scalar(select(Conversation).where(Conversation.id == conversation_id, Conversation.user_id == user_id))
+    if conversation is None:
         raise AppError("NOT_FOUND", "Conversa não encontrada.", 404)
     if (
         not conversation.content_deleted_at
