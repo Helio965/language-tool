@@ -1,5 +1,11 @@
 # Localização das referências preservadas
 
+A implementação TypeScript completa foi separada da distribuição Python em
+12/10/2026. Está preservada na tag `legacy-typescript`, commit
+`b77e724c85e7ca9c86f2669af998f26ec5ceda82`. Consulte essa referência para usar os
+caminhos e comandos históricos abaixo. Os testes de importação Python mantêm
+uma cópia imutável do esquema antigo em `tests/fixtures/legacy_schema.sql`.
+
 Os documentos desta pasta são cópias da documentação TypeScript anterior à
 migração. Seus textos e links relativos foram preservados no contexto original;
 alguns links pressupõem os arquivos na raiz ou em `docs/`/`design/`, como estavam

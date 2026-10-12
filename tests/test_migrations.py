@@ -28,7 +28,7 @@ def migration_app(path):
 
 def original_database(path):
     with sqlite3.connect(path) as connection:
-        connection.executescript((ROOT / "apps/api/src/db/schema.sql").read_text())
+        connection.executescript((ROOT / "tests/fixtures/legacy_schema.sql").read_text())
         connection.execute("ALTER TABLE users DROP COLUMN session_version")
         connection.execute(
             "INSERT INTO users(id,name,email,password_hash,role,created_at,terms_accepted_at) VALUES(?,?,?,?,?,?,?)",
