@@ -78,7 +78,7 @@ def get(user_id, identifier):
 def set_status(user_id, identifier, status):
     require_user(user_id)
     entry = require_entry(identifier)
-    if status not in {"learning", "learned"}:
+    if not isinstance(status, str) or status not in {"learning", "learned"}:
         raise AppError("VALIDATION", "Status inválido.")
     timestamp = now_iso()
     item = db.session.get(UserVocabulary, (user_id, identifier))

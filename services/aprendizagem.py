@@ -7,6 +7,7 @@ from services.common import AppError, learner_bundle, new_id, now_iso, require_u
 from content import catalog
 from services import exercicios
 from datetime import datetime, timedelta
+from math import isfinite
 
 
 def require_lesson(lesson_id):
@@ -239,6 +240,7 @@ def study_seconds(value, maximum=3 * 3600):
         or not isinstance(value, (int, float))
         or value < 0
         or value > maximum
+        or not isfinite(value)
     ):
         raise AppError("VALIDATION", "Tempo de estudo inválido.")
     return int(value + 0.5)
