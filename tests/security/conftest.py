@@ -108,24 +108,38 @@ def audit_accounts(audit_app):
     accounts = []
     for letter in ("a", "b"):
         client = AuditClient(audit_app)
-        response = client.post("/api/auth/register", json={
-            "name": f"Synthetic Audit {letter.upper()}",
-            "email": f"audit-{letter}@example.test",
-            "password": "SyntheticAudit2026",
-            "passwordConfirmation": "SyntheticAudit2026",
-            "acceptedTerms": True,
-        })
+        response = client.post(
+            "/api/auth/register",
+            json={
+                "name": f"Synthetic Audit {letter.upper()}",
+                "email": f"audit-{letter}@example.test",
+                "password": "SyntheticAudit2026",
+                "passwordConfirmation": "SyntheticAudit2026",
+                "acceptedTerms": True,
+            },
+        )
         assert response.status_code == 201
         account = response.get_json()
-        response = client.put("/api/me/profile", json={
-            "goal": "basics", "perceivedLevel": "beginner", "priorExperience": "none",
-            "conversationInterest": True, "professionalInterest": False,
-            "interestAreas": ["education"],
-        })
+        response = client.put(
+            "/api/me/profile",
+            json={
+                "goal": "basics",
+                "perceivedLevel": "beginner",
+                "priorExperience": "none",
+                "conversationInterest": True,
+                "professionalInterest": False,
+                "interestAreas": ["education"],
+            },
+        )
         assert response.status_code == 200
         assert client.post("/api/placement/skip").status_code == 200
-        accounts.append({"client": client, "user_id": account["user"]["id"],
-                         "email": account["user"]["email"]})
+        accounts.append(
+            {
+                "client": client,
+                "user_id": account["user"]["id"],
+                "email": account["user"]["email"],
+            }
+        )
     return tuple(accounts)
 
 
