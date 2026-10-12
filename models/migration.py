@@ -1,6 +1,7 @@
 """Migração Alembic real e importação verificável sem alterar o banco de origem."""
 
 import json
+import os
 import sqlite3
 from pathlib import Path
 import click
@@ -151,8 +152,11 @@ def initialize_database(app):
         url.drivername.startswith("sqlite")
         and url.database
         and url.database != ":memory:"
+        and str(url.query.get("uri", "false")).lower() not in {"true", "1", "yes", "on"}
     ):
-        Path(db.engine.url.database).parent.mkdir(parents=True, exist_ok=True)
+        Path(db.engine.url.database).parent.mkdir(
+            parents=True, exist_ok=True, mode=0o700
+        )
     configuration = app.extensions["migrate"].migrate.get_config(
         str(ROOT / "migrations")
     )
@@ -169,7 +173,8 @@ def import_legacy(source, destination):
         raise ValueError(
             "O destino já existe; escolha um arquivo novo para preservar os dados."
         )
-    destination.parent.mkdir(parents=True, exist_ok=True)
+    destination.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    created_destination = False
     try:
         with sqlite3.connect(source.as_uri() + "?mode=ro", uri=True) as original:
             if original.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
@@ -178,13 +183,19 @@ def import_legacy(source, destination):
                 )
             if original.execute("PRAGMA foreign_key_check").fetchone():
                 raise ValueError("Banco de origem contém referências órfãs.")
+            # Claim the destination atomically and privately before copying data.
+            # A concurrent import must never overwrite a file created meanwhile.
+            descriptor = os.open(
+                destination, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600
+            )
+            os.close(descriptor)
+            created_destination = True
             with sqlite3.connect(destination) as copy:
                 original.backup(copy)
     except Exception:
-        if destination.exists():
+        if created_destination and destination.exists():
             destination.unlink()
         raise
-    destination.chmod(0o600)
     return destination
 
 
