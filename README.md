@@ -191,6 +191,7 @@ catálogo, `templates/`/`static/` apresentam a interface, `tests/` verifica jorn
 | [ARCHITECTURE](docs/ARCHITECTURE.md) | Organização e responsabilidades |
 | [DATABASE-MODEL](docs/DATABASE-MODEL.md) | 14 tabelas, DER, índices e campos aditivos |
 | [REQUIREMENTS-TRACEABILITY](docs/REQUIREMENTS-TRACEABILITY.md) | RF01–20, RNF01–10, RN01–08 e UC01–12 |
+| [Auditoria de SQL Injection](docs/security/SQL_INJECTION_AUDIT.md) | Testes isolados, evidências de parametrização, correções e limites de segurança |
 | [WINDOWS-VSCODE](docs/WINDOWS-VSCODE.md) | Instalação e execução Python no Windows/VS Code |
 | [MVP-SCOPE](docs/MVP-SCOPE.md), [USER-FLOWS](docs/USER-FLOWS.md), [IA-BEHAVIOR](docs/IA-BEHAVIOR.md) | Decisões acadêmicas, jornadas e comportamento pedagógico |
 | [Design](design/DESIGN-SYSTEM.md) | Identidade e especificações visuais preservadas |

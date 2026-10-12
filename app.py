@@ -1,6 +1,7 @@
 """Flask application factory and Python-only development entry point."""
 
 from pathlib import Path
+import os
 from urllib.parse import urlencode
 
 import click
@@ -14,6 +15,24 @@ from werkzeug.exceptions import HTTPException
 from config import ROOT, load_config, number
 from extensions import csrf, db, limiter, login_manager, migrate
 from services.common import AppError
+
+
+@event.listens_for(Engine, "do_connect")
+def sqlite_private_creation(dialect, _record, arguments, parameters):
+    if dialect.name != "sqlite" or parameters.get("uri") or not arguments:
+        return
+    filename = arguments[0]
+    if filename == ":memory:":
+        return
+    path = Path(filename)
+    path.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+    # Pre-create ordinary SQLite files privately, including manual migrations.
+    # Exclusive creation neither truncates nor changes permissions of existing data.
+    try:
+        descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    except FileExistsError:
+        return
+    os.close(descriptor)
 
 
 @event.listens_for(Engine, "connect")
@@ -32,7 +51,7 @@ def create_app(config=None):
         app.config.update(config)
     elif config is not None:
         app.config.from_object(config)
-    Path(app.instance_path).mkdir(parents=True, exist_ok=True)
+    Path(app.instance_path).mkdir(parents=True, exist_ok=True, mode=0o700)
     db.init_app(app)
     login_manager.init_app(app)
     csrf.init_app(app)
