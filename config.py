@@ -69,6 +69,9 @@ def load_config():
         "ANTHROPIC_MODEL": os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-5"),
         "AI_EFFORT": os.environ.get("AI_EFFORT", "low"),
         "AI_TIMEOUT_MS": number("AI_TIMEOUT_MS", 20000, 1000, 120000),
+        "AI_MAX_OUTPUT_TOKENS": number("AI_MAX_OUTPUT_TOKENS", 1024, 256, 2048),
+        "AI_MAX_CONTEXT_CHARS": number("AI_MAX_CONTEXT_CHARS", 8000, 2048, 12000),
+        "AI_DAILY_REQUEST_LIMIT": number("AI_DAILY_REQUEST_LIMIT", 100, 10, 2000),
         "AI_MAX_HISTORY_MESSAGES": number("AI_MAX_HISTORY_MESSAGES", 12, 2, 50),
         "CONVERSATION_RETENTION_DAYS": number(
             "CONVERSATION_RETENTION_DAYS", 90, 1, 3650
@@ -98,4 +101,6 @@ def load_config():
         raise ValueError("AI_PROVIDER precisa ser mock, demo ou anthropic.")
     if production and config["MAIL_TRANSPORT"] == "outbox":
         raise ValueError("A caixa de saída local é exclusiva do desenvolvimento.")
+    if production and config["AI_PROVIDER"] == "anthropic" and config["RATELIMIT_STORAGE_URI"].startswith("memory://"):
+        raise ValueError("Produção com IA paga exige RATELIMIT_STORAGE_URI compartilhado, como redis://.")
     return config
