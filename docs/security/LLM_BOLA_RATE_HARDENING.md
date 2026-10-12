@@ -1,24 +1,22 @@
 # Auditoria complementar — IA, autorização e limites
 
-**Estado:** revisão estática e correções propostas. A primeira rodada de CI passou com 221 testes de backend (15 de navegador excluídos); rodar novamente após cada alteração. Nenhum sistema pode ser considerado 100% seguro.
+O trabalho continua no [PR #6](https://github.com/Helio965/language-tool/pull/6), preservando os 20 commits já existentes e as funcionalidades do English AI. O relatório completo está em [ADVANCED_SECURITY_AUDIT.md](ADVANCED_SECURITY_AUDIT.md), com escopo, evidências, correções, testes e limitações. Nenhum merge foi realizado.
 
-## Achados
+A revisão inicial já separava dados não confiáveis das instruções privilegiadas e adicionava cotas por conta/globais, proteção de recuperação e cabeçalhos. A continuação validou esses controles com contas sintéticas e implementou correções adicionais:
 
-| ID | Risco | Evidência | Mitigação |
-| --- | --- | --- | --- |
-| LLM-01 | Dados não confiáveis no prompt de sistema | `build_system_prompt` interpolava nome e perfil; `_request` anexava tarefas contendo fatos | Separação: apenas instruções estáticas e enums controlados no system; dados do aluno em mensagem de usuário |
-| LLM-02 | Custos/saídas excessivos | `max_tokens=2048`, histórico com orçamento por caracteres; cota principalmente por IP | Teto configurável para tokens/total de caracteres e cota por conta |
-| LLM-03 | Eco literal de instruções internas | JSON válido poderia conter partes do próprio system prompt | Detecção conservadora de trechos exatos e erro genérico. Não previne paráfrases |
-| RATE-01 | Cotas IP insuficientes para usuários autenticados | Limits por IP e por minuto; memory storage padrão | Compartilhamento de janelas por conta, cota diária global por implantação e exigência de storage compartilhado na produção com Anthropic |
-| HEAD-01 | HSTS ausente | `after_request` continha CSP e X-Frame mas não HSTS | HSTS em APP_ENV production e Permissions-Policy |
-| RESET-01 | Verificação de token sem limite específico | `verify_reset` não tinha `reset_limit` | Limites de recuperação compartilhados |
-| BOLA | Sem bypass confirmado na revisão | Recursos da conversa vinculados a usuário autenticado e exclusão baseada na sessão | Consulta com filtros combinados ID+user e regressão de exclusão em cascata A/B |
+- A cota paga é reservada somente diante de uma tentativa externa admitida; cache, catálogo, demo, revisão local, abertura autoral e erros locais mantêm seus fluxos sem consumir esse orçamento.
+- Uma reserva curta por conversa impede chamadas simultâneas duplicadas durante seu prazo. O contador do provider simulado passou de duas chamadas para uma; a segunda requisição recebe `409 CONVERSATION_BUSY` e recupera a resposta persistida ao repetir a mesma chave após o commit.
+- Respostas do provedor com Unicode inválido são rejeitadas antes da persistência. O SDK gerenciado usa destino oficial explícito, nenhuma tentativa automática e proteção contra registros verbosos de dados privados.
+- Logs locais Werkzeug ocultam tokens de recuperação e query strings. Configuração efetiva de produção e cabeçalhos são revalidados; Redis compartilhado exige driver instalado e parâmetros compatíveis entre workers.
 
-## Limites da revisão
+Não foi confirmado novo SQL Injection, BOLA/IDOR, bypass de sessão ou falha de cascata nos caminhos testados. A hipótese de consumo da cota paga por usuários anônimos foi refutada. Riscos condicionais de configuração e melhorias estão separados dos achados confirmados no relatório.
 
-Prompt injection e jailbreak são riscos probabilísticos; **nenhum filtro ou prompt garante** que instruções internas não serão parafraseadas. Não colocar credenciais nem segredos nos prompts. Os dados em texto de usuário devem ser tratados como não confiáveis. Testar em homologação a API LLM real, orçamento de tokens efetivo, custo financeiro efetivo (as cotas de requisições não são cotas monetárias), expiração/retenção, concorrência e infraestrutura. Controles no provedor (orçamento financeiro, limites de uso e alertas) são necessários para impedir gasto inesperado. Redis/TLS/proxy/deploy real e backend Express legado não foram validados.
+**Consolidação final:** **368 testes aprovados, 0 falhas e 0 ignorados**, incluindo 15 jornadas Chromium e seis testes com Redis real local. São 131 casos novos; commits publicados e CI do SHA da entrega são registrados no [PR #6](https://github.com/Helio965/language-tool/pull/6). Rodadas focadas observadas: 38 casos novos de SDK/LLM, 18 de reserva concorrente e 32 de autorização/sessões/logs. Seus totais não devem ser somados às suítes completas, que incluem esses casos.
 
-Execute:
+Os testes usam SQLite temporário, contas fictícias e IA simulada, sem API paga ou dados reais. Provas locais não certificam Redis/TLS, SMTP, Gunicorn/proxy ou modelo real de produção. Prompt injection/jailbreak não são eliminados por filtros; cotas de requests não são orçamento financeiro. Crash, expiração de reserva ou falha do banco após resposta externa podem exigir nova tentativa com nova cobrança. Configure limites financeiros e alertas no provedor e confira a implantação conforme a seção 6 do relatório.
+
+Para repetir as regressões de backend:
+
 ```bash
 python -m pytest tests/security -q
 python -m pytest -m "not browser" -q
