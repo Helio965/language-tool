@@ -1,0 +1,245 @@
+{
+  "errors": [],
+  "overflow": [],
+  "screenshots": 34,
+  "accessibility": [
+    {
+      "page": "landing",
+      "width": 390,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "register",
+      "width": 390,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "login",
+      "width": 390,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "forgot",
+      "width": 390,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "legal",
+      "width": 390,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "landing",
+      "width": 1366,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "register",
+      "width": 1366,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "login",
+      "width": 1366,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "forgot",
+      "width": 1366,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "legal",
+      "width": 1366,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "home",
+      "width": 390,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "learn",
+      "width": 390,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "conversation",
+      "width": 390,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "progress",
+      "width": 390,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "profile",
+      "width": 390,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "preferences",
+      "width": 390,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "privacy",
+      "width": 390,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "vocabulary",
+      "width": 390,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "reviews",
+      "width": 390,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "lesson",
+      "width": 390,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "profile-edit",
+      "width": 390,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "placement",
+      "width": 390,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "home",
+      "width": 1366,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "learn",
+      "width": 1366,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "conversation",
+      "width": 1366,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "progress",
+      "width": 1366,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "profile",
+      "width": 1366,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "preferences",
+      "width": 1366,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "privacy",
+      "width": 1366,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "vocabulary",
+      "width": 1366,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "reviews",
+      "width": 1366,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "lesson",
+      "width": 1366,
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "page": "profile-edit",
+      "width": 1366,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "page": "placement",
+      "width": 1366,
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    }
+  ]
+}

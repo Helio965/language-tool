@@ -15,7 +15,7 @@ constitui validação em um computador Windows real.
 py -3.12 --version
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-dev.txt
 if (-not (Test-Path .env)) { Copy-Item .env.example .env }
 python app.py
 ```
@@ -33,7 +33,7 @@ Se PowerShell bloquear a ativação por política local, use os executáveis
 explicitamente, sem alterar a política global:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
 .\.venv\Scripts\python.exe app.py
 ```
 
@@ -42,7 +42,7 @@ No CMD:
 ```bat
 py -3.12 -m venv .venv
 .venv\Scripts\activate.bat
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-dev.txt
 if not exist .env copy .env.example .env
 python app.py
 ```

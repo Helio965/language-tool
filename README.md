@@ -1,208 +1,170 @@
 # English AI
 
-Plataforma acadêmica de aprendizado de inglês: aulas curtas, exercícios com
-correção explicada, conversação com a Lumi, vocabulário, revisão e progresso.
-A aplicação principal foi migrada para **Python 3.12 + Flask + Jinja + SQLAlchemy**.
+Plataforma de aprendizagem de inglês com aulas, exercícios, prática escrita com
+Lumi, vocabulário, revisão e acompanhamento de progresso. A aplicação utiliza
+**Python 3.12, Flask, Jinja, SQLAlchemy e SQLite**. HTML, CSS, JavaScript e fontes
+são servidos diretamente pelo Flask; não há compilação Node ou React.
 
-A identidade de caderno (papel, azul do Aprender, coral do Conversar e marca-texto)
-e o conteúdo próprio foram preservados. São 12 aulas, 65 exercícios de aula,
-67 palavras, 12 questões de nivelamento e oito assuntos de conversa. O resultado
-do nivelamento é uma estimativa pedagógica, sem certificação de proficiência.
+O catálogo preserva 12 aulas, 65 exercícios de aula, 67 palavras, 12 questões de
+nivelamento e oito assuntos de conversa. O nível é uma estimativa pedagógica,
+sem certificação oficial. A prática demonstrativa é identificada no aplicativo.
 
-## Executar no Windows
+## Instalação e desenvolvimento
 
-Instale Python 3.12 e abra a pasta do repositório. No PowerShell:
-
-```powershell
-py -3.12 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -r requirements.txt
-if (-not (Test-Path .env)) { Copy-Item .env.example .env }
-python app.py
-```
-
-Abra <http://localhost:5000>. Uma instalação nova de desenvolvimento aplica as
-migrações e sincroniza o conteúdo sem criar conta falsa. Cadastre-se, configure
-seu perfil e faça o nivelamento (ou escolha começar como Iniciante).
-
-Se a política do PowerShell impedir ativar o ambiente, execute o Python dele
-sem mudar a política do sistema:
-
-```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe app.py
-```
-
-No Prompt de Comando, a ativação é `.venv\Scripts\activate.bat`.
-O [guia Windows e VS Code](docs/WINDOWS-VSCODE.md) detalha intérprete, tarefas,
-configuração, banco existente, testes e diagnóstico.
-
-## Linux e macOS
+Linux/macOS, a partir da raiz do repositório:
 
 ```bash
 python3.12 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
+.venv/bin/python -m pip install -r requirements-dev.txt
 [ -f .env ] || cp .env.example .env
-python app.py
+.venv/bin/python app.py
 ```
 
-A aplicação principal não requer Node, npm, build React ou TypeScript.
-`python app.py` inicia o servidor local em loopback, porta 5000, debug desligado.
-Em outro endereço de desenvolvimento use `python -m flask --app app run --host
-0.0.0.0 --port 5000`; implantação pública exige servidor WSGI e HTTPS.
+Windows, PowerShell:
 
-## O que funciona e o que exige configuração
-
-- Conta, sessão, recuperação de senha, perfil, preferências e exclusão.
-- Nivelamento adaptativo, aulas, explicações/exemplos, cinco tipos de exercício e correção.
-- Progresso persistido, vocabulário estudado e revisão espaçada com motivo.
-- Conversação integrada ao backend Python, contexto e feedback ao encerrar.
-- Preferências de correção/idioma/tradução e histórico opcional com retenção.
-
-Com o provedor padrão `mock`, o modo é **demonstração identificada**, com roteiros
-locais e correção por regras. Não é integração externa nem conversa livre
-irrestrita. SQLite persiste a aprendizagem no servidor; o demo anterior em
-`localStorage` não é usado pela aplicação principal.
-
-Para Anthropic, configure somente no `.env` do servidor:
-
-```dotenv
-AI_PROVIDER=anthropic
-ANTHROPIC_API_KEY=
-ANTHROPIC_MODEL=claude-sonnet-4-5
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+.\.venv\Scripts\python.exe app.py
 ```
 
-Preencha a chave privada no seu ambiente. Modelo é configurável conforme acesso
-da conta. Resposta inválida, timeout, autenticação ou indisponibilidade retorna erro seguro
-e preserva o texto para tentar novamente; nenhum turno incompleto é salvo. O chat
-identifica resposta real, demonstração e abertura revisada do catálogo.
-Não existe fallback automático que substitua uma resposta externa por roteiro. Exercícios fechados sempre usam gabarito local; IA não decide
-suas notas. A execução real contra Anthropic requer credencial e validação própria.
+Acesse a porta local 5000 no seu navegador. O servidor de desenvolvimento usa
+loopback e debug desligado. Cadastre-se, configure seu perfil e faça o
+nivelamento ou escolha começar como Iniciante. Nenhuma conta de exemplo é
+criada. O [guia Windows/VS Code](docs/WINDOWS-VSCODE.md) detalha a execução local.
 
-Em desenvolvimento sem SMTP, os e-mails de boas-vindas/redefinição viram `.html`
-e `.json` em `instance/outbox/`; abra o HTML local para usar o link. **Nenhum
-email real é enviado nesse modo.** Envio SMTP exige `SMTP_HOST`, porta/TLS,
-credenciais, remetente e `APP_PUBLIC_URL`; veja
-[EMAIL-AND-AUTH.md](docs/EMAIL-AND-AUTH.md).
+`requirements.txt` contém somente dependências de execução;
+`requirements-dev.txt` acrescenta pytest e Playwright com versões fixadas.
+Gunicorn é usado em produção Linux e não é instalado no Windows. Alterações de
+versões devem ser deliberadas; os arquivos `.in` registram requisitos diretos.
 
-## Configuração e segurança
+## Configuração
 
-`.env.example` contém exemplos sem segredos. `.env`, bancos, outbox e ambiente
-virtual ficam fora do Git. Variáveis principais:
+`.env.example` é a configuração de desenvolvimento. Preserve seu `.env` e
+bancos existentes; eles são ignorados pelo Git. Não publique chaves, senhas,
+bancos, outbox ou backups.
 
-| Variável | Uso / padrão |
+| Variável | Uso |
 | --- | --- |
-| `APP_ENV` | `development`, `testing`, `production` |
-| `SECRET_KEY` | Segredo de sessão; produção exige 32+ caracteres |
-| `PORT` | Porta local, 5000 |
-| `DATABASE_URL` | SQLite em `instance/english-ai.db` por padrão |
-| `AUTO_INIT_DB` | Inicialização automática em desenvolvimento; desligue ao importar banco existente |
-| `AUTH_TOKEN_TTL_HOURS` | Sessão, 72 horas; nome compatível, sessão atual não é JWT |
-| `AI_PROVIDER` | `mock`/`demo` demonstrativo ou `anthropic` |
-| `ANTHROPIC_MODEL` | Modelo configurável, `claude-sonnet-4-5` |
-| `AI_TIMEOUT_MS`, `AI_MAX_HISTORY_MESSAGES` | 20.000 ms e 12 mensagens |
-| `CONVERSATION_RETENTION_DAYS` | 90 dias |
-| `PASSWORD_RESET_TTL_MINUTES` | 15 minutos |
-| `MAIL_TRANSPORT`, `MAIL_OUTBOX_DIR` | Transporte e caixa local |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE` | SMTP; STARTTLS (587) ou TLS direto (465) |
-| `SMTP_USER`, `SMTP_PASSWORD`, `MAIL_FROM` | Credenciais/remetente privados |
-| `APP_PUBLIC_URL` | URL dos links, `http://localhost:5000` em dev |
-| `RATELIMIT_STORAGE_URI` | `memory://` para desenvolvimento/uma instância |
+| `APP_ENV` | `development`, `testing` ou `production` |
+| `SECRET_KEY` | Segredo estável de sessão, obrigatório com 32+ caracteres em produção |
+| `PORT` | Porta do servidor local, padrão 5000 |
+| `DATABASE_URL` | SQLite em `instance/english-ai.db` em desenvolvimento |
+| `AUTO_INIT_DB` | Migrações/seed automáticos em desenvolvimento; false em produção/importação |
+| `AUTH_TOKEN_TTL_HOURS` | Validade da sessão, padrão 72 horas |
+| `AI_PROVIDER` | `mock`/`demo` em desenvolvimento; `anthropic` em produção |
+| `ANTHROPIC_API_KEY`, `ANTHROPIC_MODEL` | Credencial do servidor e modelo acessível à conta |
+| `AI_TIMEOUT_MS`, `AI_MAX_HISTORY_MESSAGES` | Limites de tempo e contexto, padrões 20000 ms e 12 mensagens |
+| `CONVERSATION_RETENTION_DAYS` | Prazo do histórico salvo, padrão 90 dias |
+| `MAIL_TRANSPORT` | `outbox` em desenvolvimento, `smtp` ou `disabled` em produção |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE` | SMTP com STARTTLS ou TLS direto |
+| `SMTP_USER`, `SMTP_PASSWORD`, `MAIL_FROM` | Autenticação e remetente do servidor |
+| `APP_PUBLIC_URL` | Origem pública dos links; HTTPS obrigatório em produção |
+| `PASSWORD_RESET_TTL_MINUTES` | Expiração de links de recuperação, padrão 15 minutos |
+| `RATELIMIT_STORAGE_URI` | `memory://` em desenvolvimento; Redis compartilhado em produção |
+| `TRUSTED_PROXY_COUNT` | 0 direto; 1 somente atrás do proxy HTTPS documentado |
 
-Há scrypt compatível com contas antigas, cookie httpOnly/Strict (Secure em
-produção), CSRF global, limites, validação, checagem do dono, escape de conteúdo
-HTML e cabeçalhos restritivos. Redefinir senha e logout invalidam sessões
-anteriores da conta; logout encerra também outros dispositivos. Os links de
-senha têm uso único, validade curta e só seu hash é guardado no banco.
+O exemplo [.env.production.example](.env.production.example) declara os campos
+necessários sem credenciais. Segredo gerado, mock/demo, e-mail local, debug,
+CSRF desativado, limites desativados, URL HTTP e migração automática são
+recusados em produção. A configuração final também é validada quando fornecida
+por `create_app(config)`.
 
-Por padrão, produção não inicializa o banco automaticamente: configure segredo/URL/HTTPS,
-execute migrações e seed antes do servidor. PostgreSQL e escala distribuída são
-evoluções; este desenvolvimento valida SQLite.
+## IA e e-mail
 
-## Banco existente, migrações e manutenção
+O modo demonstrativo produz roteiros e correções locais, sem chamadas externas.
+A interface identifica sua origem, inclusive em explicações e exemplos de aulas.
+Para usar Anthropic, configure `AI_PROVIDER=anthropic`, uma chave privada e o
+modelo disponível. A chave ausente mantém o serviço explicitamente
+indisponível, sem substituir respostas por demonstração. Falhas de autenticação,
+timeout, rede ou resposta inválida preservam o texto e não salvam turnos
+incompletos. Exercícios fechados usam o gabarito local.
 
-O esquema preserva as 14 tabelas de domínio e acrescenta campos de passagem,
-idempotência/resultados e origem da resposta de IA. Para banco novo:
+Filtros reconhecem alguns padrões de dados pessoais; não garantem anonimização
+completa. Não compartilhe informações sensíveis no conteúdo de aprendizagem.
 
-```bash
-python -m flask --app app db upgrade
-python -m flask --app app seed
-```
+Sem SMTP no desenvolvimento, os e-mails ficam em `instance/outbox/`, em HTML e
+JSON privados. Nenhum e-mail real é enviado. Produção exige configuração SMTP
+com TLS e remetente válido; com `MAIL_TRANSPORT=disabled`, a recuperação retorna
+indisponibilidade para qualquer endereço, sem revelar contas. A resposta de
+solicitação descreve recebimento, sem garantir entrega. O envio em background é
+limitado e de melhor esforço: fila durável, retries operacionais e comprovação
+de entrega continuam requisitos antes de uma operação comercial confiável.
 
-**Não sobrescreva um banco existente.** O importador faz uma cópia SQLite
-consistente e preserva a origem; o destino precisa ser novo e
-`AUTO_INIT_DB=false` durante a importação. Com os valores configurados no `.env`:
+Lembretes de estudo estão desabilitados porque não existe rotina de envio;
+preferências antigas permanecem guardadas. Não há pagamento, voz, certificação
+ou administração acrescentados nesta revisão.
 
-```bash
-python -m flask --app app import-legacy CAMINHO_DO_BANCO_ANTIGO
-```
+## Banco, importação e manutenção
 
-Confirme integridade, contagens e hashes das colunas antigas antes de adotar a
-cópia; contas mantêm identificador/hash scrypt. O seed insere apenas conteúdo
-ausente e preserva linhas existentes. O catálogo versionado em `content/` é a
-fonte pedagógica em execução; personalizações no cache do banco antigo são
-preservadas como dados, sem constituir um editor de conteúdo personalizado.
-Não se importam automaticamente
-contas locais do navegador. O procedimento Windows completo, backup e rollback
-estão em [WINDOWS-VSCODE.md](docs/WINDOWS-VSCODE.md) e
-[PYTHON-MIGRATION.md](docs/PYTHON-MIGRATION.md).
-
-Para aplicar retenção e limpar dados privados vencidos:
+O SQLite preserva 14 tabelas de domínio. Migrações Alembic e seed são
+idempotentes e preservam linhas existentes. Para preparação explícita:
 
 ```bash
-python -m flask --app app purge-private-data
+.venv/bin/python -m flask --app app db upgrade
+.venv/bin/python -m flask --app app seed
+.venv/bin/python -m flask --app app db current
 ```
 
-Agende a limpeza e backups quando implantar o serviço. Histórico desligado
-remove conteúdo ao encerrar a conversa; exclusão de conta exige senha e elimina
-suas relações por cascata.
-
-## Testes e evidências
+Para importar um banco antigo, defina um **destino novo** em `DATABASE_URL` e
+`AUTO_INIT_DB=false` antes de executar:
 
 ```bash
-python -m pytest -m "not browser" -q
-python -m playwright install chromium
-python -m pytest -m browser -q
+.venv/bin/python -m flask --app app import-legacy CAMINHO_DO_BANCO_ANTIGO
 ```
 
-O primeiro comando testa serviços/API com SQLite temporário, sem IA paga nem SMTP
-externo. O segundo instala navegador para os testes de interface. Os resultados
-executados e eventuais bloqueios ficam em
-[MIGRATION-AUDIT.md](docs/MIGRATION-AUDIT.md); os 276 testes + 16 E2E anteriores
-pertencem ao baseline TypeScript, não são números da suíte Python.
+Não sobrescreva um banco. O importador preserva a origem e verifica integridade,
+relações e colunas históricas. Senhas scrypt existentes continuam válidas; o
+estado antigo do navegador não é importado como uma conta do servidor.
 
-Se o ambiente já possui Chromium, a suíte pode usar `CHROMIUM_EXECUTABLE`
-conforme o guia. Não desative verificação TLS/checksum para instalar dependências.
-IA/SMTP reais, Windows, Safari/Firefox e aparelhos reais só serão considerados
-validados quando executados nos respectivos ambientes.
+A rotina `python -m flask --app app purge-private-data` aplica retenção de
+conversas e remove tokens vencidos. Deve ser agendada pelo operador. Backup e
+restauração segura estão em [DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-## Organização, documentação e legado
+## Testes
 
-`app.py` cria o app; `config.py` valida ambientes; `extensions.py` centraliza
-extensões. `blueprints/` recebe HTTP, `services/` aplica regras/transações,
-`models/` mapeia tabelas, `ai/` encapsula provedor/políticas, `content/` preserva
-catálogo, `templates/`/`static/` apresentam a interface, `tests/` verifica jornadas.
+```bash
+.venv/bin/python -m pip check
+.venv/bin/python -m pytest -m "not browser" -q
+.venv/bin/python -m playwright install chromium
+.venv/bin/python -m pytest -m browser -q
+```
 
-| Documento | Conteúdo |
-| --- | --- |
-| [MIGRATION-AUDIT](docs/MIGRATION-AUDIT.md) | Diagnóstico, evidências, validações e limites |
-| [PYTHON-MIGRATION](docs/PYTHON-MIGRATION.md) | Estratégia, contratos, migração de dados e recuperação |
-| [ARCHITECTURE](docs/ARCHITECTURE.md) | Organização e responsabilidades |
-| [DATABASE-MODEL](docs/DATABASE-MODEL.md) | 14 tabelas, DER, índices e campos aditivos |
-| [REQUIREMENTS-TRACEABILITY](docs/REQUIREMENTS-TRACEABILITY.md) | RF01–20, RNF01–10, RN01–08 e UC01–12 |
-| [WINDOWS-VSCODE](docs/WINDOWS-VSCODE.md) | Instalação e execução Python no Windows/VS Code |
-| [MVP-SCOPE](docs/MVP-SCOPE.md), [USER-FLOWS](docs/USER-FLOWS.md), [IA-BEHAVIOR](docs/IA-BEHAVIOR.md) | Decisões acadêmicas, jornadas e comportamento pedagógico |
-| [Design](design/DESIGN-SYSTEM.md) | Identidade e especificações visuais preservadas |
-| [README legado](docs/legacy/README.md) | Execução anterior React/Express, preservada para comparação; [localização dos links históricos](docs/legacy/INDEX.md) |
+Se Chromium já estiver instalado, use
+`CHROMIUM_EXECUTABLE=/usr/bin/chromium` no comando de navegador. Os testes usam
+SQLite/outbox temporários e transportes de IA controlados, sem custo de IA nem
+SMTP externo. Os testes de navegador iniciam seu próprio Flask. O workflow
+[Python validation](.github/workflows/python.yml) executa a suíte no GitHub.
 
-O original continua em `apps/`, `packages/` e `e2e/`, com lockfile npm próprio.
-A tag `python-migration-baseline-067fd06` identifica o ponto de restauração; a
-branch `codex/python-flask-migration` recebe commits incrementais para revisão.
-Não há merge automático da `main`.
+`/api/health` consulta o banco e mostra o modo de IA.
+`/api/ready` retorna 503 se a IA externa ou SMTP não estiverem configurados.
+Esses endpoints não fazem chamadas pagas nem comprovam validade da chave ou
+entrega externa: as integrações precisam de testes reais próprios.
 
-Lacunas mantidas do MVP: lembretes salvos sem envio, sem voz/pronúncia automática,
-administração, arquivo Figma ou certificação. Privacidade é texto informativo;
-uso público exige revisão jurídica/operacional. DOCX/PDF acadêmicos originais
-não foram reenviados: as consolidações disponíveis e suas decisões foram
-preservadas, com essa limitação registrada.
+## Implantação e estado comercial
+
+Use [DEPLOYMENT.md](docs/DEPLOYMENT.md) para Gunicorn, proxy HTTPS, Redis,
+migrações, limpeza, backups e rollback. `python app.py` é destinado ao
+desenvolvimento. A operação documentada inicialmente usa SQLite em um único
+host; múltiplas instâncias exigem análise de capacidade e estratégia de banco.
+
+O [relatório técnico](docs/AUDITORIA-TECNICA.md) registra os achados, correções e
+evidências. [PREPARACAO-COMERCIAL.md](docs/PREPARACAO-COMERCIAL.md) diferencia o
+ambiente validado das pendências externas e jurídicas. A aparência e os testes
+locais não constituem validação de uma implantação comercial.
+
+## Organização e legado
+
+`app.py` cria a aplicação; `config.py` valida ambientes; `blueprints/` atende HTTP;
+`services/` aplica regras; `models/`, `database/` e `migrations/` preservam dados;
+`ai/` encapsula provedores; `content/` guarda o catálogo; `templates/` e `static/`
+compõem a interface; `tests/` verifica jornadas.
+
+O código TypeScript completo foi separado da distribuição Python e preservado
+na tag **`legacy-typescript`**, commit
+`b77e724c85e7ca9c86f2669af998f26ec5ceda82`. Isso inclui `apps/`, `packages/`,
+`e2e/` e seus manifests/lockfiles. O esquema SQL histórico usado pelos testes
+permanece, byte a byte, em `tests/fixtures/legacy_schema.sql`.
+Documentos em `docs/legacy/`, especificações históricas e screenshots anteriores
+são acervo de desenvolvimento, sem dependência em produção.

@@ -1,5 +1,10 @@
 # Migração incremental para Python
 
+> Registro histórico da migração. Desde a revisão de preparação comercial, o
+> TypeScript está na tag `legacy-typescript`; os caminhos `apps/`, `packages/` e
+> `e2e/` citados abaixo pertencem ao baseline. O estado atual está em
+> [AUDITORIA-TECNICA.md](AUDITORIA-TECNICA.md).
+
 ## Ponto de restauração e política
 
 Versão inicial: `067fd0681dcb36e4d0c76fea618d2cf89c9ab39a`.

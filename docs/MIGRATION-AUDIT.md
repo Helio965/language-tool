@@ -1,5 +1,10 @@
 # Auditoria técnica e relatório de migração — English AI
 
+> Registro histórico da migração. Desde a revisão de preparação comercial, o
+> TypeScript está na tag `legacy-typescript`; os caminhos `apps/`, `packages/` e
+> `e2e/` citados abaixo pertencem ao baseline. O estado atual está em
+> [AUDITORIA-TECNICA.md](AUDITORIA-TECNICA.md).
+
 ## Fontes e estado inicial
 
 Baseline: `067fd0681dcb36e4d0c76fea618d2cf89c9ab39a`, preservado pela tag

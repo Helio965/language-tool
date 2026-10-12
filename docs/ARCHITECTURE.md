@@ -1,10 +1,14 @@
 # Arquitetura — English AI em Python
 
 A aplicação principal usa Python 3.12, Flask, SQLAlchemy e Jinja. Preserva a
-arquitetura acadêmica **Aplicação → Backend → Banco / Motor de IA**, os dois
+arquitetura **Aplicação → Backend → Banco / Motor de IA**, os dois
 modos pedagógicos e os UC01–UC12. A organização anterior está em
 [legacy/ARCHITECTURE.md](legacy/ARCHITECTURE.md); a auditoria e as decisões de
 transição estão em [MIGRATION-AUDIT.md](MIGRATION-AUDIT.md).
+
+O TypeScript completo está na tag `legacy-typescript` (`b77e724`); os caminhos
+antigos nas comparações históricas pertencem a essa referência. Consulte
+[DEPLOYMENT.md](DEPLOYMENT.md) para a configuração de produção atual.
 
 ## Objetivos e decisões
 
@@ -45,7 +49,8 @@ flowchart TB
 app.py                    factory, cabeçalhos, erros, CLI e servidor local
 config.py                 configuração validada por ambiente
 extensions.py             db, login, csrf, limiter, migrate
-requirements.in/.txt      dependências diretas e versões fixadas
+requirements.in/.txt      dependências diretas e versões de runtime
+requirements-dev.in/.txt  dependências de validação
 blueprints/               páginas Jinja e API por contexto
 models/                   14 tabelas, serialização pública e migração segura
 services/                 autenticação, perfil, aprendizagem, revisão, progresso, e-mail
@@ -59,7 +64,9 @@ tests/                    pytest, SQLite temporário e interface
 .vscode/                  tarefas e execução para VS Code
 docs/                     requisitos, arquitetura, auditoria e guias
 docs/legacy/              documentos preservados da implementação anterior
-apps/, packages/, e2e/    implementação TypeScript preservada para comparação
+tests/fixtures/          esquema legado preservado para testar importação
+wsgi.py / gunicorn.conf.py entrypoint e configuração de produção Linux
+scripts/                 backup/restauração SQLite em caminho novo
 ```
 
 `create_app(config)` permite uma configuração de teste sem compartilhar banco
