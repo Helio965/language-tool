@@ -101,6 +101,8 @@ pytest==9.1.1
     # via -r requirements.in
 python-dotenv==1.2.4
     # via -r requirements.in
+redis==7.4.1
+    # via limits
 sniffio==1.3.1
     # via anthropic
 sqlalchemy==2.0.54

@@ -81,8 +81,11 @@ O serviço grava metadata em mensagens; a UI informa origem com transparência.
 ## Provedor e configuração
 
 O adaptador `AnthropicProvider` usa o SDK Python oficial e `messages.create` com
-modelo configurável, `max_tokens=2048`, `output_config.format` JSON schema,
-timeout (padrão 20 s) e uma nova tentativa do SDK. Não envia parâmetros beta do
+modelo configurável, `max_tokens` configurável (padrão 1024),
+`output_config.format` JSON schema, timeout de I/O (padrão 20 s) e nenhuma
+tentativa automática do SDK. O timeout não garante um prazo absoluto para a
+resposta. O destino é explicitamente `https://api.anthropic.com`; logs verbosos
+de requisição/resposta do SDK são filtrados. Não envia parâmetros beta do
 adaptador antigo nem presume compatibilidade de modelos não verificados.
 
 | Configuração | Valor / efeito |
@@ -91,6 +94,11 @@ adaptador antigo nem presume compatibilidade de modelos não verificados.
 | `ANTHROPIC_API_KEY` | Privada no servidor |
 | `ANTHROPIC_MODEL` | `claude-sonnet-4-5` por padrão; configure modelo acessível à conta |
 | `AI_TIMEOUT_MS` | 20.000 por padrão |
+| `AI_MAX_OUTPUT_TOKENS` | 1.024 por padrão, entre 256 e 2.048 |
+| `AI_MAX_CONTEXT_CHARS` | 8.000 caracteres por padrão |
+| `AI_MINUTE_REQUEST_LIMIT` | 10 chamadas externas por conta/minuto |
+| `AI_DAILY_REQUEST_LIMIT` | 100 chamadas externas por conta/dia |
+| `AI_GLOBAL_DAILY_REQUEST_LIMIT` | 1.000 chamadas externas por dia, compartilhadas |
 | `AI_MAX_HISTORY_MESSAGES` | 12 por padrão |
 | `AI_EFFORT` | Variável legada aceita pela configuração; não enviada pelo adaptador atual para manter compatibilidade do modelo padrão |
 

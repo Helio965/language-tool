@@ -12,7 +12,7 @@ from sqlalchemy import event, text
 from sqlalchemy.engine import Engine
 from werkzeug.exceptions import HTTPException
 
-from config import ROOT, load_config, number
+from config import ROOT, load_config, number, validate_effective_config
 from extensions import csrf, db, limiter, login_manager, migrate
 from services.common import AppError
 
@@ -51,6 +51,10 @@ def create_app(config=None):
         app.config.update(config)
     elif config is not None:
         app.config.from_object(config)
+    validate_effective_config(app.config)
+    from services.request_logging import install_werkzeug_redaction
+
+    install_werkzeug_redaction()
     Path(app.instance_path).mkdir(parents=True, exist_ok=True, mode=0o700)
     db.init_app(app)
     login_manager.init_app(app)
@@ -153,10 +157,17 @@ def create_app(config=None):
     def headers(response):
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
-        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
-        if app.config.get("APP_ENV") == "production":
+        response.headers["Permissions-Policy"] = (
+            "camera=(), microphone=(), geolocation=()"
+        )
+        if app.config.get("APP_ENV") == "production" and request.is_secure:
             response.headers["Strict-Transport-Security"] = "max-age=31536000"
-        response.headers["Referrer-Policy"] = "same-origin"
+        response.headers["Referrer-Policy"] = (
+            "no-referrer"
+            if request.path in {"/entrar", "/cadastro", "/recuperar-senha"}
+            or request.path.startswith("/redefinir-senha/")
+            else "same-origin"
+        )
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'"
         )
@@ -214,5 +225,12 @@ def create_app(config=None):
 
 
 if __name__ == "__main__":
+    from services.request_logging import SafeRequestHandler
+
     application = create_app()
-    application.run(host="127.0.0.1", port=number("PORT", 5000, 1, 65535), debug=False)
+    application.run(
+        host="127.0.0.1",
+        port=number("PORT", 5000, 1, 65535),
+        debug=False,
+        request_handler=SafeRequestHandler,
+    )

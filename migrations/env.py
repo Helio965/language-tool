@@ -6,7 +6,7 @@ from flask import current_app
 
 config = context.config
 if config.config_file_name:
-    fileConfig(config.config_file_name)
+    fileConfig(config.config_file_name, disable_existing_loggers=False)
 database = current_app.extensions["migrate"].db
 target_metadata = database.metadata
 

@@ -4,6 +4,7 @@ import os
 import secrets
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from dotenv import load_dotenv
 
@@ -27,6 +28,56 @@ def number(name, default, minimum, maximum):
     if not minimum <= value <= maximum:
         raise ValueError(f"{name} fora do intervalo permitido.")
     return value
+
+
+def validate_effective_config(config):
+    """Validate the final factory configuration, including explicit overrides."""
+    if config.get("APP_ENV") != "production":
+        return
+    secret = config.get("SECRET_KEY")
+    if not isinstance(secret, (str, bytes)) or len(secret) < 32:
+        raise ValueError("Produção exige SECRET_KEY com pelo menos 32 caracteres.")
+    if config.get("DEBUG"):
+        raise ValueError("Produção exige DEBUG desabilitado.")
+    if config.get("SESSION_COOKIE_SECURE") is not True:
+        raise ValueError("Produção exige SESSION_COOKIE_SECURE habilitado.")
+    if config.get("SESSION_COOKIE_HTTPONLY") is not True:
+        raise ValueError("Produção exige SESSION_COOKIE_HTTPONLY habilitado.")
+    same_site = config.get("SESSION_COOKIE_SAMESITE")
+    if not isinstance(same_site, str) or same_site.casefold() != "strict":
+        raise ValueError("Produção exige SESSION_COOKIE_SAMESITE=Strict.")
+    if config.get("WTF_CSRF_ENABLED", True) is not True:
+        raise ValueError("Produção exige proteção CSRF habilitada.")
+    if config.get("MAIL_TRANSPORT") == "outbox":
+        raise ValueError("A caixa de saída local é exclusiva do desenvolvimento.")
+    if config.get("RATELIMIT_ENABLED", True) is not True:
+        raise ValueError("Produção exige limites de solicitações habilitados.")
+    if config.get("AI_PROVIDER") != "anthropic":
+        return
+    uri = config.get("RATELIMIT_STORAGE_URI", "")
+    try:
+        parsed = urlsplit(uri)
+    except (TypeError, ValueError):
+        raise ValueError(
+            "Produção com IA paga exige um armazenamento Redis compartilhado válido."
+        ) from None
+    shared = parsed.scheme in {"redis", "rediss", "redis+unix"}
+    if not shared or not (
+        parsed.path if parsed.scheme == "redis+unix" else parsed.hostname
+    ):
+        raise ValueError(
+            "Produção com IA paga exige RATELIMIT_STORAGE_URI compartilhado, como redis://."
+        )
+    if config.get("RATELIMIT_IN_MEMORY_FALLBACK_ENABLED") or config.get(
+        "RATELIMIT_IN_MEMORY_FALLBACK"
+    ):
+        raise ValueError(
+            "Produção com IA paga não permite fallback local para os limites de solicitações."
+        )
+    if config.get("RATELIMIT_SWALLOW_ERRORS"):
+        raise ValueError(
+            "Produção com IA paga não permite ignorar falhas do armazenamento de limites."
+        )
 
 
 def load_config():
@@ -63,6 +114,7 @@ def load_config():
         "AUTO_INIT_DB": flag("AUTO_INIT_DB", not production),
         "TIME_ZONE": "America/Sao_Paulo",
         "RATELIMIT_STORAGE_URI": os.environ.get("RATELIMIT_STORAGE_URI", "memory://"),
+        "RATELIMIT_ENABLED": True,
         "RATELIMIT_HEADERS_ENABLED": True,
         "AI_PROVIDER": os.environ.get("AI_PROVIDER", "mock"),
         "ANTHROPIC_API_KEY": os.environ.get("ANTHROPIC_API_KEY", ""),
@@ -71,6 +123,7 @@ def load_config():
         "AI_TIMEOUT_MS": number("AI_TIMEOUT_MS", 20000, 1000, 120000),
         "AI_MAX_OUTPUT_TOKENS": number("AI_MAX_OUTPUT_TOKENS", 1024, 256, 2048),
         "AI_MAX_CONTEXT_CHARS": number("AI_MAX_CONTEXT_CHARS", 8000, 2048, 12000),
+        "AI_MINUTE_REQUEST_LIMIT": number("AI_MINUTE_REQUEST_LIMIT", 10, 1, 120),
         "AI_DAILY_REQUEST_LIMIT": number("AI_DAILY_REQUEST_LIMIT", 100, 10, 2000),
         "AI_GLOBAL_DAILY_REQUEST_LIMIT": number(
             "AI_GLOBAL_DAILY_REQUEST_LIMIT", 1000, 10, 100000
@@ -104,6 +157,5 @@ def load_config():
         raise ValueError("AI_PROVIDER precisa ser mock, demo ou anthropic.")
     if production and config["MAIL_TRANSPORT"] == "outbox":
         raise ValueError("A caixa de saída local é exclusiva do desenvolvimento.")
-    if production and config["AI_PROVIDER"] == "anthropic" and config["RATELIMIT_STORAGE_URI"].startswith("memory://"):
-        raise ValueError("Produção com IA paga exige RATELIMIT_STORAGE_URI compartilhado, como redis://.")
+    validate_effective_config(config)
     return config
