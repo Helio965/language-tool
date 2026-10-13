@@ -5,7 +5,7 @@ import hashlib
 import hmac
 import re
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from flask import current_app
 from sqlalchemy import delete, update
 from sqlalchemy.exc import IntegrityError

@@ -5,8 +5,8 @@ from sqlalchemy import select
 
 from extensions import db
 from models import Conversation, Message
-from test_journeys import beginner, web
-from test_ui_recovery import recovery_page
+from test_journeys import beginner, web as web
+from test_ui_recovery import recovery_page as recovery_page
 
 import pytest
 

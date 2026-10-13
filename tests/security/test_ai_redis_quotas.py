@@ -26,7 +26,12 @@ from extensions import db, limiter
 from models import User
 from services.aprendizagem import explain_again
 from services.common import AppError
-from test_ai_quotas import ConfiguredQuotaProvider, post, quota_factory, register
+from test_ai_quotas import (
+    ConfiguredQuotaProvider,
+    post,
+    quota_factory as quota_factory,
+    register,
+)
 
 
 @dataclass

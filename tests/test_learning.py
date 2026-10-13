@@ -8,12 +8,11 @@ from extensions import db
 from models import (
     ExerciseAttempt,
     LearningProfile,
-    Preferences,
     Progress,
     Review,
     UserVocabulary,
 )
-from services import aprendizagem, nivelamento, revisao
+from services import aprendizagem
 from services.exercicios import grade_closed_exercise, normalize_answer
 
 PROFILE = {

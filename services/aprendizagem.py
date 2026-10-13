@@ -2,8 +2,8 @@
 
 from sqlalchemy import select, update
 from extensions import db
-from models import ExerciseAttempt, LearningProfile, Progress, UserVocabulary
-from services.common import AppError, learner_bundle, new_id, now_iso, require_user
+from models import ExerciseAttempt, Progress, UserVocabulary
+from services.common import AppError, learner_bundle, new_id, now_iso
 from content import catalog
 from services import exercicios
 from datetime import datetime, timedelta

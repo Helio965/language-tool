@@ -4,7 +4,7 @@ import copy
 import re
 
 from ai.correction import apply_issues, check_grammar
-from ai.personality import ASSISTANT_PERSONA, policy_for, with_assistant_name
+from ai.personality import policy_for, with_assistant_name
 
 REDACTION_PLACEHOLDER = "[dado removido]"
 REDACTION_PATTERNS = [

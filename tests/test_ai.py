@@ -1,7 +1,6 @@
 """Real DB flows and official SDK transport checks; no paid external API calls."""
 
 import json
-from datetime import datetime, timedelta, timezone
 
 import anthropic
 import httpx
@@ -9,14 +8,14 @@ import pytest
 from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
-from ai.conversation import DemoAIService, empty_context, redact_sensitive_data
+from ai.conversation import DemoAIService, empty_context
 from ai.correction import (
     apply_issues,
     build_correction,
     check_grammar,
     decide_conversation_corrections,
 )
-from ai.prompts import CONVERSATION_SCHEMA, OPENING_SCHEMA, build_system_prompt
+from ai.prompts import OPENING_SCHEMA, build_system_prompt
 from ai.provider import (
     AnthropicProvider,
     LLMAIService,
