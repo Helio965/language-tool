@@ -6,7 +6,7 @@ import hmac
 import re
 
 from flask import current_app
-from sqlalchemy import delete, literal_column, or_, select, update
+from sqlalchemy import case, delete, literal_column, or_, select, update
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
@@ -21,7 +21,7 @@ from ai.personality import policy_for
 from ai.provider import get_ai_service
 from content import catalog
 from extensions import db
-from models import Conversation, Message, Preferences, Review
+from models import Conversation, Message, Preferences, Review, User
 from services.common import (
     AppError,
     iso,
@@ -107,6 +107,19 @@ def _owned(user_id, conversation_id, require_content=False):
             409,
         )
     return conversation
+
+
+def _current_preferences(user_id):
+    # Provider I/O can outlive account deletion in another request. Do not use
+    # cached child rows or repair defaults after the owner's cascade has run.
+    preferences = db.session.get(Preferences, user_id, populate_existing=True)
+    if preferences is None:
+        if db.session.get(User, user_id, populate_existing=True) is None:
+            raise AppError("UNAUTHENTICATED", "Entre na sua conta para continuar.", 401)
+        raise AppError(
+            "INCOMPLETE_ACCOUNT", "Não foi possível carregar o perfil da conta.", 409
+        )
+    return preferences
 
 
 def _summary(conversation, messages=None):
@@ -214,9 +227,7 @@ def start(user_id, topic_id):
     if lesson:
         data["lessonOpener"] = lesson["practice"]["opener"]
     opening = get_ai_service().start_conversation(data)
-    saved = db.session.get(
-        Preferences, user_id, populate_existing=True
-    ).save_conversation_history
+    saved = _current_preferences(user_id).save_conversation_history
     clock = now()
     timestamp = iso(clock)
     conversation = Conversation(
@@ -539,7 +550,7 @@ def _send_claimed(user_id, conversation, raw_text, idempotency_key, fingerprint,
     # The owned nonce and optimistic version prevent a stale result from
     # committing after deletion, expiry, or a replacement lease.
     try:
-        preferences = db.session.get(Preferences, user_id, populate_existing=True)
+        preferences = _current_preferences(user_id)
         values = {
             "context": updated_context,
             "user_message_count": expected_count + 1,
@@ -550,9 +561,18 @@ def _send_claimed(user_id, conversation, raw_text, idempotency_key, fingerprint,
         }
         if not preferences.save_conversation_history:
             values["retention"] = "ephemeral"
-            values["expires_at"] = min(
-                conversation.expires_at or iso(now() + timedelta(days=1)),
-                iso(now() + timedelta(days=1)),
+            expiry = iso(now() + timedelta(days=1))
+            # Compare the current database row inside the guarded UPDATE. The
+            # cached conversation may predate a privacy change during I/O.
+            values["expires_at"] = case(
+                (
+                    or_(
+                        Conversation.expires_at.is_(None),
+                        Conversation.expires_at > expiry,
+                    ),
+                    expiry,
+                ),
+                else_=Conversation.expires_at,
             )
         changed = db.session.execute(
             update(Conversation)
