@@ -5,6 +5,7 @@ from .base import PublicModel
 
 class Conversation(PublicModel, db.Model):
     __tablename__ = "conversations"
+    hidden_fields = frozenset({"pending_request_nonce", "pending_request_expires_at"})
     __table_args__ = (
         db.CheckConstraint(
             "retention IN ('saved', 'ephemeral')", name="ck_conversation_retention"
@@ -37,6 +38,8 @@ class Conversation(PublicModel, db.Model):
     created_at = db.Column(db.String, nullable=False)
     updated_at = db.Column(db.String, nullable=False)
     ended_at = db.Column(db.String)
+    pending_request_nonce = db.Column(db.String(36))
+    pending_request_expires_at = db.Column(db.String)
 
 
 class Message(PublicModel, db.Model):

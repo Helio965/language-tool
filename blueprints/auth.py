@@ -102,6 +102,7 @@ def request_reset():
 
 
 @bp.post("/auth/password-reset/verify")
+@reset_limit
 def verify_reset():
     status, _ = autenticacao.inspect_reset(body().get("token"))
     return jsonify(status=status)
@@ -109,6 +110,7 @@ def verify_reset():
 
 @bp.post("/auth/password-reset/confirm")
 @auth_limit
+@reset_limit
 def confirm_reset():
     prior_user = current_user.id if current_user.is_authenticated else None
     user_id = autenticacao.reset_password(body())

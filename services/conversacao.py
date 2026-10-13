@@ -6,8 +6,9 @@ import hmac
 import re
 
 from flask import current_app
-from sqlalchemy import delete, literal_column, or_, select, update
+from sqlalchemy import case, delete, literal_column, or_, select, update
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 from ai.conversation import (
     empty_context,
@@ -20,7 +21,7 @@ from ai.personality import policy_for
 from ai.provider import get_ai_service
 from content import catalog
 from extensions import db
-from models import Conversation, Message, Preferences, Review
+from models import Conversation, Message, Preferences, Review, User
 from services.common import (
     AppError,
     iso,
@@ -59,6 +60,19 @@ def _messages(conversation_id):
     )
 
 
+def _clear_pending_turn(conversation):
+    # The independent claim Session can reserve after this identity-map object
+    # was read. Force the UPDATE even if its cached fields were already None.
+    db.session.execute(
+        update(Conversation)
+        .where(
+            Conversation.id == conversation.id,
+            Conversation.user_id == conversation.user_id,
+        )
+        .values(pending_request_nonce=None, pending_request_expires_at=None)
+    )
+
+
 def _delete_content(conversation, timestamp=None):
     timestamp = timestamp or now_iso()
     db.session.execute(
@@ -67,12 +81,17 @@ def _delete_content(conversation, timestamp=None):
     conversation.context = empty_context()
     conversation.content_deleted_at = timestamp
     conversation.ended_at = conversation.ended_at or timestamp
+    _clear_pending_turn(conversation)
 
 
 def _owned(user_id, conversation_id, require_content=False):
     require_user(user_id)
-    conversation = db.session.get(Conversation, conversation_id)
-    if conversation is None or conversation.user_id != user_id:
+    conversation = db.session.scalar(
+        select(Conversation).where(
+            Conversation.id == conversation_id, Conversation.user_id == user_id
+        )
+    )
+    if conversation is None:
         raise AppError("NOT_FOUND", "Conversa não encontrada.", 404)
     if (
         not conversation.content_deleted_at
@@ -88,6 +107,19 @@ def _owned(user_id, conversation_id, require_content=False):
             409,
         )
     return conversation
+
+
+def _current_preferences(user_id):
+    # Provider I/O can outlive account deletion in another request. Do not use
+    # cached child rows or repair defaults after the owner's cascade has run.
+    preferences = db.session.get(Preferences, user_id, populate_existing=True)
+    if preferences is None:
+        if db.session.get(User, user_id, populate_existing=True) is None:
+            raise AppError("UNAUTHENTICATED", "Entre na sua conta para continuar.", 401)
+        raise AppError(
+            "INCOMPLETE_ACCOUNT", "Não foi possível carregar o perfil da conta.", 409
+        )
+    return preferences
 
 
 def _summary(conversation, messages=None):
@@ -195,9 +227,7 @@ def start(user_id, topic_id):
     if lesson:
         data["lessonOpener"] = lesson["practice"]["opener"]
     opening = get_ai_service().start_conversation(data)
-    saved = db.session.get(
-        Preferences, user_id, populate_existing=True
-    ).save_conversation_history
+    saved = _current_preferences(user_id).save_conversation_history
     clock = now()
     timestamp = iso(clock)
     conversation = Conversation(
@@ -306,6 +336,79 @@ def _replay_turn(conversation_id, key, fingerprint):
     }
 
 
+def _claim_turn(user_id, conversation_id, expected_count):
+    """Commit a short lease without holding a database write lock during I/O.
+
+    The nonce protects the eventual write if a crashed/slow request loses its
+    lease. This cannot guarantee exactly-once billing at the external provider.
+    """
+    nonce = new_id()
+    clock = now()
+    timeout_ms = max(1000, min(120000, current_app.config.get("AI_TIMEOUT_MS", 20000)))
+    expires_at = iso(clock + timedelta(milliseconds=timeout_ms + 30000))
+    try:
+        with Session(db.engine) as claim_session:
+            claimed = claim_session.execute(
+                update(Conversation)
+                .where(
+                    Conversation.id == conversation_id,
+                    Conversation.user_id == user_id,
+                    Conversation.user_message_count == expected_count,
+                    Conversation.content_deleted_at.is_(None),
+                    Conversation.ended_at.is_(None),
+                    or_(
+                        Conversation.expires_at.is_(None),
+                        Conversation.expires_at > iso(clock),
+                    ),
+                    or_(
+                        Conversation.pending_request_nonce.is_(None),
+                        Conversation.pending_request_expires_at <= iso(clock),
+                    ),
+                )
+                .values(
+                    pending_request_nonce=nonce,
+                    pending_request_expires_at=expires_at,
+                )
+                .execution_options(synchronize_session=False)
+            )
+            claim_session.commit()
+    except SQLAlchemyError as exc:
+        raise AppError(
+            "PERSISTENCE_FAILED",
+            "Não foi possível reservar o envio. Tente novamente.",
+            503,
+        ) from exc
+    if claimed.rowcount != 1:
+        raise AppError(
+            "CONVERSATION_BUSY",
+            "Há um envio em andamento ou a conversa foi alterada. Aguarde e tente novamente.",
+            409,
+        )
+    return nonce
+
+
+def _release_turn(user_id, conversation_id, nonce):
+    # A stale request must never erase a newer request's lease. Cleanup failure
+    # leaves only a bounded lease; it must not mask the provider/persistence error.
+    try:
+        with Session(db.engine) as claim_session:
+            claim_session.execute(
+                update(Conversation)
+                .where(
+                    Conversation.id == conversation_id,
+                    Conversation.user_id == user_id,
+                    Conversation.pending_request_nonce == nonce,
+                )
+                .values(pending_request_nonce=None, pending_request_expires_at=None)
+                .execution_options(synchronize_session=False)
+            )
+            claim_session.commit()
+    except SQLAlchemyError as exc:
+        current_app.logger.warning(
+            "Conversation lease cleanup failed: %s", type(exc).__name__
+        )
+
+
 def send(user_id, conversation_id, raw_text, idempotency_key=None):
     conversation = _owned(user_id, conversation_id, require_content=True)
     if (
@@ -331,6 +434,29 @@ def send(user_id, conversation_id, raw_text, idempotency_key=None):
         return replay
     if conversation.ended_at:
         raise AppError("CONVERSATION_ENDED", "Esta conversa já foi encerrada.", 409)
+    try:
+        nonce = _claim_turn(user_id, conversation_id, conversation.user_message_count)
+    except AppError as exc:
+        if exc.code != "CONVERSATION_BUSY":
+            raise
+        db.session.rollback()
+        conversation = _owned(user_id, conversation_id, require_content=True)
+        replay = _replay_turn(conversation_id, idempotency_key, fingerprint)
+        if replay:
+            return replay
+        if conversation.ended_at:
+            raise AppError("CONVERSATION_ENDED", "Esta conversa já foi encerrada.", 409)
+        raise
+    try:
+        return _send_claimed(
+            user_id, conversation, raw_text, idempotency_key, fingerprint, nonce
+        )
+    finally:
+        _release_turn(user_id, conversation_id, nonce)
+
+
+def _send_claimed(user_id, conversation, raw_text, idempotency_key, fingerprint, nonce):
+    conversation_id = conversation.id
     bundle = learner_bundle(user_id)
     topic = catalog.topic(conversation.topic_id)
     if topic is None:
@@ -421,20 +547,32 @@ def send(user_id, conversation_id, raw_text, idempotency_key=None):
     corrected_skills += [
         item["skillTag"] for item in decision["inline"] + decision["deferred"]
     ]
-    # Optimistic claim prevents both concurrent turns and content resurrection.
+    # The owned nonce and optimistic version prevent a stale result from
+    # committing after deletion, expiry, or a replacement lease.
     try:
-        preferences = db.session.get(Preferences, user_id, populate_existing=True)
+        preferences = _current_preferences(user_id)
         values = {
             "context": updated_context,
             "user_message_count": expected_count + 1,
             "corrected_skills": corrected_skills[-50:],
             "updated_at": assistant_message.created_at,
+            "pending_request_nonce": None,
+            "pending_request_expires_at": None,
         }
         if not preferences.save_conversation_history:
             values["retention"] = "ephemeral"
-            values["expires_at"] = min(
-                conversation.expires_at or iso(now() + timedelta(days=1)),
-                iso(now() + timedelta(days=1)),
+            expiry = iso(now() + timedelta(days=1))
+            # Compare the current database row inside the guarded UPDATE. The
+            # cached conversation may predate a privacy change during I/O.
+            values["expires_at"] = case(
+                (
+                    or_(
+                        Conversation.expires_at.is_(None),
+                        Conversation.expires_at > expiry,
+                    ),
+                    expiry,
+                ),
+                else_=Conversation.expires_at,
             )
         changed = db.session.execute(
             update(Conversation)
@@ -442,6 +580,8 @@ def send(user_id, conversation_id, raw_text, idempotency_key=None):
                 Conversation.id == conversation_id,
                 Conversation.user_id == user_id,
                 Conversation.user_message_count == expected_count,
+                Conversation.pending_request_nonce == nonce,
+                Conversation.pending_request_expires_at > now_iso(),
                 Conversation.content_deleted_at.is_(None),
                 Conversation.ended_at.is_(None),
                 or_(
@@ -488,6 +628,7 @@ def send(user_id, conversation_id, raw_text, idempotency_key=None):
 
 def end(user_id, conversation_id):
     conversation = _owned(user_id, conversation_id)
+    _clear_pending_turn(conversation)
     messages = _messages(conversation_id)
     user_messages = [item for item in messages if item.role == "user"]
     corrections = [

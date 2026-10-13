@@ -1,7 +1,7 @@
 """A lost HTTP reply must not charge, count or store the same turn twice."""
 
 from concurrent.futures import ThreadPoolExecutor
-from threading import Barrier
+from threading import Event
 
 import pytest
 from sqlalchemy import select
@@ -181,16 +181,19 @@ def test_provider_failure_does_not_reserve_key_or_persist_a_half_turn(
         assert db.session.get(Conversation, conversation["id"]).user_message_count == 1
 
 
-def test_simultaneous_same_key_commits_one_pair_and_both_callers_recover_it(
+def test_simultaneous_same_key_calls_provider_once_then_both_callers_recover_pair(
     client, app, monkeypatch
 ):
     user_id = register(client)
     conversation = start(client)
-    barrier = Barrier(2)
+    entered, release = Event(), Event()
+    calls = []
     demo = DemoAIService()
 
     def parallel_provider(data):
-        barrier.wait(timeout=10)
+        calls.append(1)
+        entered.set()
+        assert release.wait(timeout=10)
         return demo.conversation(data)
 
     monkeypatch.setattr(app.extensions["english_ai"], "conversation", parallel_provider)
@@ -202,8 +205,18 @@ def test_simultaneous_same_key_commits_one_pair_and_both_callers_recover_it(
             )
 
     with ThreadPoolExecutor(max_workers=2) as executor:
-        results = list(executor.map(lambda _index: parallel_send(), range(2)))
-    assert results[0] == results[1]
+        first = executor.submit(parallel_send)
+        try:
+            assert entered.wait(timeout=10)
+            with pytest.raises(conversacao.AppError) as busy:
+                executor.submit(parallel_send).result(timeout=10)
+            assert busy.value.code == "CONVERSATION_BUSY"
+            assert busy.value.status == 409
+        finally:
+            release.set()
+        original = first.result(timeout=10)
+    assert parallel_send() == original
+    assert len(calls) == 1
     with app.app_context():
         assert db.session.get(Conversation, conversation["id"]).user_message_count == 1
         assert (

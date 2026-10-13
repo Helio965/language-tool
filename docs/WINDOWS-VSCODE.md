@@ -177,6 +177,12 @@ Os testes usam banco temporário, mailer em memória/outbox e provedor controlad
 chamadas reais a Anthropic/SMTP não são disparadas pela suíte padrão. O relatório
 registra separadamente a suíte e qualquer integração externa executada.
 
+Os novos testes de cotas compartilhadas iniciam um `redis-server` efêmero e
+exigem o executável no `PATH` ou em `REDIS_SERVER_EXECUTABLE`. A execução completa
+com Redis foi validada no Linux; execute esse conjunto no WSL/Linux para
+reproduzi-la. Isso não acrescenta Redis ao modo demonstrativo da aplicação.
+A execução nativa dessa integração no Windows permanece não validada.
+
 Para usar Chromium já instalado, configure no terminal conforme a suíte:
 
 ```powershell

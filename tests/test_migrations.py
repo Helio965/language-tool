@@ -321,7 +321,7 @@ def test_partial_second_upgrade_can_resume(tmp_path):
             db.session.execute(
                 db.text("SELECT version_num FROM alembic_version")
             ).scalar()
-            == "0003_conversation_idempotency"
+            == "0004_conversation_claim"
         )
         assert "completion_result" in {
             column["name"] for column in inspect(db.engine).get_columns("progress")

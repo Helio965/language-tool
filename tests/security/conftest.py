@@ -45,8 +45,12 @@ class AuditClient:
 @pytest.fixture
 def audit_app(tmp_path, monkeypatch):
     network_attempts = []
+    allowed_addresses = set()
+    original_connect = socket.socket.connect
 
     def deny_network(_socket, address):
+        if address in allowed_addresses:
+            return original_connect(_socket, address)
         network_attempts.append(address)
         raise AssertionError("Network access is forbidden in the isolated SQL audit.")
 
@@ -86,6 +90,9 @@ def audit_app(tmp_path, monkeypatch):
         application_module, "Flask", partial(Flask, instance_path=str(instance))
     )
     application = application_module.create_app()
+    # A dedicated Redis test may opt into one ephemeral loopback address only.
+    # External providers and every other address remain forbidden.
+    application.extensions["audit_allowed_addresses"] = allowed_addresses
     with application.app_context():
         assert db.engine.dialect.name == "sqlite"
         assert Path(db.engine.url.database).resolve().is_relative_to(tmp_path.resolve())

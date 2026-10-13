@@ -167,7 +167,10 @@ python -m pytest -m browser -q
 ```
 
 O primeiro comando testa serviços/API com SQLite temporário, sem IA paga nem SMTP
-externo. O segundo instala navegador para os testes de interface. Os resultados
+externo. Os testes de cotas compartilhadas também precisam de `redis-server`
+local (ou `REDIS_SERVER_EXECUTABLE` apontando para seu executável); eles iniciam
+e encerram sua própria instância efêmera em loopback. O segundo comando instala
+navegador para os testes de interface. Os resultados
 executados e eventuais bloqueios ficam em
 [MIGRATION-AUDIT.md](docs/MIGRATION-AUDIT.md); os 276 testes + 16 E2E anteriores
 pertencem ao baseline TypeScript, não são números da suíte Python.
@@ -192,6 +195,7 @@ catálogo, `templates/`/`static/` apresentam a interface, `tests/` verifica jorn
 | [DATABASE-MODEL](docs/DATABASE-MODEL.md) | 14 tabelas, DER, índices e campos aditivos |
 | [REQUIREMENTS-TRACEABILITY](docs/REQUIREMENTS-TRACEABILITY.md) | RF01–20, RNF01–10, RN01–08 e UC01–12 |
 | [Auditoria de SQL Injection](docs/security/SQL_INJECTION_AUDIT.md) | Testes isolados, evidências de parametrização, correções e limites de segurança |
+| [Auditoria avançada de segurança](docs/security/ADVANCED_SECURITY_AUDIT.md) | IA, cotas compartilhadas, concorrência, autorização, sessões e limites da validação |
 | [WINDOWS-VSCODE](docs/WINDOWS-VSCODE.md) | Instalação e execução Python no Windows/VS Code |
 | [MVP-SCOPE](docs/MVP-SCOPE.md), [USER-FLOWS](docs/USER-FLOWS.md), [IA-BEHAVIOR](docs/IA-BEHAVIOR.md) | Decisões acadêmicas, jornadas e comportamento pedagógico |
 | [Design](design/DESIGN-SYSTEM.md) | Identidade e especificações visuais preservadas |
