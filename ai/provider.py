@@ -79,9 +79,11 @@ def _validate(value, schema):
         for item in value:
             _validate(item, schema["items"])
     elif kind == "string":
-        if not isinstance(value, str) or not schema.get("minLength", 0) <= len(
-            value.strip()
-        ) <= schema.get("maxLength", 1200):
+        if (
+            not isinstance(value, str)
+            or len(value) > schema.get("maxLength", 1200)
+            or len(value.strip()) < schema.get("minLength", 0)
+        ):
             raise ValueError("Invalid text")
         # json.loads accepts escaped lone UTF-16 surrogates, which cannot be
         # encoded for database bindings or further HTTP requests.
@@ -105,8 +107,16 @@ def validate_response(raw, schema):
         # Inspect generated prose only. A learner can legitimately quote these
         # words in a grammar span or fact; those data fields are not instructions.
         # Paraphrases and other jailbreaks remain outside this conservative check.
-        for key in ("reply", "translation", "feedback", "explanation", "en", "pt"):
-            item = value.get(key)
+        prose = [
+            value.get(key)
+            for key in ("reply", "translation", "feedback", "explanation", "en", "pt")
+        ]
+        for issue in value.get("issues", []):
+            prose.extend(
+                issue[key]
+                for key in ("replacement", "explanation_pt", "explanation_en")
+            )
+        for item in prose:
             if isinstance(item, str) and any(
                 phrase.casefold() in item.casefold()
                 for phrase in INTERNAL_INSTRUCTION_SNIPPETS

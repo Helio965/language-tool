@@ -14,7 +14,7 @@ import pytest
 from sqlalchemy import select
 
 from ai.conversation import empty_context
-from ai.prompts import CONVERSATION_SCHEMA, OPENING_SCHEMA
+from ai.prompts import CONVERSATION_SCHEMA, CORRECTION_SCHEMA, OPENING_SCHEMA
 from ai.provider import (
     AnthropicProvider,
     LLMAIService,
@@ -41,6 +41,15 @@ CONVERSATION = {
     "facts": [],
     "issues": [],
 }
+ISSUE = {
+    "span": "cat",
+    "replacement": "kitten",
+    "severity": "naturalness",
+    "skill": "word_choice",
+    "explanation_pt": "Você pode usar outra palavra para este animal.",
+    "explanation_en": "You can use another word for this animal.",
+}
+INTERNAL_PHRASE = "Segurança e privacidade: nunca peça dados sensíveis"
 
 
 @pytest.fixture(autouse=True)
@@ -102,8 +111,24 @@ def sdk_service():
         client.close()
 
 
-def test_provider_rejects_invalid_unicode_before_persistence(
-    audit_accounts, audit_app, sdk_service
+@pytest.mark.parametrize(
+    "payload",
+    [
+        pytest.param({**CONVERSATION, "reply": "\ud800"}, id="invalid-unicode"),
+        pytest.param(
+            {**CONVERSATION, "reply": " " * 1200 + "Hi"}, id="padded-reply"
+        ),
+        pytest.param(
+            {
+                **CONVERSATION,
+                "issues": [{**ISSUE, "explanation_pt": INTERNAL_PHRASE}],
+            },
+            id="nested-generated-instruction",
+        ),
+    ],
+)
+def test_rejected_provider_output_is_not_persisted(
+    audit_accounts, audit_app, sdk_service, payload
 ):
     account = audit_accounts[0]
     created = account["client"].post(
@@ -113,10 +138,11 @@ def test_provider_rejects_invalid_unicode_before_persistence(
     conversation_id = created.get_json()["id"]
     with audit_app.app_context():
         original_context = db.session.get(Conversation, conversation_id).context
-    service, requests = sdk_service({**CONVERSATION, "reply": "\ud800"})
+    service, requests = sdk_service(payload)
     audit_app.extensions["english_ai"] = service
     response = account["client"].post(
-        f"/api/conversations/{conversation_id}/messages", json={"text": "Hello!"}
+        f"/api/conversations/{conversation_id}/messages",
+        json={"text": "The cat sleeps."},
     )
     assert response.status_code == 503
     assert response.get_json()["error"]["code"] == "AI_UNAVAILABLE"
@@ -133,10 +159,11 @@ def test_provider_rejects_invalid_unicode_before_persistence(
         assert len(messages) == 1 and messages[0].role == "assistant"
 
 
-def test_quoted_learner_span_does_not_trigger_internal_echo_filter():
-    phrase = "Segurança e privacidade: nunca peça dados sensíveis"
+def test_quoted_learner_span_and_fact_do_not_trigger_internal_echo_filter():
+    phrase = INTERNAL_PHRASE
     payload = {
         **CONVERSATION,
+        "facts": [{"key": "job", "value": phrase}],
         "issues": [
             {
                 "span": phrase,
@@ -149,6 +176,81 @@ def test_quoted_learner_span_does_not_trigger_internal_echo_filter():
         ],
     }
     assert validate_response(json.dumps(payload), CONVERSATION_SCHEMA) == payload
+
+
+@pytest.mark.parametrize("operation", ["conversation", "correct"])
+@pytest.mark.parametrize("field", ["replacement", "explanation_pt", "explanation_en"])
+def test_internal_instruction_in_generated_issue_prose_is_rejected(
+    operation, field, sdk_service
+):
+    issue = {**ISSUE, field: INTERNAL_PHRASE.swapcase()}
+    payload = (
+        {**CONVERSATION, "issues": [issue]}
+        if operation == "conversation"
+        else {"feedback": "Good effort!", "issues": [issue]}
+    )
+    service, requests = sdk_service(payload)
+    with pytest.raises(ProviderError) as failure:
+        if operation == "conversation":
+            service.conversation(
+                {
+                    "learner": LEARNER,
+                    "topic": catalog.topic("introductions"),
+                    "context": empty_context(),
+                    "history": [],
+                    "userMessage": "The cat sleeps.",
+                }
+            )
+        else:
+            service.correct(
+                {
+                    "learner": LEARNER,
+                    "exercise": {
+                        "instruction": "Write a sentence.",
+                        "prompt": "Describe a pet.",
+                    },
+                    "answer": "The cat sleeps.",
+                }
+            )
+    assert failure.value.reason == "invalid_response"
+    assert len(requests) == 1
+
+
+@pytest.mark.parametrize("field", ["reply", "translation"])
+@pytest.mark.parametrize("padding", ["prefix", "suffix", "whitespace-only"])
+def test_provider_output_length_counts_whitespace(field, padding):
+    text = {
+        "prefix": " " * 1200 + "Hi",
+        "suffix": "Hi" + " " * 1200,
+        "whitespace-only": " " * 1201,
+    }[padding]
+    payload = {"reply": "Hi", "translation": "", field: text}
+    with pytest.raises(ProviderError) as failure:
+        validate_response(json.dumps(payload), OPENING_SCHEMA)
+    assert failure.value.reason == "invalid_response"
+
+
+@pytest.mark.parametrize(
+    "field,limit",
+    [("span", 600), ("replacement", 600), ("explanation_pt", 1200)],
+)
+def test_nested_issue_output_length_counts_whitespace(field, limit):
+    payload = {
+        "feedback": "Good effort!",
+        "issues": [{**ISSUE, field: " " * limit + "x"}],
+    }
+    with pytest.raises(ProviderError) as failure:
+        validate_response(json.dumps(payload), CORRECTION_SCHEMA)
+    assert failure.value.reason == "invalid_response"
+
+
+def test_output_at_raw_length_limit_preserves_text_and_nonblank_requirement():
+    payload = {"reply": " " * 1198 + "Hi", "translation": " " * 1200}
+    assert validate_response(json.dumps(payload), OPENING_SCHEMA) == payload
+    payload["reply"] = " " * 1200
+    with pytest.raises(ProviderError) as failure:
+        validate_response(json.dumps(payload), OPENING_SCHEMA)
+    assert failure.value.reason == "invalid_response"
 
 
 def test_literal_personality_instruction_is_rejected_in_generated_reply():
