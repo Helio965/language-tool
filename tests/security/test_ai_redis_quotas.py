@@ -58,7 +58,12 @@ def local_redis(audit_app, tmp_path):
             "Install a trusted redis-server or set REDIS_SERVER_EXECUTABLE "
             "to run the mandatory shared-quota tests."
         )
-    binary = Path(executable).resolve(strict=True)
+    # Packaged Redis can be a multicall binary reached through redis-server ->
+    # redis-check-rdb. Its argv[0] selects the mode, so resolving the symlink
+    # would start the checker rather than the owned server.
+    binary = Path(executable).absolute()
+    if not binary.is_file():
+        pytest.fail("The configured redis-server executable does not exist.")
     version = subprocess.check_output([str(binary), "--version"], text=True).strip()
     with socket.socket() as reservation:
         reservation.bind(("127.0.0.1", 0))
@@ -141,6 +146,25 @@ def counter_key(application, specification, account, scope):
         return limiter.storage.prefixed_key(
             parse(specification).key_for(prefix, account, scope)
         )
+
+
+def test_distribution_multicall_alias_starts_an_owned_server(
+    audit_app, tmp_path, monkeypatch, request
+):
+    """Exercise distro alias dispatch with the trusted installed Redis binary."""
+    executable = os.environ.get("REDIS_SERVER_EXECUTABLE") or shutil.which(
+        "redis-server"
+    )
+    if not executable:
+        pytest.fail("A trusted redis-server is required for the alias regression.")
+    bundled_binary = tmp_path / "redis-check-rdb"
+    shutil.copy2(executable, bundled_binary)
+    server_alias = tmp_path / "redis-server"
+    server_alias.symlink_to(bundled_binary)
+    monkeypatch.setenv("REDIS_SERVER_EXECUTABLE", str(server_alias))
+    runtime = request.getfixturevalue("local_redis")
+    assert runtime.client.ping() is True
+    assert runtime.version.startswith("Redis server v=")
 
 
 def test_redis_minute_budget_is_shared_across_factories_sessions_routes_and_ips(
