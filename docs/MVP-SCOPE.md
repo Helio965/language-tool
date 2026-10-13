@@ -2,7 +2,7 @@
 
 > **Transição para Python:** os requisitos e as decisões acadêmicas deste documento
 > foram preservados. A implementação atual roda com Flask/Jinja na raiz; a versão
-> anterior e seus detalhes de framework estão em [legacy/MVP-SCOPE.md](legacy/MVP-SCOPE.md).
+> anterior e seus detalhes de framework estão em [docs/MVP-SCOPE.md (histórico)](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/docs/MVP-SCOPE.md).
 > Evidências da nova execução ficam em [MIGRATION-AUDIT.md](MIGRATION-AUDIT.md),
 > não nas contagens/capturas históricas do protótipo TypeScript.
 
@@ -89,13 +89,13 @@ Nenhum requisito foi substituído. Quando os documentos divergem, a decisão aba
 
 | Tarefa | Como foi atendida |
 |--------|-------------------|
-| Criar os protótipos das telas no Figma | **Sem acesso ao Figma nesta entrega.** O protótipo foi especificado em `design/` (design system, componentes, telas) e implementado inicialmente em `apps/web` e agora em `templates/`/`static/` com backend Python. O guia `design/FIGMA-GUIDE.md` explica como reproduzi-lo no Figma. |
+| Criar os protótipos das telas no Figma | **Sem acesso ao Figma nesta entrega.** O protótipo foi especificado em `design/` (design system, componentes, telas) e implementado em `templates/`/`static/` com backend Python. A implementação anterior é recuperável na tag de migração. O guia `design/FIGMA-GUIDE.md` explica como reproduzi-lo no Figma. |
 | Desenhar login, cadastro e página inicial | Especificadas em `design/SCREEN-SPECIFICATIONS.md` e implementadas |
 | Desenhar os modos Aprender e Conversação | Especificados e implementados |
 | Definir o comportamento da IA em cada modo | `docs/IA-BEHAVIOR.md` §3–4 |
 | Documentar personalidade, correções e adaptação ao nível | `docs/IA-BEHAVIOR.md` §2, §5–7 |
 | Especificar como o usuário visualizará o progresso | `docs/UX-SPECIFICATION.md` §Progresso + tela de Progresso |
-| **Entregável:** protótipo navegável | Flask/Jinja (`python app.py`); versão anterior em `apps/web` preservada |
+| **Entregável:** protótipo navegável | Flask/Jinja (`python app.py`); referência anterior preservada na tag `python-migration-baseline-067fd06` |
 | **Entregável:** documento de comportamento da IA | `docs/IA-BEHAVIOR.md` |
 
 > A imagem também mostra, no topo, os entregáveis de outra frente: *diagrama de classes, DER e documento de arquitetura inicial*. Eles foram produzidos em `docs/DATABASE-MODEL.md` e `docs/ARCHITECTURE.md` para manter a implementação coerente.

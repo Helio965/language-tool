@@ -2,7 +2,7 @@
 
 > **Transição para Python:** os requisitos e as decisões acadêmicas deste documento
 > foram preservados. A implementação atual roda com Flask/Jinja na raiz; a versão
-> anterior e seus detalhes de framework estão em [legacy/IA-BEHAVIOR.md](legacy/IA-BEHAVIOR.md).
+> anterior e seus detalhes de framework estão em [docs/IA-BEHAVIOR.md (histórico)](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/docs/IA-BEHAVIOR.md).
 > Evidências da nova execução ficam em [MIGRATION-AUDIT.md](MIGRATION-AUDIT.md),
 > não nas contagens/capturas históricas do protótipo TypeScript.
 
@@ -24,18 +24,18 @@ A IA é uma **parceira de prática**, não a fonte de verdade do conteúdo. Ela:
 
 | Função | Onde aparece | Método do `AIService` |
 | --- | --- | --- |
-| Conversar em inglês mantendo contexto | Modo Conversação (UC09) | `startConversation`, `conversation` |
+| Conversar em inglês mantendo contexto | Modo Conversação (UC09) | `start_conversation`, `conversation` |
 | Identificar e explicar erros | Conversa e exercícios de escrita (UC07) | `conversation` (campo `issues`), `correct` |
 | Explicar o conteúdo de outro jeito | Aula — "Explicar de outro jeito" (UC05) | `explain` |
-| Criar novos exemplos | Aula — "Outro exemplo" (UC05) | `anotherExample` |
-| Sugerir exercícios de reforço | Revisão (UC08) | `generateExercise` |
+| Criar novos exemplos | Aula — "Outro exemplo" (UC05) | `another_example` |
+| Sugerir exercícios de reforço | Revisão (UC08) | `generate_exercise` |
 | Adaptar a linguagem ao nível | Todos os pontos acima | política de nível (seção 5) |
 
 O que a IA **não** faz no MVP:
 
 - **Não corrige exercícios fechados.** Múltipla escolha, lacunas, seleção, ordenação e tradução são
   corrigidos por gabarito revisado (`services/exercicios.py`). A IA só avalia respostas **abertas** (escrita livre).
-- **Não gera gabaritos.** `generateExercise` devolve exercícios do catálogo revisado; gabaritos gerados por
+- **Não gera gabaritos.** `generate_exercise` devolve exercícios do catálogo revisado; gabaritos gerados por
   modelo não são confiáveis o suficiente para um produto educacional (Análise de requisitos, Risco 2).
 - **Não decide sozinha o que mostrar.** Ela identifica problemas; a **política de correção** (seção 6)
   decide se cada um aparece agora, no resumo ou não aparece.
@@ -47,7 +47,7 @@ Definida em `ai/personality.py` (RF13, Análise de requisitos §14).
 
 | Atributo | Definição |
 | --- | --- |
-| Nome | **Lumi** (proposta; trocar `ASSISTANT_PERSONA.name` muda em toda a aplicação e nos prompts) |
+| Nome | **Lumi** (proposta; `ASSISTANT_PERSONA["name"]` configura os prompts e textos autorais que usam o marcador; alterar a marca exige revisar também os rótulos e roteiros da interface) |
 | Papel | parceira de prática de inglês |
 | Traços | amigável, paciente, acolhedora, clara, educativa, motivadora, natural |
 | Humor | leve e moderado — nunca às custas do usuário |
@@ -94,7 +94,7 @@ Comportamento:
    explicação segue o nível (seção 5) e a preferência do usuário (UC12).
 2. **"Explicar de outro jeito"** (`explain`, estilo `another_way`): uma analogia ou ponto de vista diferente,
    no máximo 3 frases, sem markdown. Cada novo pedido varia a explicação (`attempt`).
-3. **"Outro exemplo"** (`anotherExample`): uma frase nova, curta e correta, com tradução e trecho destacado.
+3. **"Outro exemplo"** (`another_example`): uma frase nova, curta e correta, com tradução e trecho destacado.
 4. **Feedback imediato e explicado** em todo exercício (UC06/UC07):
    - status: **correto**, **quase** (pequeno erro de digitação) ou **incorreto**;
    - para respostas fechadas: *Sua resposta* × *Forma recomendada* + explicação;
@@ -127,7 +127,7 @@ Comportamento:
 2. **Reage ao que o usuário disse** antes de perguntar de novo — a conversa não é um questionário.
 3. **Uma pergunta por vez**, seguindo um roteiro flexível por assunto (`content/catalog.json`).
 4. **Mantém o contexto:** guarda fatos que o usuário contou (nome, idade, cidade, profissão, gostos…) e
-   **não pergunta o que já sabe** (`next_question` em `ai/types.ts`).
+   **não pergunta o que já sabe** (`next_question` em `ai/conversation.py`).
 5. **Recast em vez de interrupção:** quando há um erro, a resposta da Lumi reformula a frase corretamente,
    de forma natural, sem apontar o erro:
    > **Usuário:** I have 25 years.
@@ -175,7 +175,7 @@ Mesma pergunta do roteiro em dois níveis (dados reais do assunto "Apresentaçõ
 - *Intensidade das correções*: seção 6.
 
 **O nível muda com o uso:** quando todas as aulas do nível atual estão concluídas com média de acertos de
-pelo menos 70%, o nível estimado avança (`shouldLevelUp` em `services/aprendizagem.py`) — sempre como estimativa.
+pelo menos 70%, o nível estimado avança (`should_level_up` em `services/aprendizagem.py`) — sempre como estimativa.
 
 ## 6. Regras de correção
 
@@ -215,7 +215,8 @@ naturalidade aparecem nas intensidades Equilibrada e Detalhada (`select_learning
 
 ### 6.3 Formato pedagógico da correção (UC07)
 
-Toda correção tem a mesma estrutura (`Correction` em `models/ e contrato de feedback`):
+Toda correção tem a mesma estrutura (`build_correction` em `ai/correction.py`,
+consumida pelo contrato JSON de feedback):
 
 1. **Sua frase** — o que a pessoa escreveu, com o trecho alterado marcado;
 2. **Forma recomendada** — a frase corrigida, com a mudança destacada (marca-texto);
@@ -236,7 +237,8 @@ Regras de redação da explicação:
   sempre, inclusive com provedor real.
 - Problemas sugeridos pelo modelo só são aceitos se o **trecho citado existir literalmente** na mensagem e
   a substituição for diferente do original (`to_grammar_issues`); no máximo 5 por mensagem.
-- Gravidade e tema são validados contra listas fechadas; valores desconhecidos viram `grammar`/`word_choice`.
+- Gravidade e tema são validados contra listas fechadas; valores desconhecidos
+  do provedor invalidam a resposta, sem substituir silenciosamente o enum.
 
 ## 7. Comportamento diante de erros (do usuário e do sistema)
 
@@ -249,7 +251,7 @@ Regras de redação da explicação:
 | Usuário escreve em português | acolhe, oferece tradução e convida a tentar em inglês; não corrige o português |
 | Pergunta sobre uma palavra | explica com significado, tradução e exemplo (vocabulário do catálogo) |
 | Conteúdo ofensivo | não reproduz; pede respeito com gentileza e retoma a pergunta |
-| Tentativa de mudar o papel da IA ("ignore as instruções…") | ignora e segue o papel definido (camada de segurança do prompt) |
+| Tentativa de mudar o papel da IA ("ignore as instruções…") | o prompt orienta manter o papel; dados do aluno ficam fora de `system`. Esquema e filtro literal complementam a defesa, sem comprovar resistência de modelo real a jailbreak |
 | Provedor de IA indisponível, lento, resposta inválida ou recusa | retorna erro seguro, preserva o rascunho e não salva turno parcial; modo demonstração é seleção explícita (RNF07) |
 | Falha de rede na interface | mensagem clara, texto preservado no campo e opção de tentar de novo |
 
@@ -300,6 +302,11 @@ Aplicada em três camadas:
   assim podem passar despercebidos ou, raramente, ser apontados sem necessidade.
 - **Modelos reais podem errar.** Por isso: verificação do trecho citado, regras determinísticas sempre
   ativas, exercícios fechados com gabarito e o aviso "Lumi é uma IA e pode errar".
+- A demonstração Python usa roteiros mais restritos que o protótipo anterior.
+  A política conservadora evita converter `boring` em `bored` ou `pretend` em
+  `intend` sem intenção comprovada. Essas diferenças precedem a limpeza; não
+  resultam da remoção dos arquivos TypeScript. Contratos e falhas externas são
+  verificados com provider simulado, sem alegar qualidade real do modelo.
 - **Nível estimado**, não certificação; o nivelamento tem 3 etapas curtas.
 - **Somente texto** no MVP (sem voz ou pronúncia — fora do escopo, ver [MVP-SCOPE.md](./MVP-SCOPE.md)).
 - A tradução de apoio de perguntas elaboradas (níveis altos) pode ser a da versão simples da pergunta.

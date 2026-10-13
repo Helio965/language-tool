@@ -1,5 +1,11 @@
 # Auditoria complementar — IA, autorização e limites
 
+> **Registro histórico da primeira continuação do PR #6, já incorporado à
+> `main`.** Os 368 casos abaixo pertencem àquela entrega; a continuação seguinte
+> registrou 423 casos em [ADVANCED_SECURITY_AUDIT.md](ADVANCED_SECURITY_AUDIT.md).
+> São execuções de versões diferentes, sem soma entre seus totais. A validação
+> da limpeza posterior está em [CODE-CLEANUP-AUDIT.md](../CODE-CLEANUP-AUDIT.md).
+
 O trabalho continua no [PR #6](https://github.com/Helio965/language-tool/pull/6), preservando os 20 commits já existentes e as funcionalidades do English AI. O relatório completo está em [ADVANCED_SECURITY_AUDIT.md](ADVANCED_SECURITY_AUDIT.md), com escopo, evidências, correções, testes e limitações. Nenhum merge foi realizado.
 
 A revisão inicial já separava dados não confiáveis das instruções privilegiadas e adicionava cotas por conta/globais, proteção de recuperação e cabeçalhos. A continuação validou esses controles com contas sintéticas e implementou correções adicionais:

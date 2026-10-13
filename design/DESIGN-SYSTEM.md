@@ -7,7 +7,7 @@ identidade e os tokens atuais, além das metas de design. O mapeamento para
 Jinja e JavaScript está em [COMPONENTS.md](./COMPONENTS.md).
 
 A versão acadêmica anterior está em
-[docs/legacy/design/DESIGN-SYSTEM.md](../docs/legacy/design/DESIGN-SYSTEM.md).
+[design/DESIGN-SYSTEM.md (histórico)](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/design/DESIGN-SYSTEM.md).
 As capturas TypeScript preservadas são referências históricas; validação da
 versão Python deve ser consultada na [auditoria](../docs/MIGRATION-AUDIT.md).
 

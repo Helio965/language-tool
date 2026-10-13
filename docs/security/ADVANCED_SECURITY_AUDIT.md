@@ -1,5 +1,12 @@
 # Auditoria avançada de segurança — English AI
 
+> **Registro histórico do PR #6, posteriormente incorporado à `main`.** As
+> contagens e os resultados deste documento pertencem à rodada descrita abaixo.
+> A consolidação posterior preserva esses controles e testes, remove o código
+> legado do checkout e registra sua nova validação em
+> [CODE-CLEANUP-AUDIT.md](../CODE-CLEANUP-AUDIT.md). A versão anterior é
+> recuperável na [tag de migração](https://github.com/Helio965/language-tool/tree/python-migration-baseline-067fd06).
+
 ## 1. Continuação e escopo
 
 Esta rodada continua o [PR #6](https://github.com/Helio965/language-tool/pull/6), na branch `security/llm-bola-rate-hardening`, a partir de `a3ad5f9c7e2e9d9c227be90079ba07277b3d0738`. O PR estava aberto em draft, com 24 commits e 30 arquivos no diff contra `main`. A `main` estava em `eaa489f6393a9f26b1f7a7e5bef27679d26ef0d1`, com a auditoria SQL do PR #5 integrada. Os commits anteriores foram preservados; não foi realizado merge.

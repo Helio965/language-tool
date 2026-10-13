@@ -2,7 +2,7 @@
 
 A origem acadêmica continua sendo a Análise de requisitos §20 (Usuário, Perfil,
 Aula, Exercício, Vocabulário, Conversação, Progresso) e os casos de uso F2.
-[O modelo anterior está preservado](legacy/DATABASE-MODEL.md). A implementação
+[O modelo anterior está preservado](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/docs/DATABASE-MODEL.md). A implementação
 atual está em `models/`, com SQLAlchemy 2 e migrações Alembic em `migrations/`.
 
 ## Entidades e rastreabilidade
@@ -165,6 +165,8 @@ erDiagram
         text expires_at
         text content_deleted_at
         text ended_at
+        text pending_request_nonce
+        text pending_request_expires_at
     }
     MESSAGES {
         text id PK
@@ -222,6 +224,7 @@ Campos acrescentados ao esquema anterior:
 - `user_vocabulary.success_streak`: sequência de acertos separada do total de revisões.
 - `messages.provider`, `generation_mode`, `model`: identifica demonstração, resposta real e abertura revisada do catálogo.
 - `messages.idempotency_key`, `request_fingerprint`, `reply_metadata`: vincula envio/reenvio ao mesmo texto e conserva o resultado do turno para recuperação; não são campos públicos da mensagem.
+- `conversations.pending_request_nonce`, `pending_request_expires_at`: revisão `0004_conversation_claim`; reserva curta antes da chamada de IA e identificação da resposta admitida. São campos privados, excluídos da serialização pública; não criam tabela nem substituem dados originais.
 
 Taxa de acertos, dias ativos, sequência, tempo, temas e palavras são calculados a
 partir das linhas persistidas. O navegador não determina a nota de conclusão.

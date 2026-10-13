@@ -4,13 +4,18 @@
 
 Versão inicial: `067fd0681dcb36e4d0c76fea618d2cf89c9ab39a`.
 Tag de restauração: `python-migration-baseline-067fd06`.
-Branch de trabalho: `codex/python-flask-migration`.
+Branch original da migração: `codex/python-flask-migration`, incorporada pelo
+[PR #4](https://github.com/Helio965/language-tool/pull/4). As auditorias
+[PR #5](https://github.com/Helio965/language-tool/pull/5) e
+[PR #6](https://github.com/Helio965/language-tool/pull/6) também estão na `main`.
 
-Não se aplica migração destrutiva na `main`. O código TypeScript permanece
-disponível durante e após as validações para comparação e restauração.
-Os commits devem separar estratégia, banco, autenticação, aprendizagem, IA,
-interface e validação/documentação. A aplicação Python roda pela raiz, sem
-comando npm; o legado tem dependências e comandos próprios.
+As migrações de dados são aditivas. A aplicação Python roda pela raiz, sem
+comando npm. A consolidação remove o código TypeScript e as cópias documentais
+redundantes do checkout atual; os originais continuam na
+[tag de migração](https://github.com/Helio965/language-tool/tree/python-migration-baseline-067fd06).
+A tag `python-cleanup-baseline-9a2d11b` preserva a versão Python com as correções
+de segurança imediatamente anterior à limpeza. O inventário e a validação dessa
+etapa ficam em [CODE-CLEANUP-AUDIT.md](CODE-CLEANUP-AUDIT.md).
 
 ## Correspondência de responsabilidades
 
@@ -27,7 +32,7 @@ comando npm; o legado tem dependências e comandos próprios.
 | `apps/web/src/styles`, fontes | `static/css`, `static/fonts` |
 | React/query/session browser | requisições HTML/JSON com sessão Flask; `static/js` só para interação |
 | testes core/API/web | `tests/` com pytest e SQLite real temporário |
-| E2E Node Playwright | testes Python de navegador quando disponíveis |
+| E2E Node Playwright | `tests/browser/`, Playwright Python com aplicação Flask real |
 
 O protocolo principal continua oferecendo páginas em português e contratos JSON
 sob `/api`. Compatibilidade de nomes de rota/JSON deve ser verificada; não se
@@ -77,9 +82,17 @@ Não execute `create_all`, `init-db` destrutivo, seed que substitua linhas ou
 ## Retorno à implementação anterior
 
 Para testar uma restauração, preserve primeiro a branch e os commits de trabalho.
-Em checkout isolado autorizado ou após salvar alterações, selecione a tag de
-baseline e siga [legacy/README.md](legacy/README.md). Não use `reset --hard` para
-descartar trabalho não salvo. A tag identifica o código; o backup identifica os
+Consulte o [README original na tag](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/README.md)
+ou crie um checkout isolado, sem alterar a branch de trabalho:
+
+```bash
+git worktree add --detach ../english-ai-baseline python-migration-baseline-067fd06
+```
+
+Os comandos Node históricos são executados a partir desse checkout. Os links
+dos documentos preservados na tag usam sua localização original e as capturas
+permanecem em `design/screenshots/`. Não use `reset --hard` para descartar trabalho
+não salvo. A tag identifica o código; o backup identifica os
 dados. Restaure a cópia SQLite íntegra e configure o caminho esperado pela API
 legada. Novas sessões Flask não são cookies JWT antigos: o login deve ser refeito.
 
@@ -92,11 +105,15 @@ exige essa conferência. As revisões recusam downgrade destrutivo; a recuperaç
 original validado para um destino novo. Campos aditivos já aplicados são
 reconhecidos ao retomar `db upgrade`; confira o estado antes de repetir.
 
-As revisões finais são `0001_legacy_schema` (criação/adoção),
+As revisões atuais são `0001_legacy_schema` (criação/adoção),
 `0002_integrity_metadata` (passagens/resultados/metadata) e
 `0003_conversation_idempotency` (recuperação de envio do chat após perda da
-resposta HTTP). A terceira revisão acrescenta campos/índice à tabela de
-mensagens, sem tabela nova nem mudança das colunas originais.
+resposta HTTP), além de `0004_conversation_claim` (reserva curta por conversa
+antes de chamar a IA). A terceira revisão acrescenta campos/índice à tabela de
+mensagens; a quarta acrescenta `pending_request_nonce` e
+`pending_request_expires_at`, campos privados de reserva. Não há tabela nova
+nem mudança das colunas originais. As quatro revisões existentes são preservadas
+na limpeza.
 
 ## Limites de compatibilidade e revisão
 
@@ -108,6 +125,8 @@ mensagens, sem tabela nova nem mudança das colunas originais.
   real permanecem conforme o escopo acadêmico/roadmap.
 - Anthropic e SMTP só têm verificação real quando suas credenciais estiverem
   configuradas e a chamada/entrega tiverem sido executadas.
-- Branch e commits estão publicados no [PR #4](https://github.com/Helio965/language-tool/pull/4),
-  em rascunho para revisão. A `main` não recebeu merge. As etapas e evidências
-  estão no [relatório de auditoria](MIGRATION-AUDIT.md).
+- As etapas, commits e resultados da migração incorporada pelo
+  [PR #4](https://github.com/Helio965/language-tool/pull/4) estão no
+  [relatório histórico de auditoria](MIGRATION-AUDIT.md). As correções de
+  segurança posteriores também foram incorporadas; sua evidência está em
+  [docs/security](security/ADVANCED_SECURITY_AUDIT.md).

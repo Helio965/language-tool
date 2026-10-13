@@ -1,5 +1,13 @@
 # RELATÓRIO DE AUDITORIA DE SEGURANÇA
 
+> **Registro histórico do PR #5, posteriormente incorporado à `main`.** As
+> contagens, achados e referências ao legado descrevem a versão examinada nesta
+> auditoria. A consolidação posterior remove os arquivos TypeScript do checkout
+> e preserva seus originais na
+> [tag de migração](https://github.com/Helio965/language-tool/tree/python-migration-baseline-067fd06).
+> Essa remoção não comprova que implantações externas antigas foram desativadas.
+> A validação atual está em [CODE-CLEANUP-AUDIT.md](../CODE-CLEANUP-AUDIT.md).
+
 ## 1. Informações gerais
 
 | Item | Informação |

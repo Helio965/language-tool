@@ -3,7 +3,7 @@
 Os identificadores e a numeração acadêmica foram preservados. Fontes disponíveis:
 consolidação da Análise (F1), Especificação de Casos de Uso (F2), fluxograma (F3)
 e tarefas Pessoa 2 (F4) em [MVP-SCOPE.md](MVP-SCOPE.md). Os DOCX/PDF originais
-não foram reenviados nesta tarefa. [A rastreabilidade anterior está preservada](legacy/REQUIREMENTS-TRACEABILITY.md).
+não foram reenviados nesta tarefa. [A rastreabilidade anterior está preservada](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/docs/REQUIREMENTS-TRACEABILITY.md).
 
 **Legenda:** implementado = caminho de código existente, com validação registrada
 no relatório; parcial = falta explícita; fora do MVP = decisão acadêmica mantida.
@@ -136,13 +136,17 @@ O reenvio de chat após perda da resposta HTTP usa
 [test_chat_idempotency.py](../tests/test_chat_idempotency.py):
 `test_lost_reply_retry_returns_original_pair_without_provider_or_counter_increment`,
 `test_reused_key_rejects_changed_content_even_when_both_addresses_are_redacted`,
-`test_simultaneous_same_key_commits_one_pair_and_both_callers_recover_it` e
+`test_simultaneous_same_key_calls_provider_once_then_both_callers_recover_pair` e
 `test_completed_saved_conversation_can_replay_but_deleted_content_cannot`.
 A jornada de rede interrompida usa
 [browser/test_chat_retry.py](../tests/browser/test_chat_retry.py):
 `test_chat_retries_lost_committed_reply_with_same_key_then_allows_repeated_text`.
-A concorrência garante uma dupla persistida; não garante apenas uma chamada ou
-cobrança externa quando os pedidos chegam simultaneamente.
+A reserva de `0004_conversation_claim` limita chamadas simultâneas a uma por
+conversa durante seu prazo; a requisição concorrente recebe `409` e pode
+recuperar a dupla após o commit. As regressões de reserva/privacidade ficam em
+`tests/security/test_chat_claims.py` e `test_chat_privacy_races.py`. Crash,
+expiração da reserva ou falha de commit posterior à resposta externa ainda
+podem levar a nova tentativa/cobrança; não há garantia financeira absoluta.
 
 ## Pessoa 2, artefatos e fronteiras do MVP
 
@@ -200,10 +204,10 @@ substituem os identificadores dos documentos acadêmicos:
 | 13 | Respeitar privacidade | Histórico opcional, expiração/exclusão, saneamento e dono em `test_ai.py`/`test_auth.py`/`test_security.py` |
 | 14 | Jornadas aprovadas | Resultado da execução final registrado na auditoria; API/serviços usam SQLite real, browser usa Flask real |
 | 15 | Interface móvel | Chromium em 320/820/1440px, páginas privadas; aparelhos reais e outros navegadores não executados |
-| 16 | Executar sem Node | `app.py`, dependências Python e interface Jinja/static; TypeScript preservado como legado |
+| 16 | Executar sem Node | `app.py`, dependências Python e interface Jinja/static; implementação TypeScript histórica recuperável pela tag de migração |
 | 17 | Responsabilidades modulares | Factory, quatro Blueprints, serviços, ORM e camada IA em `ARCHITECTURE.md` |
 | 18 | Rastrear requisitos e testes | Matrizes RF/RNF/RN/UC e índice de testes deste documento |
-| 19 | Documentação atualizada | README, arquitetura, DER, dados/rollback, IA, UX e Windows/VS Code; originais preservados em `legacy/` |
+| 19 | Documentação atualizada | README, arquitetura, DER, dados/rollback, IA, UX e Windows/VS Code; originais preservados na tag `python-migration-baseline-067fd06` |
 | 20 | Revisão no GitHub | Branch e commits em `MIGRATION-AUDIT.md`; URL do PR registrada após publicação, sem merge automático |
 
 Sem a chamada externa, o critério 12 permanece com verificação de integração

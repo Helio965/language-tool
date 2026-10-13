@@ -1,11 +1,17 @@
 # Auditoria técnica e relatório de migração — English AI
 
+> **Registro histórico da entrega do PR #4.** A migração foi incorporada à
+> `main`, assim como os PRs de segurança #5 e #6. As contagens, versões e
+> resultados abaixo pertencem à migração original. O estado e a validação da
+> consolidação atual estão em [CODE-CLEANUP-AUDIT.md](CODE-CLEANUP-AUDIT.md).
+
 ## Fontes e estado inicial
 
 Baseline: `067fd0681dcb36e4d0c76fea618d2cf89c9ab39a`, preservado pela tag
-`python-migration-baseline-067fd06`. A implementação migra na branch
-`codex/python-flask-migration`. O projeto original continua em `apps/`, `packages/`
-e `e2e/`; sua documentação técnica está preservada em [legacy/](legacy/README.md).
+`python-migration-baseline-067fd06`. A implementação foi entregue na branch
+`codex/python-flask-migration`. Naquela etapa, o projeto original foi mantido em
+`apps/`, `packages/` e `e2e/`; após a limpeza, o código e a documentação anterior
+continuam disponíveis na [tag histórica](https://github.com/Helio965/language-tool/tree/python-migration-baseline-067fd06).
 
 Foram examinados `apps/web` (telas, componentes, CSS, clientes demo/http e sessão),
 `apps/api` (rotas, autenticação, configuração, e-mail e SQLite), `packages/core`
@@ -258,8 +264,11 @@ Arquivos principais: `app.py`, `config.py`, `extensions.py`, `requirements.*`,
 `content/`, `ai/`, `templates/`, `static/`, `tests/`, `.vscode/`, README,
 `docs/` e `design/`. Documentação/legado têm revisão própria após os módulos.
 
-Branch e tag de restauração publicadas. Pull Request em rascunho para revisão:
-[PR #4](https://github.com/Helio965/language-tool/pull/4).
+Branch e tag de restauração publicadas. O
+[PR #4](https://github.com/Helio965/language-tool/pull/4) foi posteriormente
+incorporado à `main` pelo proprietário.
 O histórico completo, incluindo o registro final desta entrega, está nos
 [commits do PR](https://github.com/Helio965/language-tool/pull/4/commits).
-A `main` permanece no baseline; não foi feito merge.
+O agente não realizou merge automático. O estado atual também inclui as
+auditorias de segurança incorporadas pelos PRs #5 e #6; o cabeçalho deste
+documento distingue esse estado dos resultados históricos da migração.

@@ -3,7 +3,7 @@
 Este documento descreve as rotas e a composição da interface Flask/Jinja.
 Aprendizagem e persistência são executadas em Python; JavaScript apresenta os
 dados e envia ações à API. A especificação acadêmica anterior está preservada em
-[docs/legacy/design/SCREEN-SPECIFICATIONS.md](../docs/legacy/design/SCREEN-SPECIFICATIONS.md).
+[design/SCREEN-SPECIFICATIONS.md (histórico)](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/design/SCREEN-SPECIFICATIONS.md).
 
 As imagens em [screenshots/](./screenshots/) foram capturadas do protótipo
 TypeScript anterior em modo demonstração: celular 390px, tablet 820px e desktop
@@ -133,7 +133,7 @@ Após sucesso, volta à página pública com aviso de exclusão.
 
 ## 6. Referências preservadas
 
-A [especificação histórica](../docs/legacy/design/SCREEN-SPECIFICATIONS.md)
+A [especificação histórica](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/design/SCREEN-SPECIFICATIONS.md)
 contém a numeração 01–21, os requisitos acadêmicos e o índice das capturas.
 Para manter nomes de frames existentes no Figma, use essa numeração; a tabela
 atual acima organiza as rotas sem renumerar o material histórico.

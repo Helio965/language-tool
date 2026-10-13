@@ -3,7 +3,7 @@
 A interface atual usa Flask/Jinja, CSS e JavaScript de apresentação. Este
 documento mapeia o design para os arquivos executados pela versão Python.
 A especificação acadêmica anterior, com nomes React e suas variantes, está em
-[docs/legacy/design/COMPONENTS.md](../docs/legacy/design/COMPONENTS.md).
+[design/COMPONENTS.md (histórico)](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/design/COMPONENTS.md).
 
 Os tokens estão em [tokens.css](../static/css/tokens.css). Os estilos
 compartilhados ficam em [ui.css](../static/css/ui.css), que importa `fonts.css`

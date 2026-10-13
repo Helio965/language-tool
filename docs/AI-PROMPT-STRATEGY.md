@@ -3,14 +3,15 @@
 As regras pedagógicas de [IA-BEHAVIOR.md](IA-BEHAVIOR.md) foram preservadas.
 Implementação: `ai/personality.py`, `ai/prompts.py`, `ai/provider.py`,
 `ai/conversation.py`, `ai/correction.py`, `services/conversacao.py`.
-[A estratégia anterior está preservada](legacy/AI-PROMPT-STRATEGY.md).
+[A estratégia anterior está preservada](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/docs/AI-PROMPT-STRATEGY.md).
 
 ## Princípios
 
 1. O gabarito revisado decide exercícios fechados; modelo ajuda a conversar,
    explicar e identificar problemas em produção livre.
-2. Persona Lumi, segurança, modo, nível, preferências e contexto mínimo formam
-   instruções confiáveis; texto do usuário é conteúdo separado.
+2. Persona Lumi, segurança, modo, nível e opções canônicas validadas formam
+   as instruções privilegiadas. Primeiro nome, fatos, histórico e mensagem do
+   aluno ficam em mensagens de menor prioridade, tratados como dados.
 3. O retorno usa schema JSON fechado, validado novamente no servidor.
 4. Chave, e-mail cadastrado, senha/hash e identificador da conta não fazem parte
    do contexto enviado. Texto livre/histórico é saneado por padrões conhecidos,
@@ -119,7 +120,10 @@ selecionado. Isso não é uma chamada ao modelo.
 A suíte inclui prompt/saneamento, validação de schema/trechos, política, contexto,
 demonstração e adaptador SDK com transporte controlado. Isso verifica contrato e
 comportamento de erro, **não** qualidade/latência de respostas Anthropic reais.
-Resultados executados estão em [MIGRATION-AUDIT.md](MIGRATION-AUDIT.md).
+Resultados históricos da migração estão em [MIGRATION-AUDIT.md](MIGRATION-AUDIT.md);
+as verificações de fronteira, Unicode, cotas e concorrência posteriores estão
+em [ADVANCED_SECURITY_AUDIT.md](security/ADVANCED_SECURITY_AUDIT.md). A validação
+após remover o legado está em [CODE-CLEANUP-AUDIT.md](CODE-CLEANUP-AUDIT.md).
 
 Antes de trocar modelo/prompt, execute conjunto de mensagens com erros comuns,
 ambiguidade, português, dados pessoais e instruções fora do papel; compare
