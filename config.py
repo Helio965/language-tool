@@ -10,6 +10,22 @@ from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parent
 
+# Keep environment loading and final factory overrides subject to the same
+# operational bounds. Boolean values are not integer budgets.
+AI_INTEGER_BOUNDS = {
+    "AI_TIMEOUT_MS": (20000, 1000, 120000),
+    "AI_MAX_OUTPUT_TOKENS": (1024, 256, 2048),
+    "AI_MAX_CONTEXT_CHARS": (8000, 2048, 12000),
+    "AI_MINUTE_REQUEST_LIMIT": (10, 1, 120),
+    "AI_DAILY_REQUEST_LIMIT": (100, 10, 2000),
+    "AI_GLOBAL_DAILY_REQUEST_LIMIT": (1000, 10, 100000),
+    "AI_MAX_HISTORY_MESSAGES": (12, 2, 50),
+}
+
+
+class _EphemeralSessionSecret(str):
+    """A signer-compatible development key that cannot be promoted to production."""
+
 
 def flag(name, default=False):
     value = os.environ.get(name)
@@ -35,6 +51,8 @@ def validate_effective_config(config):
     if config.get("APP_ENV") != "production":
         return
     secret = config.get("SECRET_KEY")
+    if isinstance(secret, _EphemeralSessionSecret):
+        raise ValueError("Produção exige SECRET_KEY configurada explicitamente.")
     if not isinstance(secret, (str, bytes)) or len(secret) < 32:
         raise ValueError("Produção exige SECRET_KEY com pelo menos 32 caracteres.")
     if config.get("DEBUG"):
@@ -52,6 +70,12 @@ def validate_effective_config(config):
         raise ValueError("A caixa de saída local é exclusiva do desenvolvimento.")
     if config.get("RATELIMIT_ENABLED", True) is not True:
         raise ValueError("Produção exige limites de solicitações habilitados.")
+    for name, (default, minimum, maximum) in AI_INTEGER_BOUNDS.items():
+        value = config.get(name, default)
+        if type(value) is not int or not minimum <= value <= maximum:
+            raise ValueError(
+                f"Produção exige {name} inteiro entre {minimum} e {maximum}."
+            )
     if config.get("AI_PROVIDER") != "anthropic":
         return
     uri = config.get("RATELIMIT_STORAGE_URI", "")
@@ -97,7 +121,7 @@ def load_config():
         database_url = "postgresql://" + database_url[len("postgres://") :]
     config = {
         "APP_ENV": environment,
-        "SECRET_KEY": secret or secrets.token_hex(32),
+        "SECRET_KEY": secret or _EphemeralSessionSecret(secrets.token_hex(32)),
         "SQLALCHEMY_DATABASE_URI": database_url,
         "SQLALCHEMY_TRACK_MODIFICATIONS": False,
         "SESSION_COOKIE_NAME": "english_ai_session",
@@ -120,15 +144,10 @@ def load_config():
         "ANTHROPIC_API_KEY": os.environ.get("ANTHROPIC_API_KEY", ""),
         "ANTHROPIC_MODEL": os.environ.get("ANTHROPIC_MODEL", "claude-sonnet-4-5"),
         "AI_EFFORT": os.environ.get("AI_EFFORT", "low"),
-        "AI_TIMEOUT_MS": number("AI_TIMEOUT_MS", 20000, 1000, 120000),
-        "AI_MAX_OUTPUT_TOKENS": number("AI_MAX_OUTPUT_TOKENS", 1024, 256, 2048),
-        "AI_MAX_CONTEXT_CHARS": number("AI_MAX_CONTEXT_CHARS", 8000, 2048, 12000),
-        "AI_MINUTE_REQUEST_LIMIT": number("AI_MINUTE_REQUEST_LIMIT", 10, 1, 120),
-        "AI_DAILY_REQUEST_LIMIT": number("AI_DAILY_REQUEST_LIMIT", 100, 10, 2000),
-        "AI_GLOBAL_DAILY_REQUEST_LIMIT": number(
-            "AI_GLOBAL_DAILY_REQUEST_LIMIT", 1000, 10, 100000
-        ),
-        "AI_MAX_HISTORY_MESSAGES": number("AI_MAX_HISTORY_MESSAGES", 12, 2, 50),
+        **{
+            name: number(name, default, minimum, maximum)
+            for name, (default, minimum, maximum) in AI_INTEGER_BOUNDS.items()
+        },
         "CONVERSATION_RETENTION_DAYS": number(
             "CONVERSATION_RETENTION_DAYS", 90, 1, 3650
         ),
