@@ -148,7 +148,7 @@ Redis **7.2.12** foi compilado da fonte oficial no commit [`9913c926510755fa0d24
 | Recuperação real | Hash, validade, concorrência e revogação aprovados; SMTP, domínio, entrega e permissões não testados |
 | Plataforma e banco | SQLite/Linux temporários; Windows nativo, outros SGBDs, CVEs, backups, retenção e permissões de infraestrutura não auditados |
 | Legado e processos existentes | Nenhum teste ativo em serviço não identificado ou banco persistente. Verificar implantação Express legada e serviços reais separadamente |
-| CI e metadados do PR | Git/publicação e checks separados dos testes locais. A API GitHub está bloqueada na rede ativa; `api.github.com` foi adicionado ao rascunho, sem aplicar a rede atual |
+| CI do commit publicado | Git/publicação e checks são separados dos testes locais; conferir os jobs backend e Chromium do SHA final. A descrição do PR foi atualizada pela API REST |
 
 ## 7. Entrega
 
