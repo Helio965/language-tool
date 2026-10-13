@@ -3,7 +3,7 @@
 A aplicação principal usa Python 3.12, Flask, SQLAlchemy e Jinja. Preserva a
 arquitetura acadêmica **Aplicação → Backend → Banco / Motor de IA**, os dois
 modos pedagógicos e os UC01–UC12. A organização anterior está em
-[legacy/ARCHITECTURE.md](legacy/ARCHITECTURE.md); a auditoria e as decisões de
+[docs/ARCHITECTURE.md (histórico)](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/docs/ARCHITECTURE.md); a auditoria e as decisões de
 transição estão em [MIGRATION-AUDIT.md](MIGRATION-AUDIT.md).
 
 ## Objetivos e decisões
@@ -58,9 +58,15 @@ static/                   CSS, JavaScript por responsabilidade e fontes locais
 tests/                    pytest, SQLite temporário e interface
 .vscode/                  tarefas e execução para VS Code
 docs/                     requisitos, arquitetura, auditoria e guias
-docs/legacy/              documentos preservados da implementação anterior
-apps/, packages/, e2e/    implementação TypeScript preservada para comparação
 ```
+
+A implementação e os documentos TypeScript anteriores são recuperáveis na
+[tag de migração](https://github.com/Helio965/language-tool/tree/python-migration-baseline-067fd06).
+O checkout atual contém uma única aplicação principal, executada em Python.
+Runtime, comandos de teste, jobs de CI e tarefas VS Code não exigem instalação
+externa de Node/npm nem compilação TypeScript. Playwright Python inclui seu
+próprio driver Node para automação do navegador; isso é ferramenta de teste,
+sem executar o código legado da aplicação.
 
 `create_app(config)` permite uma configuração de teste sem compartilhar banco
 ou sessão. Extensões são criadas em `extensions.py` e vinculadas na factory para
@@ -161,9 +167,14 @@ O POST de mensagens aceita `Idempotency-Key`. Após o commit, repetir a mesma
 chave/texto recupera o resultado salvo sem novo turno nem chamada externa. A UI
 reutiliza a chave ao tentar novamente depois de perder a resposta; uma repetição
 intencional usa nova chave. Mesma chave com texto diferente retorna conflito.
-Chamadas simultâneas podem consultar o provedor antes da disputa otimista, que
-persiste uma única dupla; não há garantia de uma única cobrança externa nessa
-condição. Exclusão/expiração remove o cache privado junto com as mensagens.
+Uma reserva persistida antes da chamada externa admite somente um envio por
+conversa durante seu prazo; o segundo recebe `409 CONVERSATION_BUSY`. Após o
+commit, reenviar a mesma chave recupera a dupla salva. Um nonce impede que uma
+resposta atrasada sobrescreva reserva posterior, e não se mantém lock de escrita
+SQLite durante a espera externa. Crash, expiração da reserva ou falha de commit
+após a resposta podem exigir uma tentativa adicional com nova cobrança; não há
+garantia financeira absoluta de execução única. Exclusão/expiração remove o
+cache privado junto com as mensagens e cancela a reserva.
 
 ## Banco, operação e limitações
 
@@ -176,8 +187,14 @@ Desenvolvimento inicializa banco/conteúdo novo; produção exige aplicação
 explícita das migrações e seed antes do servidor. `python app.py` é servidor
 local de desenvolvimento, com debug desligado. Implantação com WSGI/HTTPS,
 backup periódico e agendamento de limpeza são tarefas operacionais separadas.
-PostgreSQL, Redis, fila de e-mails e múltiplas instâncias permanecem evolução;
-a versão com SQLite não é uma validação de escala horizontal.
+Produção com `AI_PROVIDER=anthropic` já exige Redis compartilhado para as cotas,
+com driver instalado e sem fallback em memória. Admissão ocorre na fronteira do
+provider: catálogo, demo, cache, replay e erro local não gastam cota paga. As
+reservas dos contadores são conservadoras e não se reembolsam automaticamente
+após falha externa. O armazenamento e os parâmetros devem ser comuns aos
+workers; testes com Redis local não validam TLS, ACLs ou disponibilidade real.
+PostgreSQL, fila durável de e-mails e escala horizontal da aplicação continuam
+evoluções; a versão com SQLite não comprova essas implantações.
 
 Permanecem fora do MVP voz, pronúncia automática, ranking, gamificação avançada,
 certificação, marketplace e vídeo. Preferência de lembrete não gera notificação.

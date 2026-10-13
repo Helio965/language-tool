@@ -133,7 +133,7 @@ DATABASE_URL=sqlite:///C:/projetos/language-tool/instance/english-ai-python.db
 O destino precisa **não existir**. Então execute na raiz, com o ambiente ativo:
 
 ```powershell
-python -m flask --app app import-legacy "C:\projetos\language-tool\apps\api\data\english-ai.db"
+python -m flask --app app import-legacy "C:\backups\english-ai-legado.db"
 ```
 
 O comando copia com backup SQLite (inclui WAL), verifica integridade/FKs,
@@ -168,9 +168,11 @@ recuperação antes de retomar.
 ## Testes e navegador
 
 ```powershell
+python -m pip check
 python -m pytest -m "not browser" -q
 python -m playwright install chromium
 python -m pytest -m browser -q
+python -m pytest -q
 ```
 
 Os testes usam banco temporário, mailer em memória/outbox e provedor controlado;
@@ -193,9 +195,15 @@ python -m pytest -m browser -q
 Versões de referência fixadas em `requirements.txt`: Flask 3.1.3,
 SQLAlchemy 2.0.54, Flask-Migrate 4.1.0, Alembic 1.20.0, Flask-Login 0.6.3,
 Flask-WTF 1.3.0, Flask-Limiter 4.1.1, SDK Anthropic 0.125.0,
-pytest 9.1.1 e Playwright 1.63.0. O cloud usa Python 3.12.14.
+pytest 9.1.1, Playwright 1.63.0 e tzdata 2026.5. O cloud usa Python 3.12.14.
 `requirements.in` registra dependências diretas; instalação utiliza o arquivo
 resolvido com versões fixadas, sem exigir ferramenta uv no Windows.
+
+A instalação inclui `tzdata`, que fornece os dados IANA usados por
+`zoneinfo.ZoneInfo("America/Sao_Paulo")` nos cálculos de progresso quando o
+sistema não oferece esse banco de fusos, como normalmente ocorre no Windows.
+A regressão simula a ausência desses dados no Linux; ela não constitui
+validação nativa do Windows.
 
 ## Diagnóstico
 

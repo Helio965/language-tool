@@ -356,9 +356,14 @@ export function initCommon() {
     }),
   );
   if (context.page === "landing" && location.hash) {
-    try {
-      $("h1,h2", $(location.hash))?.focus({ preventScroll: true });
-    } catch {}
+    const focusSection = () => {
+      try {
+        $("h1,h2", $(location.hash))?.focus({ preventScroll: true });
+      } catch {}
+    };
+    // Native fragment navigation can reset focus after deferred modules run.
+    if (document.readyState === "complete") focusSection();
+    else window.addEventListener("load", focusSection, { once: true });
   }
   if (userId) {
     const verify = async () => {

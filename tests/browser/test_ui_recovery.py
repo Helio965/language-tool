@@ -9,7 +9,7 @@ import pytest
 from playwright.sync_api import expect, sync_playwright
 
 from ai.provider import create_ai_service
-from test_journeys import beginner, web
+from test_journeys import beginner, web as web
 
 pytestmark = pytest.mark.browser
 

@@ -2,7 +2,7 @@
 
 > **Transição para Python:** os requisitos e as decisões acadêmicas deste documento
 > foram preservados. A implementação atual roda com Flask/Jinja na raiz; a versão
-> anterior e seus detalhes de framework estão em [legacy/USER-FLOWS.md](legacy/USER-FLOWS.md).
+> anterior e seus detalhes de framework estão em [docs/USER-FLOWS.md (histórico)](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/docs/USER-FLOWS.md).
 > Evidências da nova execução ficam em [MIGRATION-AUDIT.md](MIGRATION-AUDIT.md),
 > não nas contagens/capturas históricas do protótipo TypeScript.
 

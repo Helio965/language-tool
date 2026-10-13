@@ -14,7 +14,7 @@ from models import (
     Preferences,
     UserVocabulary,
 )
-from test_ai_quotas import post, quota_factory, register
+from test_ai_quotas import post, quota_factory as quota_factory, register
 
 
 class RecordingProvider:

@@ -102,6 +102,9 @@ virtual ficam fora do Git. Variáveis principais:
 | `AI_PROVIDER` | `mock`/`demo` demonstrativo ou `anthropic` |
 | `ANTHROPIC_MODEL` | Modelo configurável, `claude-sonnet-4-5` |
 | `AI_TIMEOUT_MS`, `AI_MAX_HISTORY_MESSAGES` | 20.000 ms e 12 mensagens |
+| `AI_MINUTE_REQUEST_LIMIT`, `AI_DAILY_REQUEST_LIMIT` | 10/minuto e 100/dia por conta, reservados diante de tentativa externa |
+| `AI_GLOBAL_DAILY_REQUEST_LIMIT` | 1.000/dia entre todas as contas |
+| `AI_MAX_OUTPUT_TOKENS`, `AI_MAX_CONTEXT_CHARS` | 1.024 tokens de saída e 8.000 caracteres de contexto |
 | `CONVERSATION_RETENTION_DAYS` | 90 dias |
 | `PASSWORD_RESET_TTL_MINUTES` | 15 minutos |
 | `MAIL_TRANSPORT`, `MAIL_OUTBOX_DIR` | Transporte e caixa local |
@@ -109,6 +112,10 @@ virtual ficam fora do Git. Variáveis principais:
 | `SMTP_USER`, `SMTP_PASSWORD`, `MAIL_FROM` | Credenciais/remetente privados |
 | `APP_PUBLIC_URL` | URL dos links, `http://localhost:5000` em dev |
 | `RATELIMIT_STORAGE_URI` | `memory://` para desenvolvimento/uma instância |
+
+Produção com IA Anthropic exige Redis compartilhado; o driver já está instalado
+pelas dependências Python. Cotas/tokens complementam orçamento e alertas no
+provedor, sem definir um custo financeiro exato.
 
 Há scrypt compatível com contas antigas, cookie httpOnly/Strict (Secure em
 produção), CSRF global, limites, validação, checagem do dono, escape de conteúdo
@@ -161,18 +168,25 @@ suas relações por cascata.
 ## Testes e evidências
 
 ```bash
+python -m pip check
 python -m pytest -m "not browser" -q
 python -m playwright install chromium
 python -m pytest -m browser -q
+python -m pytest -q
 ```
 
-O primeiro comando testa serviços/API com SQLite temporário, sem IA paga nem SMTP
+O `pip check` verifica dependências; o primeiro comando pytest testa serviços/API
+com SQLite temporário, sem IA paga nem SMTP
 externo. Os testes de cotas compartilhadas também precisam de `redis-server`
 local (ou `REDIS_SERVER_EXECUTABLE` apontando para seu executável); eles iniciam
-e encerram sua própria instância efêmera em loopback. O segundo comando instala
+e encerram sua própria instância efêmera em loopback. Para esse conjunto,
+o guia Windows orienta WSL/Linux; a integração Redis nativa no Windows ainda
+não foi validada. O modo demonstrativo da aplicação dispensa Redis.
+O comando Playwright instala
 navegador para os testes de interface. Os resultados
-executados e eventuais bloqueios ficam em
-[MIGRATION-AUDIT.md](docs/MIGRATION-AUDIT.md); os 276 testes + 16 E2E anteriores
+executados e eventuais bloqueios desta consolidação ficam em
+[CODE-CLEANUP-AUDIT.md](docs/CODE-CLEANUP-AUDIT.md). A migração e as auditorias de
+segurança têm relatórios históricos próprios; os 276 testes + 16 E2E anteriores
 pertencem ao baseline TypeScript, não são números da suíte Python.
 
 Se o ambiente já possui Chromium, a suíte pode usar `CHROMIUM_EXECUTABLE`
@@ -189,6 +203,7 @@ catálogo, `templates/`/`static/` apresentam a interface, `tests/` verifica jorn
 
 | Documento | Conteúdo |
 | --- | --- |
+| [CODE-CLEANUP-AUDIT](docs/CODE-CLEANUP-AUDIT.md) | Inventário, remoções justificadas, comparação e validação da consolidação Python |
 | [MIGRATION-AUDIT](docs/MIGRATION-AUDIT.md) | Diagnóstico, evidências, validações e limites |
 | [PYTHON-MIGRATION](docs/PYTHON-MIGRATION.md) | Estratégia, contratos, migração de dados e recuperação |
 | [ARCHITECTURE](docs/ARCHITECTURE.md) | Organização e responsabilidades |
@@ -199,12 +214,18 @@ catálogo, `templates/`/`static/` apresentam a interface, `tests/` verifica jorn
 | [WINDOWS-VSCODE](docs/WINDOWS-VSCODE.md) | Instalação e execução Python no Windows/VS Code |
 | [MVP-SCOPE](docs/MVP-SCOPE.md), [USER-FLOWS](docs/USER-FLOWS.md), [IA-BEHAVIOR](docs/IA-BEHAVIOR.md) | Decisões acadêmicas, jornadas e comportamento pedagógico |
 | [Design](design/DESIGN-SYSTEM.md) | Identidade e especificações visuais preservadas |
-| [README legado](docs/legacy/README.md) | Execução anterior React/Express, preservada para comparação; [localização dos links históricos](docs/legacy/INDEX.md) |
+| [README histórico na tag](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/README.md) | Execução anterior React/Express, recuperável no contexto original |
 
-O original continua em `apps/`, `packages/` e `e2e/`, com lockfile npm próprio.
-A tag `python-migration-baseline-067fd06` identifica o ponto de restauração; a
-branch `codex/python-flask-migration` recebe commits incrementais para revisão.
-Não há merge automático da `main`.
+A migração [PR #4](https://github.com/Helio965/language-tool/pull/4) e as auditorias
+[PR #5](https://github.com/Helio965/language-tool/pull/5) e
+[PR #6](https://github.com/Helio965/language-tool/pull/6) foram incorporadas à `main`.
+A consolidação remove as implementações anteriores `apps/`, `packages/`, `e2e/`
+e seus manifests Node. O código e os documentos originais continuam recuperáveis
+na [tag `python-migration-baseline-067fd06`](https://github.com/Helio965/language-tool/tree/python-migration-baseline-067fd06).
+A tag `python-cleanup-baseline-9a2d11b` preserva também o estado imediatamente
+anterior à limpeza. O procedimento de consulta/checkout isolado está em
+[PYTHON-MIGRATION.md](docs/PYTHON-MIGRATION.md). Esta entrega usa PR próprio para
+revisão, sem merge automático.
 
 Lacunas mantidas do MVP: lembretes salvos sem envio, sem voz/pronúncia automática,
 administração, arquivo Figma ou certificação. Privacidade é texto informativo;

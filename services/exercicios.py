@@ -6,7 +6,7 @@ import re
 import unicodedata
 from sqlalchemy import select
 from extensions import db
-from models import ExerciseAttempt, LearningProfile
+from models import ExerciseAttempt
 from services.common import AppError, iso, learner_bundle, new_id, now_iso
 from content import catalog
 

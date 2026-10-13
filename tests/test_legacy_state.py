@@ -11,7 +11,6 @@ from app import create_app
 from extensions import db
 from models import Conversation, LearningProfile, Message, Preferences, User
 from services import autenticacao, conversacao, perfil, progresso
-from services.common import iso
 
 
 def register(client):
@@ -91,7 +90,9 @@ def test_imported_account_missing_children_logs_in_and_keeps_existing_values(
     timestamp = "2025-01-01T00:00:00.000Z"
     with sqlite3.connect(path) as connection:
         connection.executescript(
-            (Path(__file__).parents[1] / "apps/api/src/db/schema.sql").read_text()
+            (
+                Path(__file__).parents[1] / "tests/fixtures/legacy-node-schema.sql"
+            ).read_text()
         )
         connection.execute(
             "INSERT INTO users(id,name,email,password_hash,created_at,terms_accepted_at) VALUES(?,?,?,?,?,?)",

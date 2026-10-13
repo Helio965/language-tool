@@ -9,7 +9,6 @@ from extensions import db
 from models import (
     Conversation,
     ExerciseAttempt,
-    LearningProfile,
     Progress,
     Review,
     UserVocabulary,

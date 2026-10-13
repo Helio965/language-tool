@@ -12,6 +12,7 @@ import {
   button,
   action,
   showError,
+  clearError,
   busy,
   correction,
   progress,
@@ -74,6 +75,7 @@ function runner(exercises, answeredIds, answer, finish, finishLabel) {
       const value = String(form.elements.answer.value).trim();
       if (!value || pending || feedback) return;
       pending = true;
+      clearError("#exercise-error");
       if (attemptAnswer !== value) {
         key = crypto.randomUUID();
         attemptAnswer = value;

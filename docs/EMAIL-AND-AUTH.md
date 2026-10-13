@@ -1,7 +1,7 @@
 # Autenticação, recuperação e e-mail — Python
 
 Origem: RF01–RF03, RF20, RNF04/RNF05, RN07 e UC01–UC03/UC12.
-[O documento TypeScript está preservado](legacy/EMAIL-AND-AUTH.md).
+[O documento TypeScript está preservado](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/docs/EMAIL-AND-AUTH.md).
 Implementação atual: `services/autenticacao.py`, `services/perfil.py`,
 `services/email.py`, `blueprints/auth.py` e `models/usuario.py`.
 
@@ -48,12 +48,16 @@ A mudança de identidade limpa a sessão anterior; o cliente precisa renovar CSR
 | --- | --- |
 | Requisições gerais | 200 por minuto/IP |
 | Grupo autenticação | 20 por 15 minutos/IP |
-| Pedido de recuperação | 10 por 15 minutos/IP |
+| Pedido, verificação e confirmação de recuperação | 10 por 15 minutos/IP, contador compartilhado entre os três endpoints |
 | Nova mensagem da mesma conta | intervalos/limites do serviço de IA e Blueprint |
 | Novo link de redefinição | intervalo mínimo de 60 segundos por conta |
 
-O armazenamento padrão do limitador é memória; limites entre múltiplas
-instâncias exigem armazenamento compartilhado configurado e dependência própria.
+O armazenamento padrão do limitador é memória para desenvolvimento; limites
+entre múltiplas instâncias exigem armazenamento compartilhado configurado.
+O driver Redis já pertence às dependências Python, e produção com Anthropic
+exige Redis compartilhado sem fallback local. Logs locais Werkzeug ocultam o
+token na URL e as queries; páginas de conta/recuperação usam `no-referrer`.
+Logs de proxy/WSGI externos exigem configuração e validação próprias.
 
 ## Recuperação e redefinição
 

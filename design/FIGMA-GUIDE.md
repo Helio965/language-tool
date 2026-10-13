@@ -18,7 +18,7 @@ Este guia descreve tokens atuais e variantes de design propostas. Os nomes
 visuais podem ser mantidos no Figma; a implementação correspondente usa macros
 Jinja, templates e funções JavaScript, conforme
 [COMPONENTS.md](./COMPONENTS.md). A versão acadêmica anterior está preservada em
-[docs/legacy/design/FIGMA-GUIDE.md](../docs/legacy/design/FIGMA-GUIDE.md).
+[design/FIGMA-GUIDE.md (histórico)](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/design/FIGMA-GUIDE.md).
 
 ---
 
@@ -36,7 +36,7 @@ Jinja, templates e funções JavaScript, conforme
 | `🗂️ Referências` | as capturas de `design/screenshots`, travadas, para comparar |
 
 Nomes de frames: `<largura>/<nº>-<tela>/<estado>`, por exemplo `390/09-aula/feedback-incorreto`, seguindo a
-numeração da [especificação acadêmica preservada](../docs/legacy/design/SCREEN-SPECIFICATIONS.md).
+numeração da [especificação acadêmica preservada](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/design/SCREEN-SPECIFICATIONS.md).
 Para os arquivos e rotas atuais, use [SCREEN-SPECIFICATIONS.md](./SCREEN-SPECIFICATIONS.md).
 
 ## 2. Variáveis (Figma Variables)

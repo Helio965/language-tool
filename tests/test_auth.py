@@ -3,7 +3,7 @@
 import base64
 import hashlib
 import re
-from datetime import datetime, timezone
+from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier
 import pytest

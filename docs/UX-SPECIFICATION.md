@@ -3,7 +3,7 @@
 > **Transição para Python:** os requisitos e as decisões acadêmicas deste documento
 > foram preservados. As tabelas expressam padrões de UX e metas; sua presença não
 > significa auditoria completa de acessibilidade. A implementação atual roda com Flask/Jinja na raiz; a versão
-> anterior e seus detalhes de framework estão em [legacy/UX-SPECIFICATION.md](legacy/UX-SPECIFICATION.md).
+> anterior e seus detalhes de framework estão em [docs/UX-SPECIFICATION.md (histórico)](https://github.com/Helio965/language-tool/blob/python-migration-baseline-067fd06/docs/UX-SPECIFICATION.md).
 > Evidências da nova execução ficam em [MIGRATION-AUDIT.md](MIGRATION-AUDIT.md),
 > não nas contagens/capturas históricas do protótipo TypeScript.
 
